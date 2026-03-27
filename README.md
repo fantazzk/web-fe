@@ -1,42 +1,41 @@
-# sv
+# Fantazzk
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+치지직 대회 모의 드래프트/경매 통합 플랫폼.
 
-## Creating a project
+대회 템플릿을 만들고, 혼자(AI 상대) 또는 친구들과(링크 공유) 모의 경매/드래프트를 진행할 수 있다.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## 기술 스택
 
-```sh
-# create a new project
-npx sv create my-app
+| 항목            | 기술                 |
+| --------------- | -------------------- |
+| Framework       | SvelteKit (Svelte 5) |
+| Package Manager | pnpm                 |
+| Styling         | Tailwind CSS v4      |
+| Deploy          | Vercel               |
+| Language        | TypeScript (strict)  |
+
+## 시작하기
+
+```bash
+pnpm install
+pnpm dev
 ```
 
-To recreate this project with the same configuration:
+## 스크립트
 
-```sh
-# recreate this project
-pnpm dlx sv@0.13.0 create --template minimal --types ts --add eslint prettier tailwindcss="plugins:none" sveltekit-adapter="adapter:vercel" --install pnpm .
+```bash
+pnpm dev        # 개발 서버
+pnpm build      # 프로덕션 빌드
+pnpm preview    # 빌드 미리보기
+pnpm check      # 타입 검사
+pnpm lint       # 린트
+pnpm format     # 코드 포맷
 ```
 
-## Developing
+## 주요 기능
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- **규칙 엔진** — 경매/드래프트를 설정값만으로 전환 가능한 모듈형 엔진
+- **대회 템플릿** — 누구나 선수풀과 규칙을 만들어 공유
+- **솔로 모드** — AI 상대와 혼자서 시뮬레이션
+- **멀티플레이어** — 링크 하나로 실시간 경매/드래프트
+- **결과 공유 카드** — 이미지 카드 자동 생성, 커뮤니티 바이럴
