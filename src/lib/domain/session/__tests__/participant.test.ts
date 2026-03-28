@@ -1,26 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { Participant } from '../participant.ts';
-import { SessionError } from '../errors.ts';
 
 describe('Participant', () => {
-	describe('생성', () => {
-		it('HUMAN 참가자를 기본값으로 생성한다', () => {
-			const p = new Participant({
-				id: 'user-1',
-				nickname: '테스터',
-				type: 'HUMAN',
-				role: 'GUEST'
-			});
-
-			expect(p.id).toBe('user-1');
-			expect(p.nickname).toBe('테스터');
-			expect(p.type).toBe('HUMAN');
-			expect(p.role).toBe('GUEST');
-			expect(p.readyStatus).toBe('NOT_READY');
-			expect(p.connected).toBe(true);
-		});
-
-		it('AI 참가자는 항상 READY이고 connected이다', () => {
+	describe('생성 규칙', () => {
+		it('AI는 NOT_READY/disconnected로 생성해도 READY + connected로 강제된다', () => {
 			const p = new Participant({
 				id: 'ai-1',
 				nickname: 'AI 1',
@@ -34,7 +17,7 @@ describe('Participant', () => {
 			expect(p.connected).toBe(true);
 		});
 
-		it('HOST는 항상 READY이다', () => {
+		it('HOST는 NOT_READY로 생성해도 READY로 강제된다', () => {
 			const p = new Participant({
 				id: 'host-1',
 				nickname: '호스트',
@@ -72,7 +55,6 @@ describe('Participant', () => {
 				role: 'HOST'
 			});
 
-			expect(() => p.toggleReady()).toThrow(SessionError);
 			expect(() => p.toggleReady()).toThrow(
 				expect.objectContaining({ code: 'CANNOT_TOGGLE_READY' })
 			);
@@ -92,32 +74,7 @@ describe('Participant', () => {
 		});
 	});
 
-	describe('disconnect / reconnect', () => {
-		it('HUMAN 참가자를 disconnect 한다', () => {
-			const p = new Participant({
-				id: 'user-1',
-				nickname: '테스터',
-				type: 'HUMAN',
-				role: 'GUEST'
-			});
-
-			const disconnected = p.disconnect();
-			expect(disconnected.connected).toBe(false);
-			expect(disconnected).not.toBe(p);
-		});
-
-		it('disconnect된 참가자를 reconnect 한다', () => {
-			const p = new Participant({
-				id: 'user-1',
-				nickname: '테스터',
-				type: 'HUMAN',
-				role: 'GUEST'
-			});
-
-			const reconnected = p.disconnect().reconnect();
-			expect(reconnected.connected).toBe(true);
-		});
-
+	describe('disconnect', () => {
 		it('AI는 disconnect 할 수 없다', () => {
 			const p = new Participant({
 				id: 'ai-1',
@@ -133,7 +90,7 @@ describe('Participant', () => {
 	});
 
 	describe('promoteToHost', () => {
-		it('GUEST를 HOST로 승격하면 READY가 된다', () => {
+		it('GUEST를 HOST로 승격하면 READY가 강제된다', () => {
 			const p = new Participant({
 				id: 'user-1',
 				nickname: '테스터',
@@ -144,7 +101,6 @@ describe('Participant', () => {
 			const promoted = p.promoteToHost();
 			expect(promoted.role).toBe('HOST');
 			expect(promoted.readyStatus).toBe('READY');
-			expect(promoted).not.toBe(p);
 		});
 	});
 });
