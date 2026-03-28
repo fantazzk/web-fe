@@ -126,3 +126,51 @@ describe('다음 선수 진행', () => {
 		expect(() => auction.startNext()).toThrow();
 	});
 });
+
+describe('유찰', () => {
+	it('markUnsold()하면 UNSOLD가 되고 선수는 버려진다', () => {
+		const auction = Auction.create(createConfig());
+		const unsold = auction.markUnsold();
+		expect(unsold.phase).toBe('UNSOLD');
+		expect(unsold.currentPlayer).toBeNull();
+		expect(unsold.soldPlayers).toHaveLength(0);
+	});
+
+	it('유찰 후 startNext()로 다음 선수가 올라온다', () => {
+		const next = Auction.create(createConfig()).markUnsold().startNext();
+		expect(next.phase).toBe('BIDDING');
+		expect(next.currentPlayer?.name).toBe('선수B');
+	});
+});
+
+describe('경매 완료', () => {
+	it('모든 선수를 소진하면 COMPLETED가 된다', () => {
+		const config = createConfig({
+			playerPool: [{ name: '선수A', position: 'TOP' }]
+		});
+		const completed = Auction.create(config).placeBid('team-1', 10).settle().startNext();
+		expect(completed.phase).toBe('COMPLETED');
+		expect(completed.isCompleted).toBe(true);
+		expect(completed.currentPlayer).toBeNull();
+	});
+
+	it('COMPLETED 상태에서 placeBid는 NOT_BIDDING_PHASE', () => {
+		const config = createConfig({
+			playerPool: [{ name: '선수A', position: 'TOP' }]
+		});
+		const completed = Auction.create(config).placeBid('team-1', 10).settle().startNext();
+		expect(() => completed.placeBid('team-1', 10)).toThrow(
+			expect.objectContaining({ code: 'NOT_BIDDING_PHASE' })
+		);
+	});
+
+	it('COMPLETED 상태에서 startNext는 AUCTION_ALREADY_COMPLETED', () => {
+		const config = createConfig({
+			playerPool: [{ name: '선수A', position: 'TOP' }]
+		});
+		const completed = Auction.create(config).placeBid('team-1', 10).settle().startNext();
+		expect(() => completed.startNext()).toThrow(
+			expect.objectContaining({ code: 'AUCTION_ALREADY_COMPLETED' })
+		);
+	});
+});

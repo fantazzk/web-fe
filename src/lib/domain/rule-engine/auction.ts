@@ -130,6 +130,18 @@ export class Auction {
 		});
 	}
 
+	markUnsold(): Auction {
+		if (this.phase !== 'BIDDING') {
+			throw new AuctionError('NOT_BIDDING_PHASE');
+		}
+		return new Auction({
+			...this.toState(),
+			phase: 'UNSOLD',
+			currentPlayer: null,
+			currentBid: null
+		});
+	}
+
 	startNext(): Auction {
 		if (this.phase === 'COMPLETED') {
 			throw new AuctionError('AUCTION_ALREADY_COMPLETED');
