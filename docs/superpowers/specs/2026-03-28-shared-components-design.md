@@ -27,25 +27,87 @@ src/lib/components/
 
 ## 디자인 토큰 전략
 
-기존 `layout.css` `@theme` 블록의 CSS 변수를 Tailwind v4 arbitrary property 문법으로 직접 참조한다. 의미론적 별칭을 추가하지 않는다.
+Tailwind v4의 `@theme` 블록에서 `--color-*`로 정의한 변수는 자동으로 유틸리티 클래스를 생성한다. arbitrary property 문법(`text-[--color-*]`)을 사용하지 않고 네이티브 유틸리티 클래스를 활용한다.
 
-| 용도            | CSS 변수                      | Tailwind 클래스                                   |
-| --------------- | ----------------------------- | ------------------------------------------------- |
-| 금색 (accent)   | `--color-gold-500`            | `bg-[--color-gold-500]` `text-[--color-gold-500]` |
-| 밝은 금색       | `--color-gold-300`            | `text-[--color-gold-300]`                         |
-| 배경 (primary)  | `--color-bg-primary`          | `bg-[--color-bg-primary]`                         |
-| 배경 (elevated) | `--color-bg-elevated`         | `bg-[--color-bg-elevated]`                        |
-| 표면            | `--color-bg-surface`          | `bg-[--color-bg-surface]`                         |
-| 보더            | `--color-gray-700`            | `border-[--color-gray-700]`                       |
-| 텍스트 (밝음)   | `--color-gray-50`             | `text-[--color-gray-50]`                          |
-| 텍스트 (기본)   | `--color-gray-200`            | `text-[--color-gray-200]`                         |
-| 텍스트 (muted)  | `--color-gray-300`            | `text-[--color-gray-300]`                         |
-| 텍스트 (dim)    | `--color-gray-400`            | `text-[--color-gray-400]`                         |
-| 라운드          | `--radius-sm` / `--radius-md` | `rounded-[--radius-sm]`                           |
-| 디스플레이 폰트 | `--font-display`              | `font-[--font-display]`                           |
-| 헤딩 폰트       | `--font-heading`              | `font-[--font-heading]`                           |
-| 본문 폰트       | `--font-body`                 | `font-[--font-body]`                              |
-| 모노 폰트       | `--font-mono`                 | `font-[--font-mono]`                              |
+### 추가할 의미론적 별칭 (`layout.css` @theme)
+
+```css
+/* 액센트 (테마별 오버라이드 대상) */
+--color-accent: #c9a962;
+--color-accent-light: #ffd166;
+--color-accent-20: #c9a96220;
+
+/* 텍스트 의미론적 */
+--color-muted: var(--color-gray-300);
+--color-subtle: var(--color-gray-400);
+--color-dim: var(--color-gray-600);
+```
+
+### 테마 시스템
+
+`<html data-theme="gold">` 속성으로 테마를 전환한다. `@theme`에 등록된 `--color-accent*` 변수를 `[data-theme]` 셀렉터에서 오버라이드하면, `text-accent`, `bg-accent` 등의 유틸리티가 자동으로 새 색상을 반영한다.
+
+```css
+/* layout.css — @theme 아래에 추가 */
+
+[data-theme='pink'] {
+	--color-accent: #ec4899;
+	--color-accent-light: #f9a8d4;
+	--color-accent-20: #ec489920;
+}
+
+[data-theme='cyan'] {
+	--color-accent: #06b6d4;
+	--color-accent-light: #67e8f9;
+	--color-accent-20: #06b6d420;
+}
+
+[data-theme='magenta'] {
+	--color-accent: #d946ef;
+	--color-accent-light: #e879f9;
+	--color-accent-20: #d946ef20;
+}
+
+[data-theme='orange'] {
+	--color-accent: #f97316;
+	--color-accent-light: #fdba74;
+	--color-accent-20: #f9731620;
+}
+```
+
+| 테마        | accent    | accent-light | accent-20   |
+| ----------- | --------- | ------------ | ----------- |
+| gold (기본) | `#c9a962` | `#ffd166`    | `#c9a96220` |
+| pink        | `#ec4899` | `#f9a8d4`    | `#ec489920` |
+| cyan        | `#06b6d4` | `#67e8f9`    | `#06b6d420` |
+| magenta     | `#d946ef` | `#e879f9`    | `#d946ef20` |
+| orange      | `#f97316` | `#fdba74`    | `#f9731620` |
+
+**전환 방법**: `document.documentElement.dataset.theme = 'pink'`
+
+**컴포넌트 영향 없음**: 모든 컴포넌트가 `text-accent`, `bg-accent`, `border-accent` 등 의미론적 클래스를 사용하므로 테마 전환 시 코드 변경 불필요.
+
+### 토큰 매핑 테이블
+
+| 용도            | CSS 변수 (`@theme`)    | Tailwind 유틸리티 클래스                  |
+| --------------- | ---------------------- | ----------------------------------------- |
+| 액센트          | `--color-accent`       | `text-accent` `bg-accent` `border-accent` |
+| 액센트 (밝은)   | `--color-accent-light` | `text-accent-light`                       |
+| 액센트 (20%)    | `--color-accent-20`    | `bg-accent-20`                            |
+| muted 텍스트    | `--color-muted`        | `text-muted`                              |
+| subtle 텍스트   | `--color-subtle`       | `text-subtle`                             |
+| dim 텍스트      | `--color-dim`          | `text-dim`                                |
+| 배경 (primary)  | `--color-bg-primary`   | `bg-bg-primary`                           |
+| 배경 (elevated) | `--color-bg-elevated`  | `bg-bg-elevated`                          |
+| 표면            | `--color-bg-surface`   | `bg-bg-surface`                           |
+| 흰색 텍스트     | `--color-gray-50`      | `text-gray-50`                            |
+| 기본 텍스트     | `--color-gray-200`     | `text-gray-200`                           |
+| 보더            | `--color-gray-700`     | `border-gray-700`                         |
+| 라운드          | `--radius-sm/md/lg`    | `rounded-sm` `rounded-md` `rounded-lg`    |
+| 디스플레이 폰트 | `--font-display`       | `font-display`                            |
+| 헤딩 폰트       | `--font-heading`       | `font-heading`                            |
+| 본문 폰트       | `--font-body`          | `font-body`                               |
+| 모노 폰트       | `--font-mono`          | `font-mono`                               |
 
 ## 컴포넌트 상세
 
@@ -67,10 +129,10 @@ src/lib/components/
 
 **스타일 규칙:**
 
-- 공통: `font-[--font-mono] text-xs font-semibold tracking-wider inline-flex items-center justify-center`
-- PRIMARY: `bg-[--color-gold-500] text-[--color-bg-primary]`
-- SECONDARY: `border border-[--color-gray-700] text-[--color-gray-50]`
-- GHOST: `text-[--color-gray-300]`
+- 공통: `font-mono text-xs font-semibold tracking-wider inline-flex items-center justify-center`
+- PRIMARY: `bg-accent text-bg-primary`
+- SECONDARY: `border border-gray-700 text-gray-50`
+- GHOST: `text-muted`
 
 ### 2. Badge
 
@@ -87,8 +149,8 @@ src/lib/components/
 
 **스타일 규칙:**
 
-- STATUS: `bg-[--color-gold-500] text-[--color-bg-primary] py-1 px-3 font-[--font-mono] text-[10px] font-semibold tracking-wider`
-- INFO: `text-[--color-gray-300] font-[--font-mono] text-[11px] font-semibold tracking-wider`
+- STATUS: `bg-accent text-bg-primary py-1 px-3 font-mono text-[10px] font-semibold tracking-wider`
+- INFO: `text-muted font-mono text-[11px] font-semibold tracking-wider`
 
 ### 3. IconButton
 
@@ -108,8 +170,8 @@ src/lib/components/
 
 **스타일 규칙:**
 
-- 컨테이너: `{size}x{size}px`, `rounded-[--radius-sm]`, flex center
-- active: `bg-[--color-bg-primary]/[0.08]`
+- 컨테이너: `{size}x{size}px`, `rounded-sm`, flex center
+- active: `bg-bg-primary/8`
 - inactive: transparent
 - 아이콘: `{iconSize}x{iconSize}px`, 색상은 CSS `currentColor` 상속
 
@@ -132,8 +194,8 @@ src/lib/components/
 **스타일 규칙:**
 
 - 컨테이너: `flex justify-between items-center w-full`
-- title: `font-[--font-heading] text-2xl font-semibold tracking-wider text-[--color-gray-50]`
-- action: `font-[--font-mono] text-xs font-semibold tracking-wider text-[--color-gold-500]`
+- title: `font-heading text-2xl font-semibold tracking-wider text-gray-50`
+- action: `font-mono text-xs font-semibold tracking-wider text-accent`
 
 ### 5. PlayerCard
 
@@ -153,11 +215,11 @@ src/lib/components/
 **스타일 규칙:**
 
 - 컨테이너: `flex flex-col items-center justify-center gap-1.5 p-3 border`
-- selected: `border-[--color-gold-500]`, position `text-[--color-gold-500]`
-- default: `border-[--color-gray-700]`, position `text-[--color-gray-300]`
-- position: `font-[--font-mono] text-[10px] font-semibold tracking-wider`
-- name: `font-[--font-heading] text-sm font-semibold text-[--color-gray-50]`
-- team: `font-[--font-mono] text-[10px] text-[--color-gray-300]`
+- selected: `border-accent`, position `text-accent`
+- default: `border-gray-700`, position `text-muted`
+- position: `font-mono text-[10px] font-semibold tracking-wider`
+- name: `font-heading text-sm font-semibold text-gray-50`
+- team: `font-mono text-[10px] text-muted`
 
 ### 6. TemplateCard
 
@@ -179,10 +241,10 @@ src/lib/components/
 
 **스타일 규칙:**
 
-- 컨테이너: `flex flex-col gap-3 p-5 border border-[--color-gray-700]`
+- 컨테이너: `flex flex-col gap-3 p-5 border border-gray-700`
 - 상단: tag(Badge INFO 변형) + 우측 액션
-- name: `font-[--font-heading] text-base font-semibold text-[--color-gray-50]`
-- stats: `font-[--font-mono] text-[11px] font-semibold tracking-wider text-[--color-gray-300]` gap-4
+- name: `font-heading text-base font-semibold text-gray-50`
+- stats: `font-mono text-[11px] font-semibold tracking-wider text-muted` gap-4
 
 ### 7. ResultListItem
 
@@ -200,9 +262,9 @@ src/lib/components/
 
 **스타일 규칙:**
 
-- 컨테이너: `flex items-center justify-between px-4 py-3 border border-[--color-gray-700]`
+- 컨테이너: `flex items-center justify-between px-4 py-3 border border-gray-700`
 - 좌측: 유저 아바타(placeholder) + userName + templateName, gap-3
-- 우측: `font-[--font-mono] text-[11px] text-[--color-gray-400]`
+- 우측: `font-mono text-[11px] text-subtle`
 
 ### 8. FormField
 
@@ -221,7 +283,7 @@ src/lib/components/
 **스타일 규칙:**
 
 - 컨테이너: `flex flex-col gap-2`
-- label: `font-[--font-mono] text-xs font-bold tracking-wider text-[--color-gray-50]`
+- label: `font-mono text-xs font-bold tracking-wider text-gray-50`
 - 자식(slot): 입력 요소를 slot으로 받음
 
 ## import 경계 준수
@@ -232,6 +294,7 @@ src/lib/components/
 
 ## 구현 순서
 
+0. layout.css @theme에 의미론적 별칭 추가 (accent/accent-light/accent-20, muted, subtle, dim) + 테마 셀렉터 (pink, cyan, magenta, orange)
 1. Button, Badge (가장 기본, 다른 컴포넌트에서 재사용)
 2. IconButton, SectionHeader
 3. PlayerCard, TemplateCard, ResultListItem
