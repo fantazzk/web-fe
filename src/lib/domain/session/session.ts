@@ -1,6 +1,8 @@
-import type { SessionMode, SessionStatus } from './types.ts';
+import type { SessionMode, SessionStatus, SoloConfig, MultiConfig } from './types.ts';
 import { SessionError } from './errors.ts';
 import { Participant } from './participant.ts';
+
+export type { SoloConfig, MultiConfig };
 
 interface SessionState {
 	readonly id: string;
@@ -11,24 +13,6 @@ interface SessionState {
 	readonly participants: readonly Participant[];
 	readonly maxParticipants: number;
 	readonly createdAt: Date;
-}
-
-export interface SoloConfig {
-	readonly sessionId: string;
-	readonly mode: SessionMode;
-	readonly templateId: string;
-	readonly hostId: string;
-	readonly hostNickname: string;
-	readonly aiCount: number;
-}
-
-export interface MultiConfig {
-	readonly sessionId: string;
-	readonly mode: SessionMode;
-	readonly templateId: string;
-	readonly hostId: string;
-	readonly hostNickname: string;
-	readonly maxParticipants: number;
 }
 
 export class Session {
