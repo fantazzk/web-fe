@@ -14,6 +14,11 @@
 	--color-gold-500-20: #c9a96220;
 	--color-gold-300: #ffd166;
 
+	/* Accent (themeable) */
+	--color-accent: #c9a962;
+	--color-accent-light: #ffd166;
+	--color-accent-20: #c9a96220;
+
 	/* Gray */
 	--color-gray-900: #141414;
 	--color-gray-800: #2a2a2a;
@@ -25,7 +30,12 @@
 	--color-gray-200: #e0e0e0;
 	--color-gray-50: #ffffff;
 
-	/* Semantic */
+	/* Semantic (text) */
+	--color-muted: #777777;
+	--color-subtle: #666666;
+	--color-dim: #444444;
+
+	/* Semantic (status) */
 	--color-success: #16a34a;
 	--color-error: #cc3333;
 	--color-warning: #ea580c;
@@ -41,6 +51,32 @@
 	--radius-sm: 8px;
 	--radius-md: 12px;
 	--radius-lg: 14px;
+}
+
+/* ─── Themes ─── */
+
+[data-theme='pink'] {
+	--color-accent: #ec4899;
+	--color-accent-light: #f9a8d4;
+	--color-accent-20: #ec489920;
+}
+
+[data-theme='cyan'] {
+	--color-accent: #06b6d4;
+	--color-accent-light: #67e8f9;
+	--color-accent-20: #06b6d420;
+}
+
+[data-theme='magenta'] {
+	--color-accent: #d946ef;
+	--color-accent-light: #e879f9;
+	--color-accent-20: #d946ef20;
+}
+
+[data-theme='orange'] {
+	--color-accent: #f97316;
+	--color-accent-light: #fdba74;
+	--color-accent-20: #f9731620;
 }
 
 /* ─── Global Styles ─── */
