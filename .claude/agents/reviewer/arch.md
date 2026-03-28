@@ -9,7 +9,7 @@
 src/lib/
 ├── domain/        # 순수 비즈니스 로직 (UI 무관, 서버/클라이언트 공유)
 │   ├── rule-engine/   # 경매/드래프트 규칙 검증, 상태 전이
-│   ├── session/       # 세션 상태 머신
+│   ├── session/       # 세션(방) 생명주기 및 참가자 관리
 │   ├── ai/            # 솔로 모드 AI 로직
 │   └── template/      # 템플릿 스키마, 검증
 ├── server/        # 서버 전용 (DB, Supabase, API 로직)
