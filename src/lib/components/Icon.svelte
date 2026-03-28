@@ -6,7 +6,8 @@
 		| 'users'
 		| 'settings'
 		| 'palette'
-		| 'droplet';
+		| 'droplet'
+		| 'close';
 
 	interface Props {
 		name: IconName;
@@ -70,5 +71,8 @@
 		<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
 		<path d="M12 13v3" />
 		<path d="M10 15h4" />
+	{:else if name === 'close'}
+		<path d="M18 6 6 18" />
+		<path d="m6 6 12 12" />
 	{/if}
 </svg>

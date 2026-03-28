@@ -6,31 +6,9 @@
 		Badge,
 		SectionHeader,
 		TemplateCard,
-		ResultListItem
+		ResultListItem,
+		ThemePicker
 	} from '$lib/components';
-
-	const themes = [
-		{ name: 'gold', color: '#c9a962' },
-		{ name: 'pink', color: '#ec4899' },
-		{ name: 'cyan', color: '#06b6d4' },
-		{ name: 'magenta', color: '#d946ef' },
-		{ name: 'orange', color: '#f97316' }
-	] as const;
-
-	let currentTheme = $state('gold');
-	let pickerOpen = $state(false);
-
-	function selectTheme(name: string) {
-		currentTheme = name;
-		document.documentElement.dataset['theme'] = name;
-		pickerOpen = false;
-	}
-
-	function handleClickOutside(e: MouseEvent) {
-		if (pickerOpen && !(e.target as Element).closest('.relative')) {
-			pickerOpen = false;
-		}
-	}
 
 	const templates = [
 		{
@@ -79,12 +57,7 @@
 	<title>Fantazzk</title>
 </svelte:head>
 
-<div
-	class="flex h-screen bg-bg-primary"
-	onclick={handleClickOutside}
-	onkeydown={() => {}}
-	role="presentation"
->
+<div class="flex h-screen bg-bg-primary">
 	<!-- Sidebar -->
 	<Sidebar logo="CD">
 		{#snippet nav()}
@@ -106,37 +79,7 @@
 			</button>
 		{/snippet}
 		{#snippet footer()}
-			<div class="relative">
-				<button
-					class="flex h-12 w-12 items-center justify-center"
-					aria-label="테마 변경"
-					aria-expanded={pickerOpen}
-					onclick={() => (pickerOpen = !pickerOpen)}
-				>
-					<Icon name="palette" color="#0A0A0A" />
-				</button>
-				{#if pickerOpen}
-					<div
-						class="absolute bottom-0 left-16 flex gap-2 rounded-md border border-gray-700 bg-bg-elevated p-3 shadow-lg"
-						role="radiogroup"
-						aria-label="테마 선택"
-					>
-						{#each themes as t, i (i)}
-							<button
-								class="h-7 w-7 rounded-full border-2 transition-transform hover:scale-110 {currentTheme ===
-								t.name
-									? 'scale-110 border-gray-50'
-									: 'border-transparent'}"
-								style:background-color={t.color}
-								aria-label="{t.name} 테마"
-								role="radio"
-								aria-checked={currentTheme === t.name}
-								onclick={() => selectTheme(t.name)}
-							></button>
-						{/each}
-					</div>
-				{/if}
-			</div>
+			<ThemePicker />
 		{/snippet}
 	</Sidebar>
 
