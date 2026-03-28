@@ -174,3 +174,51 @@ describe('경매 완료', () => {
 		);
 	});
 });
+
+describe('복합 시나리오', () => {
+	it('여러 라운드 진행 후 포지션 제한에 걸린다', () => {
+		const config = createConfig({
+			positionLimit: 1,
+			totalPoints: 100,
+			minBidUnit: 5,
+			playerPool: [
+				{ name: '선수A', position: 'TOP' },
+				{ name: '선수B', position: 'MID' },
+				{ name: '선수C', position: 'TOP' }
+			]
+		});
+
+		// 라운드 1: team-1이 선수A(TOP) 낙찰
+		const round1 = Auction.create(config).placeBid('team-1', 10).settle().startNext();
+
+		// 라운드 2: 선수B(MID) — team-2 낙찰
+		const round2 = round1.placeBid('team-2', 15).settle().startNext();
+
+		// 라운드 3: 선수C(TOP) — team-1은 이미 TOP 보유 → 입찰 불가
+		expect(round2.currentPlayer?.position).toBe('TOP');
+		expect(() => round2.placeBid('team-1', 10)).toThrow(
+			expect.objectContaining({ code: 'POSITION_LIMIT_REACHED' })
+		);
+
+		// team-2는 TOP 없으므로 입찰 가능
+		const final = round2.placeBid('team-2', 10).settle().startNext();
+		expect(final.phase).toBe('COMPLETED');
+	});
+
+	it('모든 포인트를 사용한 팀은 입찰할 수 없다', () => {
+		const config = createConfig({
+			totalPoints: 10,
+			minBidUnit: 5,
+			playerPool: [
+				{ name: '선수A', position: 'TOP' },
+				{ name: '선수B', position: 'MID' }
+			]
+		});
+
+		const round2 = Auction.create(config).placeBid('team-1', 10).settle().startNext();
+
+		expect(() => round2.placeBid('team-1', 5)).toThrow(
+			expect.objectContaining({ code: 'INSUFFICIENT_POINTS' })
+		);
+	});
+});
