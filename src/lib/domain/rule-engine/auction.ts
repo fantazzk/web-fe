@@ -68,6 +68,41 @@ export class Auction {
 		});
 	}
 
+	placeBid(teamId: string, amount: number): Auction {
+		if (this.phase !== 'BIDDING') {
+			throw new AuctionError('NOT_BIDDING_PHASE');
+		}
+		if (!this.currentPlayer) {
+			throw new AuctionError('NO_CURRENT_PLAYER');
+		}
+		const team = this.findTeam(teamId);
+
+		if (amount % this.config.minBidUnit !== 0) {
+			throw new AuctionError('BID_INVALID_UNIT');
+		}
+		if (amount > team.remainingPoints) {
+			throw new AuctionError('INSUFFICIENT_POINTS');
+		}
+		if (this.currentBid !== null && amount <= this.currentBid.amount) {
+			throw new AuctionError('BID_TOO_LOW');
+		}
+		if (this.currentBid === null && amount <= 0) {
+			throw new AuctionError('BID_TOO_LOW');
+		}
+
+		const positionCount = team.roster.filter(
+			(p) => p.position === this.currentPlayer!.position
+		).length;
+		if (positionCount >= this.config.positionLimit) {
+			throw new AuctionError('POSITION_LIMIT_REACHED');
+		}
+
+		return new Auction({
+			...this.toState(),
+			currentBid: { teamId, amount }
+		});
+	}
+
 	private toState(): AuctionState {
 		return {
 			config: this.config,

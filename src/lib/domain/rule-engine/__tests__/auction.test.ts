@@ -38,3 +38,53 @@ describe('경매 생성', () => {
 		expect(auction.remainingPool).toHaveLength(2);
 	});
 });
+
+describe('입찰', () => {
+	it('최고가를 초과하는 유효한 입찰이 반영된다', () => {
+		const auction = Auction.create(createConfig());
+		const afterBid = auction.placeBid('team-1', 10);
+		expect(afterBid.currentBid?.teamId).toBe('team-1');
+		expect(afterBid.currentBid?.amount).toBe(10);
+		expect(afterBid.phase).toBe('BIDDING');
+	});
+
+	it('기존 입찰보다 높은 금액으로 입찰하면 갱신된다', () => {
+		const auction = Auction.create(createConfig()).placeBid('team-1', 10);
+		const afterSecond = auction.placeBid('team-2', 15);
+		expect(afterSecond.currentBid?.teamId).toBe('team-2');
+		expect(afterSecond.currentBid?.amount).toBe(15);
+	});
+});
+
+describe('입찰 검증 - 금액', () => {
+	it('최고가 이하 금액이면 BID_TOO_LOW', () => {
+		const auction = Auction.create(createConfig()).placeBid('team-1', 10);
+		expect(() => auction.placeBid('team-2', 10)).toThrow(
+			expect.objectContaining({ code: 'BID_TOO_LOW' })
+		);
+		expect(() => auction.placeBid('team-2', 5)).toThrow(
+			expect.objectContaining({ code: 'BID_TOO_LOW' })
+		);
+	});
+
+	it('최소 단위에 맞지 않으면 BID_INVALID_UNIT', () => {
+		const auction = Auction.create(createConfig({ minBidUnit: 5 }));
+		expect(() => auction.placeBid('team-1', 7)).toThrow(
+			expect.objectContaining({ code: 'BID_INVALID_UNIT' })
+		);
+	});
+
+	it('잔여 포인트보다 높은 금액이면 INSUFFICIENT_POINTS', () => {
+		const auction = Auction.create(createConfig({ totalPoints: 10 }));
+		expect(() => auction.placeBid('team-1', 15)).toThrow(
+			expect.objectContaining({ code: 'INSUFFICIENT_POINTS' })
+		);
+	});
+
+	it('존재하지 않는 팀이면 TEAM_NOT_FOUND', () => {
+		const auction = Auction.create(createConfig());
+		expect(() => auction.placeBid('unknown-team', 10)).toThrow(
+			expect.objectContaining({ code: 'TEAM_NOT_FOUND' })
+		);
+	});
+});
