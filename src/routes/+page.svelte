@@ -1,6 +1,10 @@
+<!--
+  페이지: 홈 대시보드
+  설명: 인기 템플릿 탐색, 검색, "혼자 하기" / "방 만들기" 진입점.
+        커뮤니티가 만든 대회 템플릿을 탐색하고 선택하여 세션을 시작하는 랜딩 화면.
+-->
 <svelte:head>
 	<title>Fantazzk</title>
 </svelte:head>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<h1>홈 대시보드</h1>
