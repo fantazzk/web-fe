@@ -14,7 +14,6 @@
 	</h2>
 	{#if actionText}
 		{#if actionHref}
-			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href is passed from outside -->
 			<a href={actionHref} class="font-mono text-xs font-semibold tracking-wider text-accent">
 				{actionText}
 			</a>

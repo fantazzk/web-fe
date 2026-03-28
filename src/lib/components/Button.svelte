@@ -42,7 +42,6 @@
 </script>
 
 {#if href && !disabled}
-	<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href is passed from outside -->
 	<a {href} class={classes} {...rest}>
 		{@render children()}
 	</a>
