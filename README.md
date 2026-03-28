@@ -39,3 +39,16 @@ pnpm format     # 코드 포맷
 - **솔로 모드** — AI 상대와 혼자서 시뮬레이션
 - **멀티플레이어** — 링크 하나로 실시간 경매/드래프트
 - **결과 공유 카드** — 이미지 카드 자동 생성, 커뮤니티 바이럴
+
+## 페이지 경로
+
+배포 URL: https://fantazzk-rho.vercel.app/
+
+| 경로                                             | 설명                  |
+| ------------------------------------------------ | --------------------- |
+| https://fantazzk-rho.vercel.app/                 | 홈 (랜딩 페이지)      |
+| https://fantazzk-rho.vercel.app/templates/create | 템플릿 생성           |
+| https://fantazzk-rho.vercel.app/lobby/[id]       | 대기실 (방 입장/관리) |
+| https://fantazzk-rho.vercel.app/auction/[id]     | 경매 진행 화면        |
+| https://fantazzk-rho.vercel.app/draft/[id]       | 드래프트 진행 화면    |
+| https://fantazzk-rho.vercel.app/result/[id]      | 결과 화면             |
