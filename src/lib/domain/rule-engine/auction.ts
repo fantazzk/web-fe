@@ -103,6 +103,61 @@ export class Auction {
 		});
 	}
 
+	settle(): Auction {
+		if (this.phase !== 'BIDDING') {
+			throw new AuctionError('NOT_BIDDING_PHASE');
+		}
+		if (!this.currentPlayer || !this.currentBid) {
+			throw new AuctionError('NO_CURRENT_PLAYER');
+		}
+
+		const player = this.currentPlayer;
+		const bid = this.currentBid;
+
+		const updatedTeams = this.updateTeam(bid.teamId, (t) => ({
+			...t,
+			remainingPoints: t.remainingPoints - bid.amount,
+			roster: [...t.roster, { name: player.name, position: player.position }]
+		}));
+
+		return new Auction({
+			...this.toState(),
+			phase: 'SOLD',
+			currentPlayer: null,
+			currentBid: null,
+			teams: updatedTeams,
+			soldPlayers: [...this.soldPlayers, { player, bid }]
+		});
+	}
+
+	startNext(): Auction {
+		if (this.phase === 'COMPLETED') {
+			throw new AuctionError('AUCTION_ALREADY_COMPLETED');
+		}
+		if (this.phase !== 'SOLD' && this.phase !== 'UNSOLD') {
+			throw new AuctionError('NOT_BIDDING_PHASE');
+		}
+
+		const next = this.remainingPool[0];
+		if (!next) {
+			return new Auction({
+				...this.toState(),
+				phase: 'COMPLETED',
+				currentPlayer: null,
+				currentBid: null,
+				remainingPool: []
+			});
+		}
+
+		return new Auction({
+			...this.toState(),
+			phase: 'BIDDING',
+			currentPlayer: next,
+			currentBid: null,
+			remainingPool: this.remainingPool.slice(1)
+		});
+	}
+
 	private toState(): AuctionState {
 		return {
 			config: this.config,

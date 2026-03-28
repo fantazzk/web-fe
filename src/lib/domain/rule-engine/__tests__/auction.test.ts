@@ -88,3 +88,41 @@ describe('입찰 검증 - 금액', () => {
 		);
 	});
 });
+
+describe('낙찰', () => {
+	it('settle()하면 낙찰팀의 포인트가 차감되고 로스터에 선수가 추가된다', () => {
+		const auction = Auction.create(createConfig()).placeBid('team-1', 10);
+		const settled = auction.settle();
+		expect(settled.phase).toBe('SOLD');
+		const team1 = settled.teams.find((t) => t.id === 'team-1');
+		expect(team1?.remainingPoints).toBe(90);
+		expect(team1?.roster).toHaveLength(1);
+		expect(team1?.roster[0]?.name).toBe('선수A');
+	});
+
+	it('낙찰된 선수는 soldPlayers에 기록된다', () => {
+		const settled = Auction.create(createConfig()).placeBid('team-1', 10).settle();
+		expect(settled.soldPlayers).toHaveLength(1);
+		expect(settled.soldPlayers[0]?.player.name).toBe('선수A');
+		expect(settled.soldPlayers[0]?.bid.amount).toBe(10);
+	});
+
+	it('입찰 없이 settle()하면 에러', () => {
+		const auction = Auction.create(createConfig());
+		expect(() => auction.settle()).toThrow(expect.objectContaining({ code: 'NO_CURRENT_PLAYER' }));
+	});
+});
+
+describe('다음 선수 진행', () => {
+	it('startNext()하면 remainingPool에서 다음 선수가 올라온다', () => {
+		const next = Auction.create(createConfig()).placeBid('team-1', 10).settle().startNext();
+		expect(next.phase).toBe('BIDDING');
+		expect(next.currentPlayer?.name).toBe('선수B');
+		expect(next.remainingPool).toHaveLength(1);
+	});
+
+	it('BIDDING 상태에서 startNext()하면 에러', () => {
+		const auction = Auction.create(createConfig());
+		expect(() => auction.startNext()).toThrow();
+	});
+});
