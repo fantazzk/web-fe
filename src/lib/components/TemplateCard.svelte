@@ -1,18 +1,24 @@
 <script lang="ts">
-	import Badge from './Badge.svelte';
-
 	interface Props {
 		tag: string;
 		name: string;
+		number?: string;
 		stats: Array<{ label: string }>;
 	}
 
-	let { tag, name, stats }: Props = $props();
+	let { tag, name, number, stats }: Props = $props();
 </script>
 
 <div class="flex flex-col gap-3 border border-gray-700 p-5">
 	<div class="flex w-full items-center justify-between">
-		<Badge variant="INFO">{tag}</Badge>
+		<span
+			class="border border-accent px-3 py-1 font-mono text-[10px] font-semibold tracking-wider text-accent"
+		>
+			{tag}
+		</span>
+		{#if number}
+			<span class="font-mono text-base font-semibold text-dim">{number}</span>
+		{/if}
 	</div>
 	<span class="font-heading text-base font-semibold text-gray-50">
 		{name}
