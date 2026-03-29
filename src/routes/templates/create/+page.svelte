@@ -3,7 +3,11 @@
 </script>
 
 <svelte:head>
-	<title>템플릿 생성 | Fantazzk</title>
+	<title>템플릿 만들기 | FANTAZZK</title>
+	<meta
+		name="description"
+		content="나만의 경매/드래프트 템플릿을 만들어 보세요. 팀 수, 선수 풀, 포인트를 자유롭게 설정하세요."
+	/>
 </svelte:head>
 
 <div class="flex h-screen bg-bg-primary">

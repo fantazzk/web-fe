@@ -120,7 +120,8 @@
 </script>
 
 <svelte:head>
-	<title>드래프트방 | Fantazzk</title>
+	<title>드래프트 진행 중 | FANTAZZK</title>
+	<meta name="robots" content="noindex" />
 </svelte:head>
 
 <div class="flex h-screen flex-col bg-bg-primary">

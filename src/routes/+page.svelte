@@ -54,7 +54,16 @@
 </script>
 
 <svelte:head>
-	<title>Fantazzk</title>
+	<title>FANTAZZK — 자낳대, 치지직컵 모의경매 & 드래프트</title>
+	<meta
+		name="description"
+		content="자낳대 모의경매, 치지직 드래프트를 직접 체험하세요. 나만의 드림팀을 경매하고 결과를 공유하는 모의 드래프트 시뮬레이터."
+	/>
+	<meta property="og:title" content="FANTAZZK — 자낳대, 치지직컵 모의경매 & 드래프트" />
+	<meta
+		property="og:description"
+		content="자낳대 모의경매, 치지직 드래프트를 직접 체험하세요. 나만의 드림팀을 경매하고 결과를 공유하는 모의 드래프트 시뮬레이터."
+	/>
 </svelte:head>
 
 <div class="flex h-screen bg-bg-primary">
@@ -89,26 +98,15 @@
 		<section class="flex h-[260px] items-center gap-10 border border-gray-50 p-8">
 			<div class="flex flex-1 flex-col justify-center gap-4">
 				<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">
-					FEATURED TOURNAMENT
+					모의 드래프트 & 경매 시뮬레이터
 				</span>
-				<h1 class="font-heading text-4xl font-bold text-gray-50">Chzzk 챌린저스 시즌 3</h1>
+				<h1 class="font-heading text-4xl font-bold text-gray-50">나만의 드림팀, 직접 경매하세요</h1>
 				<p class="font-mono text-[13px] leading-relaxed text-muted">
-					최고의 스트리머들이 펼치는 리그 오브 레전드 토너먼트.<br />
-					나만의 드림팀을 구성하세요.
+					자낳대 모의경매부터 치지직 드래프트까지.<br />
+					좋아하는 스트리머로 팀을 짜고, 결과를 공유하세요.
 				</p>
-				<div class="flex gap-6">
-					<span class="font-mono text-[11px] font-semibold tracking-wider text-muted">
-						GAME: LOL
-					</span>
-					<span class="font-mono text-[11px] font-semibold tracking-wider text-muted">
-						TEAMS: 8
-					</span>
-					<span class="font-mono text-[11px] font-semibold tracking-wider text-muted">
-						USED: 1.2K
-					</span>
-				</div>
 				<div>
-					<Button variant="PRIMARY" size="MD">QUICK START</Button>
+					<Button variant="PRIMARY" size="MD">지금 시작하기</Button>
 				</div>
 			</div>
 			<div class="h-full w-[280px] rounded-sm bg-gray-800"></div>
