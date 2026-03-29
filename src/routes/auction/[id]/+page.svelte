@@ -30,7 +30,8 @@
 </script>
 
 <svelte:head>
-	<title>경매방 | Fantazzk</title>
+	<title>경매 진행 중 | FANTAZZK</title>
+	<meta name="robots" content="noindex" />
 </svelte:head>
 
 <div class="flex h-screen flex-col bg-bg-primary">

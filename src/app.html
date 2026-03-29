@@ -4,6 +4,23 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "WebApplication",
+				"name": "FANTAZZK",
+				"url": "https://fantazzk-rho.vercel.app",
+				"description": "치지직 대회 모의 드래프트/경매 시뮬레이터. 자낳대 모의경매, 치지직 드래프트를 체험하세요.",
+				"applicationCategory": "GameApplication",
+				"operatingSystem": "Web",
+				"offers": {
+					"@type": "Offer",
+					"price": "0",
+					"priceCurrency": "KRW"
+				},
+				"inLanguage": "ko"
+			}
+		</script>
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
