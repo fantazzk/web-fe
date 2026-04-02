@@ -46,7 +46,7 @@
 		{@render children()}
 	</a>
 {:else}
-	<button {disabled} class={classes} {...rest}>
+	<button type="button" {disabled} class={classes} {...rest}>
 		{@render children()}
 	</button>
 {/if}
