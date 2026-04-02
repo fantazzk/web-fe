@@ -7,7 +7,9 @@
 		| 'settings'
 		| 'palette'
 		| 'droplet'
-		| 'close';
+		| 'close'
+		| 'link'
+		| 'play';
 
 	interface Props {
 		name: IconName;
@@ -29,7 +31,7 @@
 	stroke-width="2"
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	aria-hidden={!label}
+	aria-hidden={label ? undefined : true}
 	role={label ? 'img' : undefined}
 	aria-label={label}
 >
@@ -74,5 +76,10 @@
 	{:else if name === 'close'}
 		<path d="M18 6 6 18" />
 		<path d="m6 6 12 12" />
+	{:else if name === 'link'}
+		<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+		<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+	{:else if name === 'play'}
+		<polygon points="5 3 19 12 5 21 5 3" />
 	{/if}
 </svg>
