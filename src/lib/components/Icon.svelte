@@ -31,7 +31,7 @@
 	stroke-width="2"
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	aria-hidden={!label}
+	aria-hidden={label ? undefined : true}
 	role={label ? 'img' : undefined}
 	aria-label={label}
 >

@@ -6,15 +6,16 @@
 		template: {
 			name: 'LCK Spring 2026',
 			description: '6 PLAYERS · 치지직 LCK 스프링 시즌 모의 경매. 나만의 드림팀을 구성하세요.'
-		},
-		settings: {
-			mode: 'AUCTION',
-			teams: 4,
-			points: '1,000 PTS',
-			time: '30 SEC',
-			roster: '5 PLAYERS'
 		}
 	};
+
+	const settingsItems = [
+		{ label: 'MODE', value: 'AUCTION' },
+		{ label: 'TEAMS', value: '4' },
+		{ label: 'POINTS', value: '1,000 PTS' },
+		{ label: 'TIME', value: '30 SEC' },
+		{ label: 'ROSTER', value: '5 PLAYERS' }
+	];
 
 	interface Participant {
 		nickname: string;
@@ -57,19 +58,32 @@
 	<Sidebar logo="BD">
 		{#snippet nav()}
 			<button
-				class="flex h-12 w-12 items-center justify-center rounded-sm bg-bg-primary/8"
+				type="button"
+				class="flex h-12 w-12 items-center justify-center rounded-sm bg-bg-primary/8 text-bg-primary"
 				aria-label="대시보드"
 			>
-				<Icon name="layout-grid" color="#0A0A0A" />
+				<Icon name="layout-grid" />
 			</button>
-			<button class="flex h-12 w-12 items-center justify-center" aria-label="참가자">
-				<Icon name="users" color="#0A0A0A" />
+			<button
+				type="button"
+				class="flex h-12 w-12 items-center justify-center text-bg-primary"
+				aria-label="참가자"
+			>
+				<Icon name="users" />
 			</button>
-			<button class="flex h-12 w-12 items-center justify-center" aria-label="트렌드">
-				<Icon name="trending-up" color="#0A0A0A" />
+			<button
+				type="button"
+				class="flex h-12 w-12 items-center justify-center text-bg-primary"
+				aria-label="트렌드"
+			>
+				<Icon name="trending-up" />
 			</button>
-			<button class="flex h-12 w-12 items-center justify-center" aria-label="설정">
-				<Icon name="settings" color="#0A0A0A" />
+			<button
+				type="button"
+				class="flex h-12 w-12 items-center justify-center text-bg-primary"
+				aria-label="설정"
+			>
+				<Icon name="settings" />
 			</button>
 		{/snippet}
 		{#snippet footer()}
@@ -93,6 +107,7 @@
 			</div>
 			<div class="flex items-center gap-4">
 				<button
+					type="button"
 					class="flex items-center gap-2 bg-accent px-6 py-2.5 font-mono text-sm font-semibold tracking-wider text-bg-primary"
 				>
 					<Icon name="link" size={14} />
@@ -114,11 +129,13 @@
 						PARTICIPANTS
 					</h2>
 					<ul class="flex list-none flex-col gap-2">
-						{#each participants as p, i (i)}
+						{#each participants as p, i (p.nickname)}
 							<li class="flex items-center justify-between border border-gray-700 px-4 py-3">
 								<div class="flex items-center gap-3">
 									<span
 										class="h-2.5 w-2.5 rounded-full {p.isOnline ? 'bg-green-500' : 'bg-gray-600'}"
+										role="img"
+										aria-label={p.isOnline ? '온라인' : '오프라인'}
 									></span>
 									<span class="font-mono text-sm font-semibold text-muted">
 										{String(i + 1).padStart(2, '0')}
@@ -163,8 +180,8 @@
 							{chatMessages.length}개 메시지
 						</span>
 					</h2>
-					<div class="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
-						{#each chatMessages as msg, i (i)}
+					<div class="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4" aria-live="polite">
+						{#each chatMessages as msg (msg.nickname + msg.text)}
 							<div class="flex flex-col gap-0.5">
 								<span class="font-mono text-sm font-semibold text-accent">
 									{msg.nickname}
@@ -177,6 +194,7 @@
 						<input
 							type="text"
 							placeholder="메시지를 입력하세요…"
+							aria-label="채팅 메시지 입력"
 							class="w-full bg-transparent font-mono text-base text-gray-50 outline-none placeholder:text-muted"
 							disabled
 						/>
@@ -205,16 +223,16 @@
 						게임 설정
 					</h2>
 					<dl class="flex flex-col">
-						{#each Object.entries(room.settings) as [key, value], i (i)}
+						{#each settingsItems as item, i (item.label)}
 							<div
 								class="flex items-center justify-between px-5 py-2.5 {i > 0
 									? 'border-t border-gray-800'
 									: ''}"
 							>
 								<dt class="font-mono text-sm font-semibold tracking-wider text-muted">
-									{key.toUpperCase()}
+									{item.label}
 								</dt>
-								<dd class="font-mono text-base font-semibold text-gray-50">{value}</dd>
+								<dd class="font-mono text-base font-semibold text-gray-50">{item.value}</dd>
 							</div>
 						{/each}
 					</dl>
@@ -233,6 +251,7 @@
 						</span>
 					</div>
 					<button
+						type="button"
 						class="flex h-14 w-full items-center justify-center gap-2 font-mono text-base font-semibold tracking-wider {canStart
 							? 'bg-accent text-bg-primary'
 							: 'cursor-not-allowed bg-gray-700 text-muted'}"
