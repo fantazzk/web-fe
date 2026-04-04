@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { toPng } from 'html-to-image';
 	import { Button, Icon } from '$lib/components';
+	import type { ResultTeam } from '$lib/features/result/types';
 
 	let cardEl: HTMLDivElement;
 	let saving = $state(false);
@@ -12,16 +13,10 @@
 		saveMessage = '';
 		try {
 			const dataUrl = await toPng(cardEl, { pixelRatio: 2 });
-			const res = await fetch(dataUrl);
-			const blob = await res.blob();
-			const url = URL.createObjectURL(blob);
 			const link = document.createElement('a');
 			link.download = `${tournament.title.replace(/\s+/g, '-').toLowerCase()}-result.png`;
-			link.href = url;
-			document.body.appendChild(link);
+			link.href = dataUrl;
 			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
 			saveMessage = '이미지가 저장되었습니다.';
 		} catch (err) {
 			console.error('이미지 저장 실패:', err);
@@ -31,6 +26,7 @@
 		}
 	}
 
+	// TODO: load function에서 params.id 기반으로 데이터 로드 예정
 	const tournament = {
 		title: 'CHZZK STREAMER LEAGUE S3',
 		subtitle: '치지직 스트리머 리그 시즌 3 · 모의 경매 결과',
@@ -38,19 +34,7 @@
 		mode: 'AUCTION' as const
 	};
 
-	interface Player {
-		name: string;
-		position: string;
-		price: string;
-	}
-
-	interface Team {
-		captain: string;
-		players: Player[];
-		total: string;
-	}
-
-	const teams: Team[] = [
+	const teams: ResultTeam[] = [
 		{
 			captain: '풍월량',
 			players: [
@@ -133,7 +117,7 @@
 		<!-- Team Cards -->
 		<section class="flex flex-1 overflow-hidden px-8 py-6">
 			<ul class="flex flex-1 list-none gap-4">
-				{#each teams as team, i (i)}
+				{#each teams as team (team.captain)}
 					<li class="flex flex-1">
 						<article class="flex flex-1 flex-col border border-gray-700">
 							<!-- Captain Header -->
@@ -150,7 +134,7 @@
 
 							<!-- Player List -->
 							<ol class="flex flex-1 list-none flex-col gap-4 px-4 py-5">
-								{#each team.players as player, pi (pi)}
+								{#each team.players as player, pi (player.name)}
 									<li class="flex flex-col gap-1">
 										<span class="font-mono text-base font-semibold text-gray-50">
 											{String(pi + 1).padStart(2, '0')}&nbsp;&nbsp;{player.name}
