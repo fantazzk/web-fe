@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { Auction } from '../auction.ts';
 import type { AuctionConfig } from '../types.ts';
 

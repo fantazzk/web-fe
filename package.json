@@ -12,8 +12,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"test": "vitest run",
-		"test:watch": "vitest"
+		"test": "bun test",
+		"test:watch": "bun test --watch"
 	},
 	"lint-staged": {
 		"*.{js,ts,svelte}": [
@@ -31,7 +31,7 @@
 		"@sveltejs/kit": "^2.50.2",
 		"@sveltejs/vite-plugin-svelte": "^6.2.4",
 		"@tailwindcss/vite": "^4.1.18",
-		"@types/node": "^20",
+		"@types/bun": "latest",
 		"eslint": "^10.0.3",
 		"eslint-plugin-svelte": "^3.15.2",
 		"globals": "^17.4.0",
@@ -46,7 +46,6 @@
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.57.0",
 		"vite": "^7.3.1",
-		"vitest": "^4.1.2",
 		"html-to-image": "^1.11.13"
 	}
 }

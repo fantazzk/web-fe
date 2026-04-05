@@ -20,7 +20,8 @@
 		"noImplicitReturns": true, // 모든 경로에서 명시적 return 필수
 		"exactOptionalPropertyTypes": true, // undefined를 optional에만 허용
 		"noPropertyAccessFromIndexSignature": true, // index signature는 bracket 접근만 허용
-		"verbatimModuleSyntax": true // import/export type 명시 강제
+		"verbatimModuleSyntax": true, // import/export type 명시 강제
+		"types": ["bun-types"]
 	}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
 	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
