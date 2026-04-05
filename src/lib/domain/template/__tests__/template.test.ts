@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { Template } from '../template.ts';
 import { Player } from '../player.ts';
 import type { TemplateParams } from '../types.ts';
