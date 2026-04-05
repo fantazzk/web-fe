@@ -61,16 +61,23 @@
 	<!-- Sidebar -->
 	<Sidebar logo="CD">
 		{#snippet nav()}
-			<button
+			<a
+				href="/"
 				class="flex h-12 w-12 items-center justify-center rounded-sm bg-bg-primary/8"
 				aria-label="대시보드"
 				aria-current="page"
+				title="대시보드"
 			>
 				<Icon name="layout-grid" color="#0A0A0A" />
-			</button>
-			<button class="flex h-12 w-12 items-center justify-center" aria-label="템플릿">
+			</a>
+			<a
+				href="/templates/create"
+				class="flex h-12 w-12 items-center justify-center"
+				aria-label="템플릿"
+				title="템플릿 만들기"
+			>
 				<Icon name="file-text" color="#0A0A0A" />
-			</button>
+			</a>
 			<button class="flex h-12 w-12 items-center justify-center" aria-label="트렌드">
 				<Icon name="trending-up" color="#0A0A0A" />
 			</button>
