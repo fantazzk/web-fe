@@ -73,7 +73,7 @@
 			<a
 				href="/templates/create"
 				class="flex h-12 w-12 items-center justify-center"
-				aria-label="템플릿"
+				aria-label="템플릿 만들기"
 				title="템플릿 만들기"
 			>
 				<Icon name="file-text" color="#0A0A0A" />

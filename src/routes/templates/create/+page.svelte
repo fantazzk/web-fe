@@ -21,7 +21,7 @@
 			<a
 				href="/templates/create"
 				class="flex h-12 w-12 items-center justify-center rounded-sm bg-bg-primary/8"
-				aria-label="템플릿"
+				aria-label="템플릿 만들기"
 				aria-current="page"
 				title="템플릿 만들기"
 			>
