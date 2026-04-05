@@ -1,11 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-import { env } from '$env/dynamic/public';
+import { env as privateEnv } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 
-const supabaseUrl = env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = env.PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = publicEnv.PUBLIC_SUPABASE_URL;
+const supabaseServiceRoleKey = privateEnv['SUPABASE_SERVICE_ROLE_KEY'];
 
-if (!supabaseUrl || !supabaseAnonKey) {
-	throw new Error('PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY must be set');
+if (!supabaseUrl || !supabaseServiceRoleKey) {
+	throw new Error('PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
 }
 
-export const supabaseServer = createClient(supabaseUrl, supabaseAnonKey);
+export const supabaseServer = createClient(supabaseUrl, supabaseServiceRoleKey);
