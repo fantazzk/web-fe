@@ -10,16 +10,23 @@
 	<!-- Sidebar -->
 	<Sidebar logo="MD">
 		{#snippet nav()}
-			<button class="flex h-12 w-12 items-center justify-center" aria-label="대시보드">
+			<a
+				href="/"
+				class="flex h-12 w-12 items-center justify-center"
+				aria-label="대시보드"
+				title="대시보드"
+			>
 				<Icon name="layout-grid" color="#0A0A0A" />
-			</button>
-			<button
+			</a>
+			<a
+				href="/templates/create"
 				class="flex h-12 w-12 items-center justify-center rounded-sm bg-bg-primary/8"
-				aria-label="템플릿"
+				aria-label="템플릿 만들기"
 				aria-current="page"
+				title="템플릿 만들기"
 			>
 				<Icon name="file-text" color="#0A0A0A" />
-			</button>
+			</a>
 			<button class="flex h-12 w-12 items-center justify-center" aria-label="트렌드">
 				<Icon name="trending-up" color="#0A0A0A" />
 			</button>

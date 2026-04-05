@@ -57,13 +57,14 @@
 	<!-- Sidebar -->
 	<Sidebar logo="BD">
 		{#snippet nav()}
-			<button
-				type="button"
+			<a
+				href="/"
 				class="flex h-12 w-12 items-center justify-center rounded-sm bg-bg-primary/8 text-bg-primary"
 				aria-label="대시보드"
+				title="대시보드"
 			>
 				<Icon name="layout-grid" />
-			</button>
+			</a>
 			<button
 				type="button"
 				class="flex h-12 w-12 items-center justify-center text-bg-primary"
