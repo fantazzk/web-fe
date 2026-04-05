@@ -6,5 +6,6 @@ build
 .claude
 .husky
 docs
-*.md
+README.md
+CLAUDE.md
 .env*
