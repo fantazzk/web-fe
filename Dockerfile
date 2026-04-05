@@ -20,7 +20,6 @@ RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/build ./build
 COPY --from=build /app/package.json ./
 
-ENV NODE_ENV=production
 ENV PORT=3000
 
 EXPOSE 3000
