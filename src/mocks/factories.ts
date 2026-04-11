@@ -87,6 +87,41 @@ export function createTemplateDetailResponse(
 	});
 }
 
+export function createDraftTemplateDetailResponse(
+	overrides?: Partial<TemplateResponse>
+): TemplateResponse {
+	return createTemplateResponse({
+		mode: 'DRAFT',
+		teamCount: 4,
+		teamSize: 5,
+		draftOrderStrategy: 'SNAKE',
+		pickBanTime: 30,
+		players: [
+			{ name: 'Zeus', position: 'TOP', displayOrder: 0 },
+			{ name: 'Kiin', position: 'TOP', displayOrder: 1 },
+			{ name: 'Doran', position: 'TOP', displayOrder: 2 },
+			{ name: 'DuDu', position: 'TOP', displayOrder: 3 },
+			{ name: 'Oner', position: 'JGL', displayOrder: 4 },
+			{ name: 'Canyon', position: 'JGL', displayOrder: 5 },
+			{ name: 'Peanut', position: 'JGL', displayOrder: 6 },
+			{ name: 'Lucid', position: 'JGL', displayOrder: 7 },
+			{ name: 'Faker', position: 'MID', displayOrder: 8 },
+			{ name: 'Chovy', position: 'MID', displayOrder: 9 },
+			{ name: 'Zeka', position: 'MID', displayOrder: 10 },
+			{ name: 'ShowMaker', position: 'MID', displayOrder: 11 },
+			{ name: 'Gumayusi', position: 'ADC', displayOrder: 12 },
+			{ name: 'Peyz', position: 'ADC', displayOrder: 13 },
+			{ name: 'Viper', position: 'ADC', displayOrder: 14 },
+			{ name: 'Aiming', position: 'ADC', displayOrder: 15 },
+			{ name: 'Keria', position: 'SUP', displayOrder: 16 },
+			{ name: 'Lehends', position: 'SUP', displayOrder: 17 },
+			{ name: 'Delight', position: 'SUP', displayOrder: 18 },
+			{ name: 'BeryL', position: 'SUP', displayOrder: 19 }
+		],
+		...overrides
+	});
+}
+
 // ─── Room ───
 
 function createTeamLeaders(count: number, budget: number): TeamLeaderResponse[] {
