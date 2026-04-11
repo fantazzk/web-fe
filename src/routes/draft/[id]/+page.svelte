@@ -10,6 +10,7 @@
 	import type { DraftConfig } from '$lib/domain/rule-engine/draft-types';
 	import type { CaptainType } from '$lib/features/draft/types';
 	import { apiGet } from '$lib/utils/api-client';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	const store = draftStore;
 	const positions = ['ALL', 'TOP', 'JGL', 'MID', 'ADC', 'SUP'];
@@ -17,6 +18,7 @@
 	let remainingSeconds = $state(0);
 	let timerInterval: ReturnType<typeof setInterval> | null = null;
 	let loading = $state(true);
+	let expandedTeams = $state<SvelteSet<string>>(new SvelteSet());
 
 	// ─── Timer ───
 
@@ -91,6 +93,14 @@
 		store.setPositionFilter(position);
 	}
 
+	function toggleTeamExpand(teamId: string): void {
+		if (expandedTeams.has(teamId)) {
+			expandedTeams.delete(teamId);
+		} else {
+			expandedTeams.add(teamId);
+		}
+	}
+
 	// ─── Lifecycle ───
 
 	onMount(async () => {
@@ -138,6 +148,8 @@
 		`${String(Math.floor(remainingSeconds / 60)).padStart(2, '0')}:${String(remainingSeconds % 60).padStart(2, '0')}`
 	);
 
+	const timerProgress = $derived(store.pickBanTime > 0 ? remainingSeconds / store.pickBanTime : 0);
+
 	const filteredPool = $derived(
 		store.draft
 			? store.positionFilter === 'ALL'
@@ -174,6 +186,8 @@
 				})
 			: []
 	);
+
+	const PREVIEW_COUNT = 3;
 </script>
 
 <svelte:head>
@@ -192,7 +206,7 @@
 		aria-live="polite"
 		class="flex h-screen items-center justify-center bg-bg-primary"
 	>
-		<span class="font-mono text-sm text-muted">로딩 중...</span>
+		<span class="font-mono text-base text-muted">로딩 중...</span>
 	</div>
 {:else}
 	<div class="relative flex h-screen flex-col bg-bg-primary">
@@ -205,7 +219,7 @@
 				class="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
 			>
 				<div class="flex flex-col items-center gap-6">
-					<h2 id="overlay-ready-title" class="font-heading text-2xl font-bold text-gray-50">
+					<h2 id="overlay-ready-title" class="font-heading text-3xl font-bold text-gray-50">
 						드래프트를 시작합니다
 					</h2>
 					<Button variant="PRIMARY" size="MD" onclick={handleStart}>시작</Button>
@@ -222,7 +236,7 @@
 				class="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
 			>
 				<div class="flex flex-col items-center gap-6">
-					<h2 id="overlay-finished-title" class="font-heading text-2xl font-bold text-gray-50">
+					<h2 id="overlay-finished-title" class="font-heading text-3xl font-bold text-gray-50">
 						드래프트가 종료되었습니다
 					</h2>
 					<Button variant="PRIMARY" size="MD" onclick={() => goto(`/result/${$page.params['id']}`)}>
@@ -236,43 +250,63 @@
 		<header class="flex h-[60px] items-center justify-between border-b border-gray-700 px-8">
 			<div class="flex items-center gap-4">
 				<span class="h-2 w-2 rounded-full bg-accent"></span>
-				<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">솔로 드래프트</span
+				<span class="font-mono text-sm font-semibold tracking-[2px] text-accent">솔로 드래프트</span
 				>
 			</div>
 			<div class="flex items-center gap-3">
-				<span class="font-mono text-xs font-semibold tracking-wider text-muted">
+				<span class="font-mono text-sm font-semibold tracking-wider text-muted">
 					라운드 {store.currentRound}
 				</span>
-				<span class="font-mono text-xs text-muted">—</span>
-				<span class="font-mono text-xs font-semibold tracking-wider text-gray-50">
+				<span class="font-mono text-sm text-muted">—</span>
+				<span class="font-mono text-sm font-semibold tracking-wider text-gray-50">
 					픽 {String(store.currentPickNumber).padStart(2, '0')} / {String(
 						store.totalPicks
 					).padStart(2, '0')}
 				</span>
 				<Badge variant="STATUS">LIVE</Badge>
 			</div>
-			<span class="font-mono text-xs font-semibold text-gray-50">{timerDisplay}</span>
+			<span class="font-mono text-sm font-semibold text-gray-50">{timerDisplay}</span>
 		</header>
 
 		<!-- Body -->
 		<div class="flex flex-1 overflow-hidden">
 			<!-- Main Content -->
 			<main id="main-content" class="flex flex-1 flex-col overflow-y-auto px-8 py-6">
+				<!-- 타이머 (대형) -->
+				<div class="flex flex-col items-center gap-2">
+					<span class="font-mono text-xs font-semibold tracking-[2px] text-muted">남은 시간</span>
+					<span
+						aria-live="off"
+						aria-label={`남은 시간 ${timerDisplay}`}
+						class="font-heading text-6xl font-bold text-accent">{timerDisplay}</span
+					>
+					<div
+						role="progressbar"
+						aria-label="드래프트 타이머 진행률"
+						aria-valuenow={remainingSeconds}
+						aria-valuemin={0}
+						aria-valuemax={store.pickBanTime}
+						class="h-1 w-full max-w-md bg-gray-700"
+					>
+						<div class="h-full bg-accent" style="width: {timerProgress * 100}%"></div>
+					</div>
+				</div>
+
 				<!-- 드래프트 순서 -->
-				<div class="flex flex-col gap-2">
-					<span class="font-mono text-[11px] font-semibold tracking-[2px] text-accent">
+				<div class="mt-5 flex flex-col gap-2">
+					<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">
 						드래프트 순서
 					</span>
 					<div class="flex items-center gap-1 overflow-x-auto">
 						{#each draftOrderDisplay as d, i (i)}
 							<div
-								class="flex h-10 w-[88px] shrink-0 items-center justify-center border {d.current
+								class="flex h-11 w-[96px] shrink-0 items-center justify-center border {d.current
 									? 'border-accent'
 									: 'border-gray-700'}"
 							>
 								<div class="flex flex-col items-center">
 									<span
-										class="font-mono text-xs font-semibold {d.current
+										class="font-mono text-sm font-semibold {d.current
 											? 'text-accent'
 											: d.done
 												? 'text-gray-50'
@@ -290,7 +324,7 @@
 				<!-- 현재 턴 배너 -->
 				{#if store.draft.currentTeamId}
 					<div
-						class="mt-4 flex h-14 items-center gap-3 bg-accent px-5 font-mono text-sm font-semibold text-bg-primary"
+						class="mt-4 flex h-14 items-center gap-3 bg-accent px-5 font-mono text-base font-semibold text-bg-primary"
 					>
 						<span>→</span>
 						<span class="tracking-wider">내 픽 — {store.currentCaptainName}</span>
@@ -300,7 +334,7 @@
 
 				<!-- 에러 메시지 -->
 				{#if errorMessage}
-					<span role="alert" class="mt-2 font-mono text-xs text-red-400">{errorMessage}</span>
+					<span role="alert" class="mt-2 font-mono text-sm text-red-400">{errorMessage}</span>
 				{/if}
 
 				<!-- 포지션 필터 탭 -->
@@ -308,7 +342,7 @@
 					{#each positions as pos (pos)}
 						<button
 							type="button"
-							class="flex h-10 w-20 items-center justify-center font-mono text-sm font-semibold tracking-wider {store.positionFilter ===
+							class="flex h-11 w-24 items-center justify-center font-mono text-sm font-semibold tracking-wider {store.positionFilter ===
 							pos
 								? 'bg-accent text-bg-primary'
 								: 'border border-gray-700 text-muted'}"
@@ -349,16 +383,19 @@
 
 			<!-- Side Panel: 팀 로스터 + 픽 히스토리 -->
 			<aside
-				class="flex w-[320px] flex-col gap-4 overflow-y-auto border-l border-gray-700 px-5 py-6"
+				class="flex w-[340px] flex-col gap-4 overflow-y-auto border-l border-gray-700 px-5 py-6"
 			>
-				<span class="font-mono text-[11px] font-semibold tracking-[2px] text-accent">팀 로스터</span
-				>
+				<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">팀 로스터</span>
 
 				{#each store.draft.teams as team, i (team.id)}
 					{@const captain = store.captains[i]}
 					{@const isCurrent = team.id === store.draft.currentTeamId}
 					{@const slotsNeeded = store.draft.config.rounds}
-					<div class="flex flex-col gap-2 {i > 0 ? 'pt-3' : ''}">
+					{@const isExpanded = expandedTeams.has(team.id)}
+					{@const hasOverflow = team.roster.length > PREVIEW_COUNT}
+					{@const visibleRoster = isExpanded ? team.roster : team.roster.slice(0, PREVIEW_COUNT)}
+					<div class="flex flex-col gap-1.5 {i > 0 ? 'pt-3' : ''}">
+						<!-- 팀 헤더 -->
 						<div class="flex items-center justify-between">
 							<span
 								class="font-heading text-base font-semibold {isCurrent
@@ -368,7 +405,7 @@
 								{captain?.name ?? `팀 ${i + 1}`}
 							</span>
 							<div class="flex items-center gap-2">
-								<span class="font-mono text-xs text-muted">
+								<span class="font-mono text-sm text-muted">
 									{team.roster.length}/{slotsNeeded}
 								</span>
 								{#if isCurrent}
@@ -378,23 +415,39 @@
 								{/if}
 							</div>
 						</div>
-						<div class="flex gap-1">
-							{#each Array(slotsNeeded) as _item, si (si)}
-								{@const filled = team.roster[si]}
-								<div
-									class="flex h-9 flex-1 items-center justify-center border {isCurrent &&
-									si === team.roster.length
-										? 'border-accent'
-										: 'border-gray-700'} {filled ? 'bg-accent-20' : ''}"
-								>
-									{#if filled}
-										<span class="font-mono text-xs font-semibold text-gray-50">
-											{filled.name}
+
+						<!-- 선수 세로 리스트 -->
+						{#if team.roster.length > 0}
+							<div class="flex flex-col gap-1">
+								{#each visibleRoster as player, si (si)}
+									<div
+										class="flex items-center gap-2 border px-3 py-1.5 {isCurrent
+											? 'border-gray-700 bg-accent-20'
+											: 'border-gray-700'}"
+									>
+										<span class="w-10 font-mono text-xs text-muted">{player.position}</span>
+										<span class="flex-1 truncate font-heading text-sm font-semibold text-gray-50">
+											{player.name}
 										</span>
-									{/if}
-								</div>
-							{/each}
-						</div>
+									</div>
+								{/each}
+								{#if hasOverflow}
+									<button
+										type="button"
+										class="flex items-center justify-center py-1 font-mono text-xs text-muted hover:text-accent"
+										onclick={() => toggleTeamExpand(team.id)}
+									>
+										{#if isExpanded}
+											접기
+										{:else}
+											… 외 {team.roster.length - PREVIEW_COUNT}명 더보기
+										{/if}
+									</button>
+								{/if}
+							</div>
+						{:else}
+							<span class="font-mono text-xs text-dim">선수 없음</span>
+						{/if}
 					</div>
 				{/each}
 
@@ -402,14 +455,14 @@
 
 				<!-- 픽 히스토리 -->
 				<div class="flex flex-col gap-3">
-					<span class="font-mono text-[11px] font-semibold tracking-[2px] text-accent">
+					<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">
 						픽 히스토리
 					</span>
 					{#each store.draft.pickHistory as record, i (i)}
 						{@const teamIndex = store.draft.config.teamIds.indexOf(record.teamId)}
 						{@const captainName = store.captains[teamIndex]?.name ?? `팀 ${teamIndex + 1}`}
 						<div class="flex items-center gap-3">
-							<span class="font-mono text-xs font-semibold text-dim">
+							<span class="font-mono text-sm font-semibold text-dim">
 								{String(i + 1).padStart(2, '0')}
 							</span>
 							<div class="flex flex-col gap-0.5">
@@ -430,7 +483,7 @@
 						)}
 						{@const currentName = store.captains[currentTeamIndex]?.name ?? ''}
 						<div class="flex items-center gap-3">
-							<span class="font-mono text-xs font-semibold text-accent">
+							<span class="font-mono text-sm font-semibold text-accent">
 								{String(store.draft.pickHistory.length + 1).padStart(2, '0')}
 							</span>
 							<div class="flex flex-col gap-0.5">
