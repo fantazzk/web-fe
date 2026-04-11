@@ -50,6 +50,34 @@ export interface CreateTemplateRequest {
 
 export type RoomStatus = 'WAITING' | 'IN_PROGRESS' | 'FINISHED';
 
+export interface RoomMemberResponse {
+	teamLeaderId: string;
+	playerName: string;
+	assignOrder: number;
+}
+
+export interface RoomPlayerResponse {
+	name: string;
+	displayOrder: number;
+	status: string;
+}
+
+export interface RoomProgressResponse {
+	currentTurnIndex: number;
+	currentRound: number;
+	currentLeaderId: string;
+	currentRoundLeaderIds: string[];
+}
+
+export interface JoinableRoomResponse {
+	code: string;
+	mode: string;
+	teamCount: number;
+	joinedLeaderCount: number;
+	remainingSlotCount: number;
+	startReadiness: string;
+}
+
 export interface RoomResponse {
 	code: string;
 	status: RoomStatus;
@@ -57,6 +85,12 @@ export interface RoomResponse {
 	teamCount?: number;
 	startReadiness?: string;
 	teamLeaders: TeamLeaderResponse[];
+	teamSize?: number;
+	budget?: number;
+	draftOrderStrategy?: string;
+	players?: RoomPlayerResponse[];
+	members?: RoomMemberResponse[];
+	progress?: RoomProgressResponse;
 }
 
 export interface TeamLeaderResponse {

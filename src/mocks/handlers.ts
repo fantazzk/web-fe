@@ -5,7 +5,8 @@ import {
 	createTemplateDetailResponse,
 	createTemplateResponse,
 	createRoomResponse,
-	createRoomSessionResponse
+	createRoomSessionResponse,
+	createJoinableRoomListResponse
 } from './factories';
 
 const BASE_URL = import.meta.env['PUBLIC_API_URL'] ?? '';
@@ -30,6 +31,10 @@ export const handlers = [
 	}),
 
 	// ─── Room API ───
+
+	http.get(`${BASE_URL}/api/v1/rooms`, () => {
+		return HttpResponse.json(success(createJoinableRoomListResponse()));
+	}),
 
 	http.post(`${BASE_URL}/api/v1/rooms`, () => {
 		return HttpResponse.json(success(createRoomSessionResponse()), { status: 201 });

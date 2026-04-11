@@ -3,7 +3,11 @@ import type {
 	TemplateResponse,
 	RoomResponse,
 	RoomSessionResponse,
-	TeamLeaderResponse
+	TeamLeaderResponse,
+	RoomMemberResponse,
+	RoomPlayerResponse,
+	RoomProgressResponse,
+	JoinableRoomResponse
 } from '$lib/types/api';
 
 // ─── 응답 래퍼 ───
@@ -103,13 +107,99 @@ function createTeamLeaders(count: number, budget: number): TeamLeaderResponse[] 
 	}));
 }
 
+export function createRoomMemberResponse(
+	overrides?: Partial<RoomMemberResponse>
+): RoomMemberResponse {
+	return {
+		teamLeaderId: 'tl-1',
+		playerName: 'KIIN',
+		assignOrder: 0,
+		...overrides
+	};
+}
+
+export function createRoomPlayerResponse(
+	overrides?: Partial<RoomPlayerResponse>
+): RoomPlayerResponse {
+	return {
+		name: 'KIIN',
+		displayOrder: 0,
+		status: 'AVAILABLE',
+		...overrides
+	};
+}
+
+export function createRoomProgressResponse(
+	overrides?: Partial<RoomProgressResponse>
+): RoomProgressResponse {
+	return {
+		currentTurnIndex: 0,
+		currentRound: 1,
+		currentLeaderId: 'tl-1',
+		currentRoundLeaderIds: ['tl-1', 'tl-2'],
+		...overrides
+	};
+}
+
+export function createJoinableRoomResponse(
+	overrides?: Partial<JoinableRoomResponse>
+): JoinableRoomResponse {
+	return {
+		code: 'ABC774',
+		mode: 'AUCTION',
+		teamCount: 8,
+		joinedLeaderCount: 3,
+		remainingSlotCount: 5,
+		startReadiness: 'NOT_READY',
+		...overrides
+	};
+}
+
+export function createJoinableRoomListResponse(): JoinableRoomResponse[] {
+	return [
+		createJoinableRoomResponse({
+			code: 'ABC774',
+			mode: 'AUCTION',
+			teamCount: 8,
+			joinedLeaderCount: 3,
+			remainingSlotCount: 5,
+			startReadiness: 'NOT_READY'
+		}),
+		createJoinableRoomResponse({
+			code: 'XYZ123',
+			mode: 'DRAFT',
+			teamCount: 4,
+			joinedLeaderCount: 2,
+			remainingSlotCount: 2,
+			startReadiness: 'NOT_READY'
+		}),
+		createJoinableRoomResponse({
+			code: 'QRS456',
+			mode: 'AUCTION',
+			teamCount: 6,
+			joinedLeaderCount: 5,
+			remainingSlotCount: 1,
+			startReadiness: 'READY'
+		})
+	];
+}
+
 export function createRoomResponse(overrides?: Partial<RoomResponse>): RoomResponse {
 	return {
 		code: 'ABC774',
 		status: 'WAITING',
 		mode: 'AUCTION',
 		teamCount: 8,
+		teamSize: 5,
+		budget: 1000,
+		draftOrderStrategy: 'SNAKE',
 		teamLeaders: createTeamLeaders(2, 1000),
+		players: [
+			createRoomPlayerResponse({ name: 'KIIN', displayOrder: 0 }),
+			createRoomPlayerResponse({ name: 'ONER', displayOrder: 1 }),
+			createRoomPlayerResponse({ name: 'CHOVY', displayOrder: 2 })
+		],
+		members: [],
 		...overrides
 	};
 }
