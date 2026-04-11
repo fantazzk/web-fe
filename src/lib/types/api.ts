@@ -22,13 +22,18 @@ export interface TemplateResponse {
 	teamCount: number;
 	teamSize: number;
 	budget?: number;
+	minBidUnit?: number;
+	pickBanTime?: number;
+	positionLimit?: number;
 	draftOrderStrategy?: 'SNAKE' | 'FIXED';
 	players?: TemplatePlayerResponse[];
+	captains?: string[];
 }
 
 export interface TemplatePlayerResponse {
 	name: string;
 	displayOrder: number;
+	position?: string;
 }
 
 export interface CreateTemplateRequest {

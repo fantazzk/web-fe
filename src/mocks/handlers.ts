@@ -73,6 +73,18 @@ export const handlers = [
 		return HttpResponse.json(success(createRoomResponse({ code })));
 	}),
 
+	// ─── Solo API ───
+
+	http.get(`${BASE_URL}/api/v1/solo/auction/:templateId`, ({ params }) => {
+		const id = params['templateId'] as string;
+		const template = createTemplateDetailResponse({ id });
+		const captains = Array.from({ length: template.teamCount }, (_, i) => ({
+			id: `captain-${i + 1}`,
+			name: `감독 ${i + 1}`
+		}));
+		return HttpResponse.json(success({ template, captains }));
+	}),
+
 	// ─── Front-only (not in OpenAPI spec) ───
 
 	http.post(`${BASE_URL}/api/v1/rooms/:code/bid`, ({ params }) => {

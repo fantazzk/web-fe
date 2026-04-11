@@ -67,17 +67,17 @@ export function createTemplateDetailResponse(
 	overrides?: Partial<TemplateResponse>
 ): TemplateResponse {
 	return createTemplateResponse({
+		budget: 1000,
+		teamCount: 4,
+		teamSize: 5,
+		minBidUnit: 5,
+		pickBanTime: 5,
 		players: [
-			{ name: 'KIIN', displayOrder: 0 },
-			{ name: 'ONER', displayOrder: 1 },
-			{ name: 'CHOVY', displayOrder: 2 },
-			{ name: 'PEYZ', displayOrder: 3 },
-			{ name: 'LEHENDS', displayOrder: 4 },
-			{ name: 'ZEUS', displayOrder: 5 },
-			{ name: 'CANYON', displayOrder: 6 },
-			{ name: 'FAKER', displayOrder: 7 },
-			{ name: 'GUMAYUSI', displayOrder: 8 },
-			{ name: 'KERIA', displayOrder: 9 }
+			{ name: 'KIIN', position: 'TOP', displayOrder: 0 },
+			{ name: 'ONER', position: 'JGL', displayOrder: 1 },
+			{ name: 'CHOVY', position: 'MID', displayOrder: 2 },
+			{ name: 'PEYZ', position: 'ADC', displayOrder: 3 },
+			{ name: 'LEHENDS', position: 'SUP', displayOrder: 4 }
 		],
 		...overrides
 	});
