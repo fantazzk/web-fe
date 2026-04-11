@@ -5,7 +5,7 @@
 	import { page } from '$app/stores';
 	import { Badge, Button, PlayerCard } from '$lib/components';
 	import { auctionStore } from '$lib/features/auction/stores/auction-store.svelte';
-	import { processBid, processTimerExpiry } from '$lib/features/auction/services/auction-driver';
+	import { processBid, processTimerExpiry } from '$lib/domain/rule-engine/auction-driver';
 	import { calcRemaining, createEndTime } from '$lib/utils/countdown';
 	import type { AuctionConfig } from '$lib/domain/rule-engine/types';
 	import type { CaptainType } from '$lib/features/auction/types';
@@ -190,17 +190,37 @@
 	<title>경매방 | Fantazzk</title>
 </svelte:head>
 
+<!-- a11y-12: skip link -->
+<a
+	href="#main-content"
+	class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:p-2 focus:text-accent"
+	>본문으로 바로가기</a
+>
+
 {#if loading}
-	<div class="flex h-screen items-center justify-center bg-bg-primary">
+	<!-- a11y-3: 로딩 상태에 role=status aria-live=polite -->
+	<div
+		role="status"
+		aria-live="polite"
+		class="flex h-screen items-center justify-center bg-bg-primary"
+	>
 		<span class="font-mono text-sm text-muted">로딩 중...</span>
 	</div>
 {:else}
 	<div class="relative flex h-screen flex-col bg-bg-primary">
 		<!-- Dim Overlay: READY -->
 		{#if store.uiPhase === 'READY'}
-			<div class="absolute inset-0 z-50 flex items-center justify-center bg-black/70">
+			<!-- a11y-1: role=dialog, aria-modal, h2 -->
+			<div
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="overlay-ready-title"
+				class="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
+			>
 				<div class="flex flex-col items-center gap-6">
-					<span class="font-heading text-2xl font-bold text-gray-50">경매를 시작합니다</span>
+					<h2 id="overlay-ready-title" class="font-heading text-2xl font-bold text-gray-50">
+						경매를 시작합니다
+					</h2>
 					<Button variant="PRIMARY" size="MD" onclick={handleStart}>시작</Button>
 				</div>
 			</div>
@@ -208,9 +228,17 @@
 
 		<!-- Dim Overlay: FINISHED -->
 		{#if store.uiPhase === 'FINISHED'}
-			<div class="absolute inset-0 z-50 flex items-center justify-center bg-black/70">
+			<!-- a11y-1: role=dialog, aria-modal, h2 -->
+			<div
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="overlay-finished-title"
+				class="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
+			>
 				<div class="flex flex-col items-center gap-6">
-					<span class="font-heading text-2xl font-bold text-gray-50">경매가 종료되었습니다</span>
+					<h2 id="overlay-finished-title" class="font-heading text-2xl font-bold text-gray-50">
+						경매가 종료되었습니다
+					</h2>
 					<Button variant="PRIMARY" size="MD" onclick={() => goto(`/result/${$page.params['id']}`)}
 						>결과 보기</Button
 					>
@@ -245,8 +273,10 @@
 				{#each store.auction.teams as team, i (team.id)}
 					{@const captain = store.captains[i]}
 					{@const isSelected = store.selectedTeamId === team.id}
+					<!-- a11y-6: aria-pressed for captain selection -->
 					<button
 						type="button"
+						aria-pressed={isSelected}
 						class="flex w-full items-center gap-2.5 px-3 py-2.5 text-left {isSelected
 							? 'border border-gray-50 bg-bg-primary/[0.08]'
 							: 'border border-gray-700'}"
@@ -274,10 +304,10 @@
 			</aside>
 
 			<!-- Center Stage -->
-			<main class="flex flex-1 flex-col gap-3 overflow-y-auto px-8 py-6">
-				<span class="font-mono text-[11px] font-semibold tracking-[2px] text-accent"
-					>경매 진행 중</span
-				>
+			<!-- a11y-12: main id for skip link -->
+			<main id="main-content" class="flex flex-1 flex-col gap-3 overflow-y-auto px-8 py-6">
+				<!-- a11y-9: h2 heading inside main -->
+				<h2 class="font-mono text-[11px] font-semibold tracking-[2px] text-accent">경매 진행 중</h2>
 
 				<!-- Player Card -->
 				{#if store.auction.currentPlayer}
@@ -303,33 +333,50 @@
 				{/if}
 
 				<!-- Timer -->
+				<!-- a11y-4: aria-live=off aria-label on timer display -->
 				<div class="flex flex-col items-center gap-1.5">
 					<span class="font-mono text-[10px] font-semibold tracking-[2px] text-muted"
 						>남은 시간</span
 					>
-					<span class="font-heading text-6xl font-bold text-accent">{timerDisplay}</span>
-					<div class="h-1 w-full bg-gray-700">
+					<span
+						aria-live="off"
+						aria-label={`남은 시간 ${timerDisplay}`}
+						class="font-heading text-6xl font-bold text-accent">{timerDisplay}</span
+					>
+					<!-- a11y-5: role=progressbar + aria-value* -->
+					<div
+						role="progressbar"
+						aria-label="경매 타이머 진행률"
+						aria-valuenow={remainingSeconds}
+						aria-valuemin={0}
+						aria-valuemax={store.pickBanTime}
+						class="h-1 w-full bg-gray-700"
+					>
 						<div class="h-full bg-accent" style="width: {timerProgress * 100}%"></div>
 					</div>
 				</div>
 
 				<!-- Bid Panel -->
 				<div class="flex flex-col gap-3">
-					<div class="flex items-center justify-between">
-						<span class="font-mono text-[11px] font-semibold tracking-wider text-muted"
-							>현재 입찰가</span
-						>
-						<span class="font-heading text-xl font-bold text-accent">
-							{store.currentHighBid.toLocaleString()} 포인트
-						</span>
-					</div>
-					<div class="flex items-center justify-between">
-						<span class="font-mono text-[11px] font-semibold tracking-wider text-muted"
-							>최고 입찰자</span
-						>
-						<span class="max-w-[200px] truncate font-heading text-sm font-semibold text-gray-50">
-							{store.currentHighBidderName ?? '없음'}
-						</span>
+					<!-- a11y-7: aria-live=polite on bid info section -->
+					<div aria-live="polite" class="flex flex-col gap-3">
+						<div class="flex items-center justify-between">
+							<span class="font-mono text-[11px] font-semibold tracking-wider text-muted"
+								>현재 입찰가</span
+							>
+							<!-- a11y-8: aria-live=polite on bid amount display -->
+							<span aria-live="polite" class="font-heading text-xl font-bold text-accent">
+								{store.currentHighBid.toLocaleString()} 포인트
+							</span>
+						</div>
+						<div class="flex items-center justify-between">
+							<span class="font-mono text-[11px] font-semibold tracking-wider text-muted"
+								>최고 입찰자</span
+							>
+							<span class="max-w-[200px] truncate font-heading text-sm font-semibold text-gray-50">
+								{store.currentHighBidderName ?? '없음'}
+							</span>
+						</div>
 					</div>
 
 					<div class="flex items-center gap-3">
@@ -362,7 +409,8 @@
 					</div>
 
 					{#if store.errorMessage}
-						<span class="font-mono text-xs text-red-400">{store.errorMessage}</span>
+						<!-- a11y-2: role=alert on error message -->
+						<span role="alert" class="font-mono text-xs text-red-400">{store.errorMessage}</span>
 					{/if}
 				</div>
 			</main>
@@ -371,56 +419,61 @@
 			<aside class="flex w-[300px] flex-col gap-3 overflow-y-auto border-l border-gray-700 p-5">
 				<span class="font-mono text-[11px] font-semibold tracking-wider text-accent">입찰 기록</span
 				>
-				{#each store.bidRecords as record, i (`${record.timestamp}-${i}`)}
-					{#if record.kind === 'SOLD'}
-						<div
-							class="flex items-center justify-between border border-green-700 bg-green-900/20 px-3 py-2.5"
-						>
-							<div class="flex flex-col gap-0.5">
-								<span class="font-heading text-[13px] font-semibold text-green-400">
-									낙찰 — {record.playerName}
-								</span>
-								<span class="font-mono text-[10px] font-semibold tracking-wider text-muted">
-									{record.teamName}
-								</span>
-							</div>
-							<span class="font-heading text-base font-bold text-green-400">
-								{record.amount.toLocaleString()} 포인트
-							</span>
-						</div>
-					{:else if record.kind === 'UNSOLD'}
-						<div
-							class="flex items-center justify-between border border-red-700 bg-red-900/20 px-3 py-2.5"
-						>
-							<span class="font-heading text-[13px] font-semibold text-red-400">
-								유찰 — {record.playerName}
-							</span>
-						</div>
-					{:else}
-						{@const isTop = i === 0}
-						<div
-							class="flex items-center justify-between px-3 py-2.5 {isTop
-								? 'border border-accent'
-								: 'border border-gray-700'}"
-						>
-							<div class="flex flex-col gap-0.5">
-								<span
-									class="max-w-[160px] truncate font-heading text-[13px] font-semibold text-gray-50"
-								>
-									{record.teamName}
-								</span>
-								<span class="font-mono text-[10px] font-semibold tracking-wider text-muted">
-									{record.playerName}에 입찰
-								</span>
-							</div>
-							<span
-								class="font-heading text-base font-bold {isTop ? 'text-accent' : 'text-gray-50'}"
+				<!-- a11y-10: ol/li 구조 -->
+				<ol class="flex flex-col gap-3">
+					{#each store.bidRecords as record, i (`${record.timestamp}-${i}`)}
+						{#if record.kind === 'SOLD'}
+							<li
+								class="flex items-center justify-between border border-green-700 bg-green-900/20 px-3 py-2.5"
 							>
-								{record.amount.toLocaleString()} 포인트
-							</span>
-						</div>
-					{/if}
-				{/each}
+								<div class="flex flex-col gap-0.5">
+									<span class="font-heading text-[13px] font-semibold text-green-400">
+										낙찰 — {record.playerName}
+									</span>
+									<span class="font-mono text-[10px] font-semibold tracking-wider text-muted">
+										{record.teamName}
+									</span>
+								</div>
+								<span class="font-heading text-base font-bold text-green-400">
+									{record.amount.toLocaleString()} 포인트
+								</span>
+							</li>
+						{:else if record.kind === 'UNSOLD'}
+							<li
+								class="flex items-center justify-between border border-red-700 bg-red-900/20 px-3 py-2.5"
+							>
+								<span class="font-heading text-[13px] font-semibold text-red-400">
+									유찰 — {record.playerName}
+								</span>
+							</li>
+						{:else}
+							{@const isTop = i === 0}
+							<li
+								class="flex items-center justify-between px-3 py-2.5 {isTop
+									? 'border border-accent'
+									: 'border border-gray-700'}"
+							>
+								<div class="flex flex-col gap-0.5">
+									<span
+										class="max-w-[160px] truncate font-heading text-[13px] font-semibold text-gray-50"
+									>
+										{record.teamName}
+										<!-- a11y-11: sr-only 텍스트로 최고 입찰 상태 전달 -->
+										{#if isTop}<span class="sr-only">(현재 최고 입찰)</span>{/if}
+									</span>
+									<span class="font-mono text-[10px] font-semibold tracking-wider text-muted">
+										{record.playerName}에 입찰
+									</span>
+								</div>
+								<span
+									class="font-heading text-base font-bold {isTop ? 'text-accent' : 'text-gray-50'}"
+								>
+									{record.amount.toLocaleString()} 포인트
+								</span>
+							</li>
+						{/if}
+					{/each}
+				</ol>
 			</aside>
 		</div>
 

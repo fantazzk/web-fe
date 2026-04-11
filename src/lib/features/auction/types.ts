@@ -1,5 +1,3 @@
-import type { Auction } from '$lib/domain/rule-engine/auction';
-
 /** 경매 페이지 UI 단계 */
 export type UIPhaseType = 'READY' | 'PLAYING' | 'FINISHED';
 
@@ -14,16 +12,6 @@ export interface BidRecordType {
 	readonly playerName: string;
 	readonly amount: number;
 	readonly timestamp: number;
-}
-
-/** auction-store가 관리하는 전체 상태 */
-export interface AuctionStoreStateType {
-	readonly auction: Auction;
-	readonly uiPhase: UIPhaseType;
-	readonly selectedTeamId: string | null;
-	readonly bidRecords: readonly BidRecordType[];
-	readonly endTime: number | null;
-	readonly errorMessage: string | null;
 }
 
 /** 감독(팀 리더) 정보 — MSW 응답에서 변환 */
