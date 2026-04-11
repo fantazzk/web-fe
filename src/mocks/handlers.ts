@@ -4,7 +4,8 @@ import {
 	createTemplateListResponse,
 	createTemplateDetailResponse,
 	createTemplateResponse,
-	createRoomResponse
+	createRoomResponse,
+	createRoomSessionResponse
 } from './factories';
 
 const BASE_URL = import.meta.env['PUBLIC_API_URL'] ?? '';
@@ -17,7 +18,7 @@ export const handlers = [
 	}),
 
 	http.get(`${BASE_URL}/api/v1/templates/:id`, ({ params }) => {
-		const id = Number(params['id']);
+		const id = params['id'] as string;
 		return HttpResponse.json(success(createTemplateDetailResponse({ id })));
 	}),
 
@@ -31,7 +32,7 @@ export const handlers = [
 	// ─── Room API ───
 
 	http.post(`${BASE_URL}/api/v1/rooms`, () => {
-		return HttpResponse.json(success(createRoomResponse()), { status: 201 });
+		return HttpResponse.json(success(createRoomSessionResponse()), { status: 201 });
 	}),
 
 	http.get(`${BASE_URL}/api/v1/rooms/:code`, ({ params }) => {
@@ -43,13 +44,15 @@ export const handlers = [
 		const code = params['code'] as string;
 		return HttpResponse.json(
 			success(
-				createRoomResponse({
-					code,
-					teamLeaders: [
-						{ id: 'tl-1', nickname: 'DragonSlayer', remainingBudget: 1000 },
-						{ id: 'tl-2', nickname: 'NightHawk_KR', remainingBudget: 1000 },
-						{ id: 'tl-3', nickname: '참가자', remainingBudget: 1000 }
-					]
+				createRoomSessionResponse({
+					room: createRoomResponse({
+						code,
+						teamLeaders: [
+							{ id: 'tl-1', nickname: 'DragonSlayer', remainingBudget: 1000 },
+							{ id: 'tl-2', nickname: 'NightHawk_KR', remainingBudget: 1000 },
+							{ id: 'tl-3', nickname: '참가자', remainingBudget: 1000 }
+						]
+					})
 				})
 			)
 		);
@@ -59,6 +62,18 @@ export const handlers = [
 		const code = params['code'] as string;
 		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
 	}),
+
+	http.put(`${BASE_URL}/api/v1/rooms/:code/draft-position`, ({ params }) => {
+		const code = params['code'] as string;
+		return HttpResponse.json(success(createRoomResponse({ code })));
+	}),
+
+	http.delete(`${BASE_URL}/api/v1/rooms/:code/draft-position`, ({ params }) => {
+		const code = params['code'] as string;
+		return HttpResponse.json(success(createRoomResponse({ code })));
+	}),
+
+	// ─── Front-only (not in OpenAPI spec) ───
 
 	http.post(`${BASE_URL}/api/v1/rooms/:code/bid`, ({ params }) => {
 		const code = params['code'] as string;
