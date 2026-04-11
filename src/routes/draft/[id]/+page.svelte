@@ -270,6 +270,77 @@
 
 		<!-- Body -->
 		<div class="flex flex-1 overflow-hidden">
+			<!-- Left Panel: 팀 로스터 -->
+			<aside
+				class="flex w-[280px] flex-col gap-4 overflow-y-auto border-r border-gray-700 px-5 py-6"
+			>
+				<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">팀 로스터</span>
+
+				{#each store.draft.teams as team, i (team.id)}
+					{@const captain = store.captains[i]}
+					{@const isCurrent = team.id === store.draft.currentTeamId}
+					{@const slotsNeeded = store.draft.config.rounds}
+					{@const isExpanded = expandedTeams.has(team.id)}
+					{@const hasOverflow = team.roster.length > PREVIEW_COUNT}
+					{@const visibleRoster = isExpanded ? team.roster : team.roster.slice(0, PREVIEW_COUNT)}
+					<div class="flex flex-col gap-1.5 {i > 0 ? 'pt-3' : ''}">
+						<!-- 팀 헤더 -->
+						<div class="flex items-center justify-between">
+							<span
+								class="font-heading text-base font-semibold {isCurrent
+									? 'text-accent'
+									: 'text-gray-50'}"
+							>
+								{captain?.name ?? `팀 ${i + 1}`}
+							</span>
+							<div class="flex items-center gap-2">
+								<span class="font-mono text-sm text-muted">
+									{team.roster.length}/{slotsNeeded}
+								</span>
+								{#if isCurrent}
+									<span class="bg-accent-20 px-2 py-1 font-mono text-xs font-semibold text-accent">
+										내 차례
+									</span>
+								{/if}
+							</div>
+						</div>
+
+						<!-- 선수 세로 리스트 -->
+						{#if team.roster.length > 0}
+							<div class="flex flex-col gap-1">
+								{#each visibleRoster as player, si (si)}
+									<div
+										class="flex items-center gap-2 border px-3 py-1.5 {isCurrent
+											? 'border-gray-700 bg-accent-20'
+											: 'border-gray-700'}"
+									>
+										<span class="w-10 font-mono text-xs text-muted">{player.position}</span>
+										<span class="flex-1 truncate font-heading text-sm font-semibold text-gray-50">
+											{player.name}
+										</span>
+									</div>
+								{/each}
+								{#if hasOverflow}
+									<button
+										type="button"
+										class="flex items-center justify-center py-1 font-mono text-xs text-muted hover:text-accent"
+										onclick={() => toggleTeamExpand(team.id)}
+									>
+										{#if isExpanded}
+											접기
+										{:else}
+											… 외 {team.roster.length - PREVIEW_COUNT}명 더보기
+										{/if}
+									</button>
+								{/if}
+							</div>
+						{:else}
+							<span class="font-mono text-xs text-dim">선수 없음</span>
+						{/if}
+					</div>
+				{/each}
+			</aside>
+
 			<!-- Main Content -->
 			<main id="main-content" class="flex flex-1 flex-col overflow-y-auto px-8 py-6">
 				<!-- 타이머 (대형) -->
@@ -381,118 +452,45 @@
 				</div>
 			</main>
 
-			<!-- Side Panel: 팀 로스터 + 픽 히스토리 -->
+			<!-- Right Panel: 픽 히스토리 -->
 			<aside
-				class="flex w-[340px] flex-col gap-4 overflow-y-auto border-l border-gray-700 px-5 py-6"
+				class="flex w-[280px] flex-col gap-3 overflow-y-auto border-l border-gray-700 px-5 py-6"
 			>
-				<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">팀 로스터</span>
-
-				{#each store.draft.teams as team, i (team.id)}
-					{@const captain = store.captains[i]}
-					{@const isCurrent = team.id === store.draft.currentTeamId}
-					{@const slotsNeeded = store.draft.config.rounds}
-					{@const isExpanded = expandedTeams.has(team.id)}
-					{@const hasOverflow = team.roster.length > PREVIEW_COUNT}
-					{@const visibleRoster = isExpanded ? team.roster : team.roster.slice(0, PREVIEW_COUNT)}
-					<div class="flex flex-col gap-1.5 {i > 0 ? 'pt-3' : ''}">
-						<!-- 팀 헤더 -->
-						<div class="flex items-center justify-between">
-							<span
-								class="font-heading text-base font-semibold {isCurrent
-									? 'text-accent'
-									: 'text-gray-50'}"
-							>
-								{captain?.name ?? `팀 ${i + 1}`}
+				<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">
+					픽 히스토리
+				</span>
+				{#each store.draft.pickHistory as record, i (i)}
+					{@const teamIndex = store.draft.config.teamIds.indexOf(record.teamId)}
+					{@const captainName = store.captains[teamIndex]?.name ?? `팀 ${teamIndex + 1}`}
+					<div class="flex items-center gap-3">
+						<span class="font-mono text-sm font-semibold text-dim">
+							{String(i + 1).padStart(2, '0')}
+						</span>
+						<div class="flex flex-col gap-0.5">
+							<span class="font-heading text-sm font-semibold text-gray-50">
+								{record.player.name}
 							</span>
-							<div class="flex items-center gap-2">
-								<span class="font-mono text-sm text-muted">
-									{team.roster.length}/{slotsNeeded}
-								</span>
-								{#if isCurrent}
-									<span class="bg-accent-20 px-2 py-1 font-mono text-xs font-semibold text-accent">
-										내 차례
-									</span>
-								{/if}
-							</div>
+							<span class="font-mono text-xs text-muted">
+								{record.player.position} → {captainName}
+							</span>
 						</div>
-
-						<!-- 선수 세로 리스트 -->
-						{#if team.roster.length > 0}
-							<div class="flex flex-col gap-1">
-								{#each visibleRoster as player, si (si)}
-									<div
-										class="flex items-center gap-2 border px-3 py-1.5 {isCurrent
-											? 'border-gray-700 bg-accent-20'
-											: 'border-gray-700'}"
-									>
-										<span class="w-10 font-mono text-xs text-muted">{player.position}</span>
-										<span class="flex-1 truncate font-heading text-sm font-semibold text-gray-50">
-											{player.name}
-										</span>
-									</div>
-								{/each}
-								{#if hasOverflow}
-									<button
-										type="button"
-										class="flex items-center justify-center py-1 font-mono text-xs text-muted hover:text-accent"
-										onclick={() => toggleTeamExpand(team.id)}
-									>
-										{#if isExpanded}
-											접기
-										{:else}
-											… 외 {team.roster.length - PREVIEW_COUNT}명 더보기
-										{/if}
-									</button>
-								{/if}
-							</div>
-						{:else}
-							<span class="font-mono text-xs text-dim">선수 없음</span>
-						{/if}
 					</div>
 				{/each}
 
-				<div class="h-px w-full bg-gray-700"></div>
-
-				<!-- 픽 히스토리 -->
-				<div class="flex flex-col gap-3">
-					<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">
-						픽 히스토리
-					</span>
-					{#each store.draft.pickHistory as record, i (i)}
-						{@const teamIndex = store.draft.config.teamIds.indexOf(record.teamId)}
-						{@const captainName = store.captains[teamIndex]?.name ?? `팀 ${teamIndex + 1}`}
-						<div class="flex items-center gap-3">
-							<span class="font-mono text-sm font-semibold text-dim">
-								{String(i + 1).padStart(2, '0')}
-							</span>
-							<div class="flex flex-col gap-0.5">
-								<span class="font-heading text-sm font-semibold text-gray-50">
-									{record.player.name}
-								</span>
-								<span class="font-mono text-xs text-muted">
-									{record.player.position} → {captainName}
-								</span>
-							</div>
+				<!-- 현재 진행 중 표시 -->
+				{#if store.draft.currentTeamId}
+					{@const currentTeamIndex = store.draft.config.teamIds.indexOf(store.draft.currentTeamId)}
+					{@const currentName = store.captains[currentTeamIndex]?.name ?? ''}
+					<div class="flex items-center gap-3">
+						<span class="font-mono text-sm font-semibold text-accent">
+							{String(store.draft.pickHistory.length + 1).padStart(2, '0')}
+						</span>
+						<div class="flex flex-col gap-0.5">
+							<span class="font-heading text-sm font-semibold text-accent">—</span>
+							<span class="font-mono text-xs text-muted">{currentName} 선택 중</span>
 						</div>
-					{/each}
-
-					<!-- 현재 진행 중 표시 -->
-					{#if store.draft.currentTeamId}
-						{@const currentTeamIndex = store.draft.config.teamIds.indexOf(
-							store.draft.currentTeamId
-						)}
-						{@const currentName = store.captains[currentTeamIndex]?.name ?? ''}
-						<div class="flex items-center gap-3">
-							<span class="font-mono text-sm font-semibold text-accent">
-								{String(store.draft.pickHistory.length + 1).padStart(2, '0')}
-							</span>
-							<div class="flex flex-col gap-0.5">
-								<span class="font-heading text-sm font-semibold text-accent">—</span>
-								<span class="font-mono text-xs text-muted">{currentName} 선택 중</span>
-							</div>
-						</div>
-					{/if}
-				</div>
+					</div>
+				{/if}
 			</aside>
 		</div>
 	</div>
