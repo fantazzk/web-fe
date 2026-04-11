@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { Sidebar, Icon, Button, ThemePicker, Toggle } from '$lib/components';
 	import { Template } from '$lib/domain/template';
 	import type { GameType, TemplateModeType, DraftModeType, TierType } from '$lib/domain/template';
+	import { POSITIONS_BY_GAME } from '$lib/domain/template';
 
 	// --- State ---
 	let name = $state('');
@@ -18,6 +20,15 @@
 	let activeStep = $state<number | null>(null);
 	let stepRefs = $state<(HTMLElement | null)[]>([null, null, null, null]);
 
+	function handleSoloPlay(): void {
+		const templateId = crypto.randomUUID();
+		if (mode === 'DRAFT') {
+			goto(`/draft/${templateId}`);
+		} else {
+			goto(`/auction/${templateId}`);
+		}
+	}
+
 	// --- 선수 관련 ---
 	const TIERS: TierType[] = ['S+', 'S', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D'];
 
@@ -27,16 +38,9 @@
 		tier: TierType;
 	}
 
-	const ROLES_BY_GAME: Record<GameType, string[]> = {
-		LEAGUE_OF_LEGENDS: ['탑', '정글', '미드', '원딜', '서포터'],
-		VALORANT: ['듀얼리스트', '이니시에이터', '컨트롤러', '센티널'],
-		OVERWATCH_2: ['탱커', '딜러', '서포터'],
-		BATTLEGROUNDS: []
-	};
-
 	let players = $state<PlayerEntry[]>([]);
-	let roles = $derived(ROLES_BY_GAME[gameType]);
-	let hasRoles = $derived(roles.length > 0);
+	let positionOptions = $derived(POSITIONS_BY_GAME[gameType]);
+	let hasRoles = $derived(positionOptions.length > 0);
 
 	// --- Derived ---
 	let completion = $derived(
@@ -71,14 +75,14 @@
 	// --- Functions ---
 	function setGameType(gt: GameType) {
 		gameType = gt;
-		const newRoles = ROLES_BY_GAME[gt];
+		const newOptions = POSITIONS_BY_GAME[gt];
 		for (const player of players) {
-			player.position = newRoles.length > 0 ? newRoles[0]! : '';
+			player.position = newOptions.length > 0 ? newOptions[0]!.value : '';
 		}
 	}
 
 	function addPlayer() {
-		players.push({ name: '', position: hasRoles ? roles[0]! : '', tier: 'B' });
+		players.push({ name: '', position: hasRoles ? positionOptions[0]!.value : '', tier: 'B' });
 	}
 
 	function removePlayer(index: number) {
@@ -461,8 +465,8 @@
 													aria-label="선수 {i + 1} 역할"
 													class="h-10 w-[140px] border border-gray-700 bg-bg-primary px-3 font-mono text-sm text-gray-50 focus:border-accent focus:outline-none"
 												>
-													{#each roles as role}
-														<option value={role}>{role}</option>
+													{#each positionOptions as opt}
+														<option value={opt.value}>{opt.label}</option>
 													{/each}
 												</select>
 											{/if}
@@ -535,7 +539,7 @@
 
 				<!-- Bottom Bar -->
 				<div class="flex items-center justify-end gap-3 border-t border-gray-700 px-14 py-4">
-					<Button variant="SECONDARY" size="MD">혼자 하기</Button>
+					<Button variant="SECONDARY" size="MD" onclick={handleSoloPlay}>혼자 하기</Button>
 					<Button variant="PRIMARY" size="MD">방 만들기</Button>
 				</div>
 			</main>

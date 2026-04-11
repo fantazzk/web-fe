@@ -3,6 +3,7 @@ import {
 	success,
 	createTemplateListResponse,
 	createTemplateDetailResponse,
+	createDraftTemplateDetailResponse,
 	createTemplateResponse,
 	createRoomResponse,
 	createRoomSessionResponse,
@@ -83,6 +84,16 @@ export const handlers = [
 	http.get(`${BASE_URL}/api/v1/solo/auction/:templateId`, ({ params }) => {
 		const id = params['templateId'] as string;
 		const template = createTemplateDetailResponse({ id });
+		const captains = Array.from({ length: template.teamCount }, (_, i) => ({
+			id: `captain-${i + 1}`,
+			name: `감독 ${i + 1}`
+		}));
+		return HttpResponse.json(success({ template, captains }));
+	}),
+
+	http.get(`${BASE_URL}/api/v1/solo/draft/:templateId`, ({ params }) => {
+		const id = params['templateId'] as string;
+		const template = createDraftTemplateDetailResponse({ id });
 		const captains = Array.from({ length: template.teamCount }, (_, i) => ({
 			id: `captain-${i + 1}`,
 			name: `감독 ${i + 1}`
