@@ -403,8 +403,7 @@
 					<div
 						class="mt-4 flex h-14 items-center gap-3 bg-accent px-5 font-mono text-base font-semibold text-bg-primary"
 					>
-						<span>→</span>
-						<span class="tracking-wider">내 픽 — {store.currentCaptainName}</span>
+						<span class="tracking-wider">{store.currentCaptainName} 님의 차례입니다.</span>
 						<span class="ml-auto tracking-wider">선수를 선택하세요</span>
 					</div>
 				{/if}
