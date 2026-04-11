@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { Sidebar, Icon, Button, ThemePicker, Toggle } from '$lib/components';
 	import { Template } from '$lib/domain/template';
 	import type { GameType, TemplateModeType, DraftModeType, TierType } from '$lib/domain/template';
@@ -17,6 +18,15 @@
 	let draftInfoRef = $state<HTMLElement | null>(null);
 	let activeStep = $state<number | null>(null);
 	let stepRefs = $state<(HTMLElement | null)[]>([null, null, null, null]);
+
+	function handleSoloPlay(): void {
+		const templateId = crypto.randomUUID();
+		if (mode === 'DRAFT') {
+			goto(`/draft/${templateId}`);
+		} else {
+			goto(`/auction/${templateId}`);
+		}
+	}
 
 	// --- 선수 관련 ---
 	const TIERS: TierType[] = ['S+', 'S', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D'];
@@ -535,7 +545,7 @@
 
 				<!-- Bottom Bar -->
 				<div class="flex items-center justify-end gap-3 border-t border-gray-700 px-14 py-4">
-					<Button variant="SECONDARY" size="MD">혼자 하기</Button>
+					<Button variant="SECONDARY" size="MD" onclick={handleSoloPlay}>혼자 하기</Button>
 					<Button variant="PRIMARY" size="MD">방 만들기</Button>
 				</div>
 			</main>
