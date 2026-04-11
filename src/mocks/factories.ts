@@ -2,6 +2,7 @@ import type {
 	ApiResponse,
 	TemplateResponse,
 	RoomResponse,
+	RoomSessionResponse,
 	TeamLeaderResponse
 } from '$lib/types/api';
 
@@ -23,7 +24,7 @@ export function error(status: number, errorCode: string, reason: string): ApiRes
 
 export function createTemplateResponse(overrides?: Partial<TemplateResponse>): TemplateResponse {
 	return {
-		id: 1,
+		id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 		name: '스트리머 랭킹전 시즌 2',
 		mode: 'AUCTION',
 		teamCount: 8,
@@ -36,7 +37,7 @@ export function createTemplateResponse(overrides?: Partial<TemplateResponse>): T
 export function createTemplateListResponse(): TemplateResponse[] {
 	return [
 		createTemplateResponse({
-			id: 1,
+			id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 			name: '스트리머 랭킹전 시즌 2',
 			mode: 'AUCTION',
 			teamCount: 8,
@@ -44,7 +45,7 @@ export function createTemplateListResponse(): TemplateResponse[] {
 			budget: 1000
 		}),
 		createTemplateResponse({
-			id: 2,
+			id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
 			name: '발로란트 프로 경매전',
 			mode: 'AUCTION',
 			teamCount: 6,
@@ -52,7 +53,7 @@ export function createTemplateListResponse(): TemplateResponse[] {
 			budget: 800
 		}),
 		{
-			id: 3,
+			id: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
 			name: '배그 스쿼드 드래프트',
 			mode: 'DRAFT',
 			teamCount: 4,
@@ -106,7 +107,23 @@ export function createRoomResponse(overrides?: Partial<RoomResponse>): RoomRespo
 	return {
 		code: 'ABC774',
 		status: 'WAITING',
+		mode: 'AUCTION',
+		teamCount: 8,
 		teamLeaders: createTeamLeaders(2, 1000),
+		...overrides
+	};
+}
+
+export function createRoomSessionResponse(
+	overrides?: Partial<RoomSessionResponse>
+): RoomSessionResponse {
+	return {
+		room: createRoomResponse(),
+		teamLeaderSession: {
+			leaderId: 'tl-1',
+			role: 'HOST',
+			actionToken: 'mock-action-token-abc123'
+		},
 		...overrides
 	};
 }
