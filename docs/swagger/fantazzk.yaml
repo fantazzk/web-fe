@@ -1,0 +1,403 @@
+openapi: 3.1.0
+info:
+  title: Fantazzk API
+  description: |-
+    Fantazzk의 드래프트/경매 팀 빌딩 API입니다.
+    모든 응답은 공통 envelope를 사용합니다.
+    - 성공 응답: resultType=SUCCESS, success 에 실제 payload 가 들어갑니다.
+    - 실패 응답: resultType=ERROR, error 에 status, errorCode, reason, data 가 들어갑니다.
+  version: v1
+servers:
+- url: http://127.0.0.1:8080
+  description: Generated server url
+tags:
+- name: Template
+  description: 팀 빌딩 템플릿 생성 및 조회 API
+- name: Room
+  description: "방 생성, 참가, 시작, 경매, 드래프트 진행 API"
+paths:
+  /api/v1/rooms/{code}/draft-position:
+    put:
+      tags:
+      - room-api-controller
+      operationId: selectDraftPosition
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Room-Action-Token
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SelectDraftPositionRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomResponse"
+    delete:
+      tags:
+      - room-api-controller
+      operationId: clearDraftPosition
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Room-Action-Token
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomResponse"
+  /api/v1/templates:
+    get:
+      tags:
+      - template-api-controller
+      operationId: list
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseListTemplateResponse"
+    post:
+      tags:
+      - template-api-controller
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplateRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseTemplateResponse"
+  /api/v1/rooms:
+    post:
+      tags:
+      - room-api-controller
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoomRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomSessionResponse"
+  /api/v1/rooms/{code}/start:
+    post:
+      tags:
+      - room-api-controller
+      operationId: start
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Room-Action-Token
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomResponse"
+  /api/v1/rooms/{code}/join:
+    post:
+      tags:
+      - room-api-controller
+      operationId: join
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinRoomRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomSessionResponse"
+  /api/v1/templates/{id}:
+    get:
+      tags:
+      - template-api-controller
+      operationId: getById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseTemplateResponse"
+  /api/v1/rooms/{code}:
+    get:
+      tags:
+      - room-api-controller
+      operationId: getByCode
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomResponse"
+components:
+  schemas:
+    SelectDraftPositionRequest:
+      type: object
+      properties:
+        draftPosition:
+          type: integer
+          format: int32
+      required:
+      - draftPosition
+    ApiResponseRoomResponse:
+      type: object
+      properties:
+        resultType:
+          type: string
+          enum:
+          - SUCCESS
+          - ERROR
+        success:
+          $ref: "#/components/schemas/RoomResponse"
+        error:
+          $ref: "#/components/schemas/ErrorMessage"
+    ErrorMessage:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          type: object
+    RoomResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        status:
+          type: string
+        mode:
+          type: string
+        teamCount:
+          type: integer
+          format: int32
+        startReadiness:
+          type: string
+        teamLeaders:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamLeaderResponse"
+    TeamLeaderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        nickname:
+          type: string
+        draftPosition:
+          type: integer
+          format: int32
+        remainingBudget:
+          type: integer
+          format: int32
+    CreateTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        mode:
+          type: string
+          enum:
+          - AUCTION
+          - DRAFT
+        teamCount:
+          type: integer
+          format: int32
+        teamSize:
+          type: integer
+          format: int32
+        budget:
+          type: integer
+          format: int32
+        draftOrderStrategy:
+          type: string
+          enum:
+          - SNAKE
+          - FIXED
+        playerNames:
+          type: array
+          items:
+            type: string
+          minItems: 1
+      required:
+      - mode
+    ApiResponseTemplateResponse:
+      type: object
+      properties:
+        resultType:
+          type: string
+          enum:
+          - SUCCESS
+          - ERROR
+        success:
+          $ref: "#/components/schemas/TemplateResponse"
+        error:
+          $ref: "#/components/schemas/ErrorMessage"
+    TemplatePlayerResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        displayOrder:
+          type: integer
+          format: int32
+    TemplateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        mode:
+          type: string
+          enum:
+          - AUCTION
+          - DRAFT
+        teamCount:
+          type: integer
+          format: int32
+        teamSize:
+          type: integer
+          format: int32
+        budget:
+          type: integer
+          format: int32
+        draftOrderStrategy:
+          type: string
+          enum:
+          - SNAKE
+          - FIXED
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemplatePlayerResponse"
+    CreateRoomRequest:
+      type: object
+      properties:
+        templateId:
+          type: string
+          format: uuid
+        hostNickname:
+          type: string
+          minLength: 1
+      required:
+      - templateId
+    ApiResponseRoomSessionResponse:
+      type: object
+      properties:
+        resultType:
+          type: string
+          enum:
+          - SUCCESS
+          - ERROR
+        success:
+          $ref: "#/components/schemas/RoomSessionResponse"
+        error:
+          $ref: "#/components/schemas/ErrorMessage"
+    RoomSessionResponse:
+      type: object
+      properties:
+        room:
+          $ref: "#/components/schemas/RoomResponse"
+        teamLeaderSession:
+          $ref: "#/components/schemas/TeamLeaderSessionResponse"
+    TeamLeaderSessionResponse:
+      type: object
+      properties:
+        leaderId:
+          type: string
+        role:
+          type: string
+        actionToken:
+          type: string
+    JoinRoomRequest:
+      type: object
+      properties:
+        nickname:
+          type: string
+          minLength: 1
+    ApiResponseListTemplateResponse:
+      type: object
+      properties:
+        resultType:
+          type: string
+          enum:
+          - SUCCESS
+          - ERROR
+        success:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemplateResponse"
+        error:
+          $ref: "#/components/schemas/ErrorMessage"
