@@ -8,3 +8,4 @@ export { default as ResultListItem } from './ResultListItem.svelte';
 export { default as FormField } from './FormField.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
 export { default as ThemePicker } from './ThemePicker.svelte';
+export { default as Toggle } from './Toggle.svelte';

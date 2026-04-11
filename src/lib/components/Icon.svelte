@@ -11,7 +11,8 @@
 		| 'download'
 		| 'link'
 		| 'refresh-cw'
-		| 'play';
+		| 'play'
+		| 'info';
 
 	interface Props {
 		name: IconName;
@@ -92,5 +93,9 @@
 		<path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14" />
 	{:else if name === 'play'}
 		<polygon points="5 3 19 12 5 21 5 3" />
+	{:else if name === 'info'}
+		<circle cx="12" cy="12" r="10" />
+		<line x1="12" y1="16" x2="12" y2="12" />
+		<line x1="12" y1="8" x2="12.01" y2="8" />
 	{/if}
 </svg>
