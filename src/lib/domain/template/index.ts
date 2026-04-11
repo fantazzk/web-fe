@@ -2,10 +2,9 @@ export { Template } from './template.ts';
 export { Player } from './player.ts';
 export type {
 	GameType,
-	TemplateMode,
-	MatchFormat,
-	TierBalancing,
-	CaptainSelectMode,
+	TemplateModeType,
+	DraftModeType,
+	TierType,
 	PlayerParams,
 	TemplateParams
 } from './types.ts';
