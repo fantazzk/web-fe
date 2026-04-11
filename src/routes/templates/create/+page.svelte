@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Sidebar, Icon, Button, ThemePicker, Toggle } from '$lib/components';
 	import { Template } from '$lib/domain/template';
-	import type { GameType, TemplateModeType, DraftModeType } from '$lib/domain/template/types';
+	import type { GameType, TemplateModeType, DraftModeType, TierType } from '$lib/domain/template';
 
 	// --- State ---
 	let name = $state('');
@@ -19,8 +19,7 @@
 	let stepRefs = $state<(HTMLElement | null)[]>([null, null, null, null]);
 
 	// --- 선수 관련 ---
-	const TIERS = ['S+', 'S', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D'] as const;
-	type TierType = (typeof TIERS)[number];
+	const TIERS: TierType[] = ['S+', 'S', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D'];
 
 	interface PlayerEntry {
 		name: string;
@@ -159,7 +158,14 @@
 						<span class="font-mono text-xs font-semibold text-muted">진행률</span>
 						<span class="font-mono text-xs font-semibold text-accent">{completion.percent}%</span>
 					</div>
-					<div class="h-1 w-full rounded-full bg-gray-700">
+					<div
+						class="h-1 w-full rounded-full bg-gray-700"
+						role="progressbar"
+						aria-valuenow={completion.percent}
+						aria-valuemin={0}
+						aria-valuemax={100}
+						aria-label="템플릿 완성도"
+					>
 						<div class="h-full rounded-full bg-accent" style="width: {completion.percent}%"></div>
 					</div>
 				</div>
@@ -217,13 +223,13 @@
 								? 'border-accent'
 								: 'border-gray-700'}"
 						>
-							<span
+							<h2
 								class="font-mono text-sm font-bold tracking-wider {activeStep === 0
 									? 'text-accent'
 									: 'text-gray-50'}"
 							>
 								1단계 기본 정보
-							</span>
+							</h2>
 							<div class="flex flex-col gap-2">
 								<label for="name" class="font-mono text-xs font-semibold tracking-[2px] text-muted">
 									대회 이름
@@ -240,10 +246,12 @@
 								<span class="font-mono text-xs font-semibold tracking-[2px] text-muted">
 									게임 종목
 								</span>
-								<div class="flex gap-2.5">
+								<div class="flex gap-2.5" role="radiogroup" aria-label="게임 종목">
 									{#each GAME_OPTIONS as opt}
 										<button
 											type="button"
+											role="radio"
+											aria-checked={gameType === opt.value}
 											onclick={() => setGameType(opt.value)}
 											class="border px-4 py-2.5 font-mono text-xs font-semibold tracking-wider {gameType ===
 											opt.value
@@ -264,21 +272,23 @@
 								? 'border-accent'
 								: 'border-gray-700'}"
 						>
-							<span
+							<h2
 								class="font-mono text-sm font-bold tracking-wider {activeStep === 1
 									? 'text-accent'
 									: 'text-gray-50'}"
 							>
 								2단계 규칙
-							</span>
+							</h2>
 							<div class="flex flex-col gap-2">
 								<span class="font-mono text-xs font-semibold tracking-[2px] text-muted">
 									진행 방식
 								</span>
-								<div class="flex gap-2.5">
+								<div class="flex gap-2.5" role="radiogroup" aria-label="진행 방식">
 									{#each MODE_OPTIONS as opt}
 										<button
 											type="button"
+											role="radio"
+											aria-checked={mode === opt.value}
 											onclick={() => (mode = opt.value)}
 											class="border px-4 py-2.5 font-mono text-xs font-semibold tracking-wider {mode ===
 											opt.value
@@ -299,6 +309,9 @@
 										<span class="relative flex items-center" bind:this={draftInfoRef}>
 											<button
 												type="button"
+												aria-label="드래프트 방식 설명"
+												aria-expanded={showDraftInfo}
+												aria-controls="draft-info-popover"
 												onclick={() => (showDraftInfo = !showDraftInfo)}
 												class="flex cursor-pointer items-center hover:text-accent {showDraftInfo
 													? 'text-accent'
@@ -308,6 +321,8 @@
 											</button>
 											{#if showDraftInfo}
 												<div
+													id="draft-info-popover"
+													role="tooltip"
 													class="absolute top-1/2 left-full z-10 ml-2 w-[260px] -translate-y-1/2 border border-accent bg-bg-primary p-3 shadow-lg"
 												>
 													<div class="flex flex-col gap-2">
@@ -337,10 +352,12 @@
 											{/if}
 										</span>
 									</div>
-									<div class="flex gap-2.5">
+									<div class="flex gap-2.5" role="radiogroup" aria-label="드래프트 방식">
 										{#each DRAFT_OPTIONS as opt}
 											<button
 												type="button"
+												role="radio"
+												aria-checked={draftType === opt.value}
 												onclick={() => (draftType = opt.value)}
 												class="border px-4 py-2.5 font-mono text-xs font-semibold tracking-wider {draftType ===
 												opt.value
@@ -408,13 +425,13 @@
 								: 'border-gray-700'}"
 						>
 							<div class="flex items-center justify-between">
-								<span
+								<h2
 									class="font-mono text-sm font-bold tracking-wider {activeStep === 2
 										? 'text-accent'
 										: 'text-gray-50'}"
 								>
 									3단계 선수
-								</span>
+								</h2>
 								<span class="font-mono text-xs text-muted">
 									{players.length}명
 								</span>
@@ -435,11 +452,13 @@
 												type="text"
 												bind:value={player.name}
 												placeholder="선수 이름"
+												aria-label="선수 {i + 1} 이름"
 												class="h-10 flex-1 border border-gray-700 bg-transparent px-3 font-mono text-sm text-gray-50 placeholder:text-subtle focus:border-accent focus:outline-none"
 											/>
 											{#if hasRoles}
 												<select
 													bind:value={player.position}
+													aria-label="선수 {i + 1} 역할"
 													class="h-10 w-[140px] border border-gray-700 bg-bg-primary px-3 font-mono text-sm text-gray-50 focus:border-accent focus:outline-none"
 												>
 													{#each roles as role}
@@ -449,6 +468,7 @@
 											{/if}
 											<select
 												bind:value={player.tier}
+												aria-label="선수 {i + 1} 등급"
 												class="h-10 w-[100px] border border-gray-700 bg-bg-primary px-3 font-mono text-sm text-gray-50 focus:border-accent focus:outline-none"
 											>
 												{#each TIERS as t}
@@ -457,6 +477,7 @@
 											</select>
 											<button
 												type="button"
+												aria-label="선수 {i + 1} 삭제"
 												onclick={() => removePlayer(i)}
 												class="flex h-10 w-8 items-center justify-center text-subtle hover:text-error"
 											>
@@ -482,13 +503,13 @@
 								? 'border-accent'
 								: 'border-gray-700'}"
 						>
-							<span
+							<h2
 								class="font-mono text-sm font-bold tracking-wider {activeStep === 3
 									? 'text-accent'
 									: 'text-gray-50'}"
 							>
 								4단계 감독
-							</span>
+							</h2>
 							<div class="flex flex-col gap-2">
 								<label
 									for="captainsNeeded"

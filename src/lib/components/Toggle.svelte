@@ -2,7 +2,7 @@
 	interface Props {
 		checked: boolean;
 		onchange?: (checked: boolean) => void;
-		label?: string;
+		label: string;
 	}
 
 	let { checked = $bindable(), onchange, label }: Props = $props();
