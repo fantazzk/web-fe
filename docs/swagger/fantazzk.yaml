@@ -97,6 +97,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApiResponseTemplateResponse"
   /api/v1/rooms:
+    get:
+      tags:
+      - room-api-controller
+      operationId: list_1
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseListJoinableRoomResponse"
     post:
       tags:
       - room-api-controller
@@ -229,6 +240,41 @@ components:
           type: string
         data:
           type: object
+    RoomMemberResponse:
+      type: object
+      properties:
+        teamLeaderId:
+          type: string
+        playerName:
+          type: string
+        assignOrder:
+          type: integer
+          format: int32
+    RoomPlayerResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        displayOrder:
+          type: integer
+          format: int32
+        status:
+          type: string
+    RoomProgressResponse:
+      type: object
+      properties:
+        currentTurnIndex:
+          type: integer
+          format: int32
+        currentRound:
+          type: integer
+          format: int32
+        currentLeaderId:
+          type: string
+        currentRoundLeaderIds:
+          type: array
+          items:
+            type: string
     RoomResponse:
       type: object
       properties:
@@ -241,12 +287,30 @@ components:
         teamCount:
           type: integer
           format: int32
+        teamSize:
+          type: integer
+          format: int32
+        budget:
+          type: integer
+          format: int32
+        draftOrderStrategy:
+          type: string
         startReadiness:
           type: string
         teamLeaders:
           type: array
           items:
             $ref: "#/components/schemas/TeamLeaderResponse"
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoomPlayerResponse"
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoomMemberResponse"
+        progress:
+          $ref: "#/components/schemas/RoomProgressResponse"
     TeamLeaderResponse:
       type: object
       properties:
@@ -401,3 +465,35 @@ components:
             $ref: "#/components/schemas/TemplateResponse"
         error:
           $ref: "#/components/schemas/ErrorMessage"
+    ApiResponseListJoinableRoomResponse:
+      type: object
+      properties:
+        resultType:
+          type: string
+          enum:
+          - SUCCESS
+          - ERROR
+        success:
+          type: array
+          items:
+            $ref: "#/components/schemas/JoinableRoomResponse"
+        error:
+          $ref: "#/components/schemas/ErrorMessage"
+    JoinableRoomResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        mode:
+          type: string
+        teamCount:
+          type: integer
+          format: int32
+        joinedLeaderCount:
+          type: integer
+          format: int32
+        remainingSlotCount:
+          type: integer
+          format: int32
+        startReadiness:
+          type: string
