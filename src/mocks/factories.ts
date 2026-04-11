@@ -71,20 +71,13 @@ export function createTemplateDetailResponse(
 		teamCount: 4,
 		teamSize: 5,
 		minBidUnit: 5,
-		pickBanTime: 30,
+		pickBanTime: 5,
 		players: [
 			{ name: 'KIIN', position: 'TOP', displayOrder: 0 },
 			{ name: 'ONER', position: 'JGL', displayOrder: 1 },
 			{ name: 'CHOVY', position: 'MID', displayOrder: 2 },
 			{ name: 'PEYZ', position: 'ADC', displayOrder: 3 },
-			{ name: 'LEHENDS', position: 'SUP', displayOrder: 4 },
-			{ name: 'ZEUS', position: 'TOP', displayOrder: 5 },
-			{ name: 'CANYON', position: 'JGL', displayOrder: 6 },
-			{ name: 'FAKER', position: 'MID', displayOrder: 7 },
-			{ name: 'GUMAYUSI', position: 'ADC', displayOrder: 8 },
-			{ name: 'KERIA', position: 'SUP', displayOrder: 9 },
-			{ name: 'DORAN', position: 'TOP', displayOrder: 10 },
-			{ name: 'PEANUT', position: 'JGL', displayOrder: 11 }
+			{ name: 'LEHENDS', position: 'SUP', displayOrder: 4 }
 		],
 		...overrides
 	});

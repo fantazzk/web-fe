@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Badge, Button, PlayerCard } from '$lib/components';
 	import { auctionStore } from '$lib/features/auction/stores/auction-store.svelte';
@@ -40,7 +42,31 @@
 	}
 
 	function handleTimerExpiry(): void {
-		const next = processTimerExpiry(store.auction);
+		const auction = store.auction;
+		const playerName = auction.currentPlayer?.name ?? '';
+
+		if (auction.currentBid) {
+			const teamId = auction.currentBid.teamId;
+			store.addBidRecord({
+				kind: 'SOLD',
+				teamId,
+				teamName: store.captains.find((c) => c.id === teamId)?.name ?? '',
+				playerName,
+				amount: auction.currentBid.amount,
+				timestamp: Date.now()
+			});
+		} else {
+			store.addBidRecord({
+				kind: 'UNSOLD',
+				teamId: '',
+				teamName: '',
+				playerName,
+				amount: 0,
+				timestamp: Date.now()
+			});
+		}
+
+		const next = processTimerExpiry(auction);
 		store.updateAuction(next);
 
 		if (next.isCompleted) {
@@ -54,6 +80,10 @@
 
 	function handleStart(): void {
 		store.setUIPhase('PLAYING');
+		const firstTeam = store.auction.teams[0];
+		if (firstTeam) {
+			store.selectTeam(firstTeam.id);
+		}
 		startTimer();
 		bidInputValue = 0;
 	}
@@ -85,8 +115,10 @@
 
 		store.updateAuction(result.auction);
 		store.addBidRecord({
+			kind: 'BID',
 			teamId: store.selectedTeamId,
 			teamName: store.captains.find((c) => c.id === store.selectedTeamId)?.name ?? '',
+			playerName: store.auction.currentPlayer?.name ?? '',
 			amount: bidInputValue,
 			timestamp: Date.now()
 		});
@@ -179,7 +211,9 @@
 			<div class="absolute inset-0 z-50 flex items-center justify-center bg-black/70">
 				<div class="flex flex-col items-center gap-6">
 					<span class="font-heading text-2xl font-bold text-gray-50">경매가 종료되었습니다</span>
-					<Button variant="PRIMARY" size="MD">결과 보기</Button>
+					<Button variant="PRIMARY" size="MD" onclick={() => goto(`/result/${$page.params['id']}`)}
+						>결과 보기</Button
+					>
 				</div>
 			</div>
 		{/if}
@@ -249,7 +283,13 @@
 				{#if store.auction.currentPlayer}
 					{@const player = store.auction.currentPlayer}
 					<div class="flex items-center gap-4 border border-gray-50 p-6">
-						<div class="h-20 w-20 border-2 border-accent bg-gray-700"></div>
+						<div
+							class="flex h-20 w-20 items-center justify-center border-2 border-accent bg-gray-700"
+						>
+							<span class="font-mono text-2xl font-bold text-accent">
+								{player.position || player.name.charAt(0)}
+							</span>
+						</div>
 						<div class="flex flex-col gap-1">
 							<span class="font-heading text-2xl font-bold text-gray-50">{player.name}</span>
 							<span class="font-mono text-xs text-muted">{player.position}</span>
@@ -293,13 +333,15 @@
 					</div>
 
 					<div class="flex items-center gap-3">
-						<input
-							type="number"
-							class="h-11 w-32 border border-gray-700 bg-bg-primary px-3 font-mono text-sm text-gray-50 focus:border-accent focus:outline-none"
-							bind:value={bidInputValue}
-							min={0}
-							step={minBidUnit}
-						/>
+						<span
+							class="flex h-11 w-32 items-center overflow-hidden border border-gray-700 px-3 font-mono text-sm font-semibold text-accent"
+						>
+							{#key bidInputValue}
+								<span in:fly={{ y: -12, duration: 200 }}>
+									{bidInputValue.toLocaleString()}
+								</span>
+							{/key}
+						</span>
 						<Button variant="SECONDARY" size="MD" onclick={() => handleAddBid(1)}
 							>+{minBidUnit}</Button
 						>
@@ -329,27 +371,55 @@
 			<aside class="flex w-[300px] flex-col gap-3 overflow-y-auto border-l border-gray-700 p-5">
 				<span class="font-mono text-[11px] font-semibold tracking-wider text-accent">입찰 기록</span
 				>
-				{#each store.bidRecords as record, i (record.timestamp)}
-					{@const isTop = i === 0}
-					<div
-						class="flex items-center justify-between px-3 py-2.5 {isTop
-							? 'border border-accent'
-							: 'border border-gray-700'}"
-					>
-						<div class="flex flex-col gap-0.5">
-							<span
-								class="max-w-[160px] truncate font-heading text-[13px] font-semibold text-gray-50"
-							>
-								{record.teamName}
-							</span>
-							<span class="font-mono text-[10px] font-semibold tracking-wider text-muted">
-								{Math.round((Date.now() - record.timestamp) / 1000)}초 전
+				{#each store.bidRecords as record, i (`${record.timestamp}-${i}`)}
+					{#if record.kind === 'SOLD'}
+						<div
+							class="flex items-center justify-between border border-green-700 bg-green-900/20 px-3 py-2.5"
+						>
+							<div class="flex flex-col gap-0.5">
+								<span class="font-heading text-[13px] font-semibold text-green-400">
+									낙찰 — {record.playerName}
+								</span>
+								<span class="font-mono text-[10px] font-semibold tracking-wider text-muted">
+									{record.teamName}
+								</span>
+							</div>
+							<span class="font-heading text-base font-bold text-green-400">
+								{record.amount.toLocaleString()} 포인트
 							</span>
 						</div>
-						<span class="font-heading text-base font-bold {isTop ? 'text-accent' : 'text-gray-50'}">
-							{record.amount.toLocaleString()} 포인트
-						</span>
-					</div>
+					{:else if record.kind === 'UNSOLD'}
+						<div
+							class="flex items-center justify-between border border-red-700 bg-red-900/20 px-3 py-2.5"
+						>
+							<span class="font-heading text-[13px] font-semibold text-red-400">
+								유찰 — {record.playerName}
+							</span>
+						</div>
+					{:else}
+						{@const isTop = i === 0}
+						<div
+							class="flex items-center justify-between px-3 py-2.5 {isTop
+								? 'border border-accent'
+								: 'border border-gray-700'}"
+						>
+							<div class="flex flex-col gap-0.5">
+								<span
+									class="max-w-[160px] truncate font-heading text-[13px] font-semibold text-gray-50"
+								>
+									{record.teamName}
+								</span>
+								<span class="font-mono text-[10px] font-semibold tracking-wider text-muted">
+									{record.playerName}에 입찰
+								</span>
+							</div>
+							<span
+								class="font-heading text-base font-bold {isTop ? 'text-accent' : 'text-gray-50'}"
+							>
+								{record.amount.toLocaleString()} 포인트
+							</span>
+						</div>
+					{/if}
 				{/each}
 			</aside>
 		</div>
