@@ -3,6 +3,7 @@
 	import { Sidebar, Icon, Button, ThemePicker, Toggle } from '$lib/components';
 	import { Template } from '$lib/domain/template';
 	import type { GameType, TemplateModeType, DraftModeType, TierType } from '$lib/domain/template';
+	import { POSITIONS_BY_GAME } from '$lib/domain/template';
 
 	// --- State ---
 	let name = $state('');
@@ -37,16 +38,9 @@
 		tier: TierType;
 	}
 
-	const ROLES_BY_GAME: Record<GameType, string[]> = {
-		LEAGUE_OF_LEGENDS: ['탑', '정글', '미드', '원딜', '서포터'],
-		VALORANT: ['듀얼리스트', '이니시에이터', '컨트롤러', '센티널'],
-		OVERWATCH_2: ['탱커', '딜러', '서포터'],
-		BATTLEGROUNDS: []
-	};
-
 	let players = $state<PlayerEntry[]>([]);
-	let roles = $derived(ROLES_BY_GAME[gameType]);
-	let hasRoles = $derived(roles.length > 0);
+	let positionOptions = $derived(POSITIONS_BY_GAME[gameType]);
+	let hasRoles = $derived(positionOptions.length > 0);
 
 	// --- Derived ---
 	let completion = $derived(
@@ -81,14 +75,14 @@
 	// --- Functions ---
 	function setGameType(gt: GameType) {
 		gameType = gt;
-		const newRoles = ROLES_BY_GAME[gt];
+		const newOptions = POSITIONS_BY_GAME[gt];
 		for (const player of players) {
-			player.position = newRoles.length > 0 ? newRoles[0]! : '';
+			player.position = newOptions.length > 0 ? newOptions[0]!.value : '';
 		}
 	}
 
 	function addPlayer() {
-		players.push({ name: '', position: hasRoles ? roles[0]! : '', tier: 'B' });
+		players.push({ name: '', position: hasRoles ? positionOptions[0]!.value : '', tier: 'B' });
 	}
 
 	function removePlayer(index: number) {
@@ -471,8 +465,8 @@
 													aria-label="선수 {i + 1} 역할"
 													class="h-10 w-[140px] border border-gray-700 bg-bg-primary px-3 font-mono text-sm text-gray-50 focus:border-accent focus:outline-none"
 												>
-													{#each roles as role}
-														<option value={role}>{role}</option>
+													{#each positionOptions as opt}
+														<option value={opt.value}>{opt.label}</option>
 													{/each}
 												</select>
 											{/if}

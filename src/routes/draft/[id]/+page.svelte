@@ -13,7 +13,6 @@
 	import { SvelteSet } from 'svelte/reactivity';
 
 	const store = draftStore;
-	const positions = ['ALL', 'TOP', 'JGL', 'MID', 'ADC', 'SUP'];
 
 	let remainingSeconds = $state(0);
 	let timerInterval: ReturnType<typeof setInterval> | null = null;
@@ -149,6 +148,13 @@
 	);
 
 	const timerProgress = $derived(store.pickBanTime > 0 ? remainingSeconds / store.pickBanTime : 0);
+
+	/** 선수풀에서 고유 포지션 추출 (순서 유지) */
+	const positions = $derived(() => {
+		if (!store.draft) return ['ALL'];
+		const unique = [...new Set(store.draft.config.playerPool.map((p) => p.position))];
+		return ['ALL', ...unique];
+	});
 
 	const filteredPool = $derived(
 		store.draft
@@ -410,7 +416,7 @@
 
 				<!-- 포지션 필터 탭 -->
 				<div class="mt-4 flex">
-					{#each positions as pos (pos)}
+					{#each positions() as pos (pos)}
 						<button
 							type="button"
 							class="flex h-11 w-24 items-center justify-center font-mono text-sm font-semibold tracking-wider {store.positionFilter ===
