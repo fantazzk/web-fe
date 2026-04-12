@@ -1,5 +1,5 @@
-import { Auction } from '$lib/domain/rule-engine/auction';
-import { AuctionError } from '$lib/domain/rule-engine/errors';
+import { Auction } from './auction.ts';
+import { AuctionError } from './errors.ts';
 
 interface BidResultType {
 	readonly auction: Auction;
