@@ -9,27 +9,27 @@
 | 항목            | 기술                 |
 | --------------- | -------------------- |
 | Framework       | SvelteKit (Svelte 5) |
-| Package Manager | pnpm                 |
+| Package Manager | bun                  |
 | Styling         | Tailwind CSS v4      |
-| Deploy          | Vercel               |
+| Deploy          | GCP Cloud Run        |
 | Language        | TypeScript (strict)  |
 
 ## 시작하기
 
 ```bash
-pnpm install
-pnpm dev
+bun install
+bun run dev
 ```
 
 ## 스크립트
 
 ```bash
-pnpm dev        # 개발 서버
-pnpm build      # 프로덕션 빌드
-pnpm preview    # 빌드 미리보기
-pnpm check      # 타입 검사
-pnpm lint       # 린트
-pnpm format     # 코드 포맷
+bun run dev        # 개발 서버
+bun run build      # 프로덕션 빌드
+bun run preview    # 빌드 미리보기
+bun run check      # 타입 검사
+bun run lint       # 린트
+bun run format     # 코드 포맷
 ```
 
 ## 주요 기능
@@ -42,13 +42,11 @@ pnpm format     # 코드 포맷
 
 ## 페이지 경로
 
-배포 URL: https://fantazzk-rho.vercel.app/
-
-| 경로                                             | 설명                  |
-| ------------------------------------------------ | --------------------- |
-| https://fantazzk-rho.vercel.app/                 | 홈 (랜딩 페이지)      |
-| https://fantazzk-rho.vercel.app/templates/create | 템플릿 생성           |
-| https://fantazzk-rho.vercel.app/lobby/[id]       | 대기실 (방 입장/관리) |
-| https://fantazzk-rho.vercel.app/auction/[id]     | 경매 진행 화면        |
-| https://fantazzk-rho.vercel.app/draft/[id]       | 드래프트 진행 화면    |
-| https://fantazzk-rho.vercel.app/result/[id]      | 결과 화면             |
+| 경로                | 설명                  |
+| ------------------- | --------------------- |
+| `/`                 | 홈 (랜딩 페이지)      |
+| `/templates/create` | 템플릿 생성           |
+| `/lobby/[id]`       | 대기실 (방 입장/관리) |
+| `/auction/[id]`     | 경매 진행 화면        |
+| `/draft/[id]`       | 드래프트 진행 화면    |
+| `/result/[id]`      | 결과 화면             |
