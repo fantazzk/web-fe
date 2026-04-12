@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
-import { Auction } from '$lib/domain/rule-engine/auction.ts';
-import type { AuctionConfig } from '$lib/domain/rule-engine/types.ts';
+import { Auction } from '../auction.ts';
+import type { AuctionConfig } from '../types.ts';
 import { processTimerExpiry, processBid } from '../auction-driver.ts';
 
 function createConfig(): AuctionConfig {
@@ -43,17 +43,24 @@ describe('processTimerExpiry', () => {
 		expect(next.currentPlayer?.name).toBe('선수B');
 	});
 
-	it('입찰이 없으면 유찰 후 다음 선수로 진행한다', () => {
+	it('입찰이 없으면 유찰 후 다음 선수로 진행하고 유찰 선수는 마지막에 재배치된다', () => {
 		const auction = Auction.create(createConfig()); // 입찰 없음
 		const next = processTimerExpiry(auction);
 		expect(next.phase).toBe('BIDDING');
 		expect(next.currentPlayer?.name).toBe('선수B');
+		expect(next.remainingPool.at(-1)?.name).toBe('선수A');
 	});
 
-	it('마지막 선수이면 COMPLETED로 전환한다', () => {
+	it('모든 선수가 낙찰되면 COMPLETED로 전환한다', () => {
 		let auction = Auction.create(createConfig());
+		// 선수A 낙찰
+		auction = auction.placeBid('team-1', 10);
 		auction = processTimerExpiry(auction);
+		// 선수B 낙찰
+		auction = auction.placeBid('team-2', 10);
 		auction = processTimerExpiry(auction);
+		// 선수C 낙찰
+		auction = auction.placeBid('team-1', 10);
 		auction = processTimerExpiry(auction);
 		expect(auction.isCompleted).toBe(true);
 	});
