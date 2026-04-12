@@ -172,6 +172,82 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponseRoomSessionResponse"
+  /api/v1/rooms/{code}/draft-picks:
+    post:
+      tags:
+      - room-api-controller
+      operationId: pickDraft
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Room-Action-Token
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PickDraftRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomResponse"
+  /api/v1/rooms/{code}/bids:
+    post:
+      tags:
+      - room-api-controller
+      operationId: placeBid
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: X-Room-Action-Token
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaceBidRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomResponse"
+  /api/v1/rooms/{code}/auction/progress:
+    post:
+      tags:
+      - room-api-controller
+      operationId: progressAuction
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseRoomResponse"
   /api/v1/templates/{id}:
     get:
       tags:
@@ -231,6 +307,30 @@ components:
           $ref: "#/components/schemas/RoomResponse"
         error:
           $ref: "#/components/schemas/ErrorMessage"
+    AuctionTargetResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        position:
+          type: string
+    DraftOrderPreviewResponse:
+      type: object
+      properties:
+        slots:
+          type: array
+          items:
+            $ref: "#/components/schemas/DraftOrderSlotResponse"
+    DraftOrderSlotResponse:
+      type: object
+      properties:
+        draftPosition:
+          type: integer
+          format: int32
+        leaderId:
+          type: string
+        nickname:
+          type: string
     ErrorMessage:
       type: object
       properties:
@@ -255,6 +355,8 @@ components:
       properties:
         name:
           type: string
+        position:
+          type: string
         displayOrder:
           type: integer
           format: int32
@@ -275,6 +377,19 @@ components:
           type: array
           items:
             type: string
+        currentAuctionRoundEndsAt:
+          type: string
+          format: date-time
+        currentAuctionTarget:
+          $ref: "#/components/schemas/AuctionTargetResponse"
+        highestBidAmount:
+          type: integer
+          format: int32
+        leadingLeaderId:
+          type: string
+        bidCount:
+          type: integer
+          format: int32
     RoomResponse:
       type: object
       properties:
@@ -293,10 +408,15 @@ components:
         budget:
           type: integer
           format: int32
+        minBidUnit:
+          type: integer
+          format: int32
         draftOrderStrategy:
           type: string
         startReadiness:
           type: string
+        draftOrderPreview:
+          $ref: "#/components/schemas/DraftOrderPreviewResponse"
         teamLeaders:
           type: array
           items:
@@ -330,6 +450,11 @@ components:
         name:
           type: string
           minLength: 1
+        gameType:
+          type: string
+          enum:
+          - LEAGUE_OF_LEGENDS
+          - OVERWATCH_2
         mode:
           type: string
           enum:
@@ -341,7 +466,16 @@ components:
         teamSize:
           type: integer
           format: int32
+        pickBanTime:
+          type: integer
+          format: int32
         budget:
+          type: integer
+          format: int32
+        minBidUnit:
+          type: integer
+          format: int32
+        positionLimit:
           type: integer
           format: int32
         draftOrderStrategy:
@@ -349,13 +483,23 @@ components:
           enum:
           - SNAKE
           - FIXED
-        playerNames:
+        players:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/PlayerRequest"
           minItems: 1
       required:
+      - gameType
       - mode
+    PlayerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        position:
+          type: string
+          minLength: 1
     ApiResponseTemplateResponse:
       type: object
       properties:
@@ -373,6 +517,8 @@ components:
       properties:
         name:
           type: string
+        position:
+          type: string
         displayOrder:
           type: integer
           format: int32
@@ -383,6 +529,11 @@ components:
           type: string
         name:
           type: string
+        gameType:
+          type: string
+          enum:
+          - LEAGUE_OF_LEGENDS
+          - OVERWATCH_2
         mode:
           type: string
           enum:
@@ -395,6 +546,15 @@ components:
           type: integer
           format: int32
         budget:
+          type: integer
+          format: int32
+        pickBanTime:
+          type: integer
+          format: int32
+        minBidUnit:
+          type: integer
+          format: int32
+        positionLimit:
           type: integer
           format: int32
         draftOrderStrategy:
@@ -451,6 +611,20 @@ components:
         nickname:
           type: string
           minLength: 1
+    PickDraftRequest:
+      type: object
+      properties:
+        playerName:
+          type: string
+          minLength: 1
+    PlaceBidRequest:
+      type: object
+      properties:
+        amount:
+          type: integer
+          format: int32
+      required:
+      - amount
     ApiResponseListTemplateResponse:
       type: object
       properties:
