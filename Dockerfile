@@ -8,7 +8,7 @@ RUN bun install --frozen-lockfile
 FROM oven/bun:1-alpine AS prod-deps
 WORKDIR /app
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production=true
+RUN bun install --frozen-lockfile --production
 
 # --- build ---
 FROM oven/bun:1-alpine AS build
