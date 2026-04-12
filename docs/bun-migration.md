@@ -81,17 +81,6 @@ Bun은 Node.js API를 대부분 지원하지만 100% 호환은 아니다. 주요
 - **네이티브 애드온** (`.node` 파일)은 지원하지 않는 경우가 있음
 - 이 프로젝트에서는 네이티브 애드온을 사용하지 않으므로 문제없음
 
-### Vercel 배포
-
-이 프로젝트는 `@sveltejs/adapter-vercel`을 사용한다. Vercel 빌드 환경에서는 bun이 기본 설치되어 있으므로 별도 설정 없이 동작한다. 필요 시 `vercel.json`에서 빌드 명령을 지정할 수 있다:
-
-```json
-{
-	"buildCommand": "bun run build",
-	"installCommand": "bun install"
-}
-```
-
 ### husky / lint-staged
 
 `bun install` 실행 시 `prepare` 스크립트(`husky`)가 정상 실행된다. `lint-staged`도 bun 환경에서 동일하게 동작한다.
