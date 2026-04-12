@@ -7,7 +7,10 @@ import type {
 	RoomMemberResponse,
 	RoomPlayerResponse,
 	RoomProgressResponse,
-	JoinableRoomResponse
+	JoinableRoomResponse,
+	AuctionTargetResponse,
+	DraftOrderPreviewResponse,
+	DraftOrderSlotResponse
 } from '$lib/types/api';
 
 // ─── 응답 래퍼 ───
@@ -30,6 +33,7 @@ export function createTemplateResponse(overrides?: Partial<TemplateResponse>): T
 	return {
 		id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 		name: '스트리머 랭킹전 시즌 2',
+		gameType: 'LEAGUE_OF_LEGENDS',
 		mode: 'AUCTION',
 		teamCount: 8,
 		teamSize: 5,
@@ -158,8 +162,46 @@ export function createRoomPlayerResponse(
 ): RoomPlayerResponse {
 	return {
 		name: 'KIIN',
+		position: 'TOP',
 		displayOrder: 0,
 		status: 'AVAILABLE',
+		...overrides
+	};
+}
+
+export function createAuctionTargetResponse(
+	overrides?: Partial<AuctionTargetResponse>
+): AuctionTargetResponse {
+	return {
+		name: 'KIIN',
+		position: 'TOP',
+		...overrides
+	};
+}
+
+export function createDraftOrderSlotResponse(
+	overrides?: Partial<DraftOrderSlotResponse>
+): DraftOrderSlotResponse {
+	return {
+		draftPosition: 1,
+		leaderId: 'tl-1',
+		nickname: 'DragonSlayer',
+		...overrides
+	};
+}
+
+export function createDraftOrderPreviewResponse(
+	overrides?: Partial<DraftOrderPreviewResponse>
+): DraftOrderPreviewResponse {
+	return {
+		slots: [
+			createDraftOrderSlotResponse({
+				draftPosition: 1,
+				leaderId: 'tl-1',
+				nickname: 'DragonSlayer'
+			}),
+			createDraftOrderSlotResponse({ draftPosition: 2, leaderId: 'tl-2', nickname: 'NightHawk_KR' })
+		],
 		...overrides
 	};
 }
@@ -227,6 +269,7 @@ export function createRoomResponse(overrides?: Partial<RoomResponse>): RoomRespo
 		teamCount: 8,
 		teamSize: 5,
 		budget: 1000,
+		minBidUnit: 5,
 		draftOrderStrategy: 'SNAKE',
 		teamLeaders: createTeamLeaders(2, 1000),
 		players: [

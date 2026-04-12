@@ -79,6 +79,21 @@ export const handlers = [
 		return HttpResponse.json(success(createRoomResponse({ code })));
 	}),
 
+	http.post(`${BASE_URL}/api/v1/rooms/:code/draft-picks`, ({ params }) => {
+		const code = params['code'] as string;
+		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	}),
+
+	http.post(`${BASE_URL}/api/v1/rooms/:code/bids`, ({ params }) => {
+		const code = params['code'] as string;
+		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	}),
+
+	http.post(`${BASE_URL}/api/v1/rooms/:code/auction/progress`, ({ params }) => {
+		const code = params['code'] as string;
+		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	}),
+
 	// ─── Solo API ───
 
 	http.get(`${BASE_URL}/api/v1/solo/auction/:templateId`, ({ params }) => {
