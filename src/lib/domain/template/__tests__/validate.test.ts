@@ -122,13 +122,12 @@ describe('validateTemplateInput', () => {
 	});
 
 	it('DRAFT 모드에서는 경매 필드가 없어도 통과한다', () => {
+		const { totalPoints: _t, minBid: _m, ...draftInput } = validInput;
 		expect(
 			validateTemplateInput({
-				...validInput,
+				...draftInput,
 				mode: 'DRAFT',
-				draftMode: 'SNAKE',
-				totalPoints: undefined,
-				minBid: undefined
+				draftMode: 'SNAKE'
 			})
 		).toBeNull();
 	});
