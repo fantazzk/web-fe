@@ -138,7 +138,8 @@ export class Auction {
 			...this.toState(),
 			phase: 'UNSOLD',
 			currentPlayer: null,
-			currentBid: null
+			currentBid: null,
+			remainingPool: [...this.remainingPool, this.currentPlayer!]
 		});
 	}
 
