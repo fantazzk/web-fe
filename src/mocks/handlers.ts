@@ -4,7 +4,6 @@ import {
 	createTemplateListResponse,
 	createTemplateDetailResponse,
 	createDraftTemplateDetailResponse,
-	createTemplateResponse,
 	createRoomResponse,
 	createRoomSessionResponse,
 	createJoinableRoomListResponse
@@ -22,13 +21,6 @@ export const handlers = [
 	http.get(`${BASE_URL}/api/v1/templates/:id`, ({ params }) => {
 		const id = params['id'] as string;
 		return HttpResponse.json(success(createTemplateDetailResponse({ id })));
-	}),
-
-	http.post(`${BASE_URL}/api/v1/templates`, async ({ request }) => {
-		const body = (await request.json()) as { name: string };
-		return HttpResponse.json(success(createTemplateResponse({ name: body.name })), {
-			status: 201
-		});
 	}),
 
 	// ─── Room API ───
