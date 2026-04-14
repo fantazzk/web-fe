@@ -19,7 +19,7 @@ paths:
   /api/v1/rooms/{code}/draft-position:
     put:
       tags:
-      - room-api-controller
+      - room-draft-api-controller
       operationId: selectDraftPosition
       parameters:
       - name: code
@@ -47,7 +47,7 @@ paths:
                 $ref: "#/components/schemas/ApiResponseRoomResponse"
     delete:
       tags:
-      - room-api-controller
+      - room-draft-api-controller
       operationId: clearDraftPosition
       parameters:
       - name: code
@@ -99,7 +99,7 @@ paths:
   /api/v1/rooms:
     get:
       tags:
-      - room-api-controller
+      - room-query-api-controller
       operationId: list_1
       responses:
         "200":
@@ -110,7 +110,7 @@ paths:
                 $ref: "#/components/schemas/ApiResponseListJoinableRoomResponse"
     post:
       tags:
-      - room-api-controller
+      - room-session-api-controller
       operationId: create_1
       requestBody:
         content:
@@ -128,7 +128,7 @@ paths:
   /api/v1/rooms/{code}/start:
     post:
       tags:
-      - room-api-controller
+      - room-auction-api-controller
       operationId: start
       parameters:
       - name: code
@@ -151,7 +151,7 @@ paths:
   /api/v1/rooms/{code}/join:
     post:
       tags:
-      - room-api-controller
+      - room-session-api-controller
       operationId: join
       parameters:
       - name: code
@@ -175,7 +175,7 @@ paths:
   /api/v1/rooms/{code}/draft-picks:
     post:
       tags:
-      - room-api-controller
+      - room-draft-api-controller
       operationId: pickDraft
       parameters:
       - name: code
@@ -204,7 +204,7 @@ paths:
   /api/v1/rooms/{code}/bids:
     post:
       tags:
-      - room-api-controller
+      - room-auction-api-controller
       operationId: placeBid
       parameters:
       - name: code
@@ -233,7 +233,7 @@ paths:
   /api/v1/rooms/{code}/auction/progress:
     post:
       tags:
-      - room-api-controller
+      - room-auction-api-controller
       operationId: progressAuction
       parameters:
       - name: code
@@ -270,7 +270,7 @@ paths:
   /api/v1/rooms/{code}:
     get:
       tags:
-      - room-api-controller
+      - room-query-api-controller
       operationId: getByCode
       parameters:
       - name: code
