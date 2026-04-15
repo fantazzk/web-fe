@@ -3,7 +3,13 @@
 	import { Sidebar, Icon, Button, ThemePicker, Toggle } from '$lib/components';
 	import { Template } from '$lib/domain/template';
 	import type { GameType, TemplateModeType, DraftModeType, TierType } from '$lib/domain/template';
-	import { POSITIONS_BY_GAME } from '$lib/domain/template';
+	import {
+		POSITIONS_BY_GAME,
+		validateTemplateInput,
+		toCreateTemplateRequest
+	} from '$lib/domain/template';
+	import type { TemplateResponseType } from '$lib/domain/template';
+	import { apiPost } from '$lib/utils/api-client';
 
 	// --- State ---
 	let name = $state('');
@@ -19,15 +25,6 @@
 	let draftInfoRef = $state<HTMLElement | null>(null);
 	let activeStep = $state<number | null>(null);
 	let stepRefs = $state<(HTMLElement | null)[]>([null, null, null, null]);
-
-	function handleSoloPlay(): void {
-		const templateId = crypto.randomUUID();
-		if (mode === 'DRAFT') {
-			goto(`/draft/${templateId}`);
-		} else {
-			goto(`/auction/${templateId}`);
-		}
-	}
 
 	// --- 선수 관련 ---
 	const TIERS: TierType[] = ['S+', 'S', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D'];
@@ -55,6 +52,46 @@
 			captainsNeeded
 		})
 	);
+
+	// --- API 연동 ---
+	let isCreating = $state(false);
+
+	let validationError = $derived(
+		validateTemplateInput({
+			name,
+			gameType,
+			mode,
+			pickBanTime,
+			players,
+			captainsNeeded,
+			...(mode === 'AUCTION' ? { totalPoints, minBid } : {}),
+			...(mode === 'DRAFT' ? { draftMode: draftType } : {})
+		})
+	);
+	let canSubmit = $derived(validationError === null);
+
+	async function handleCreateRoom(): Promise<void> {
+		if (!canSubmit || isCreating) return;
+		isCreating = true;
+		try {
+			const req = toCreateTemplateRequest({
+				name,
+				gameType,
+				mode,
+				pickBanTime,
+				players,
+				captainsNeeded,
+				...(mode === 'AUCTION' ? { totalPoints, minBid } : {}),
+				...(mode === 'DRAFT' ? { draftMode: draftType } : {})
+			});
+			const res = await apiPost<TemplateResponseType>(fetch, '/api/v1/templates', req);
+			await goto(mode === 'DRAFT' ? `/draft/${res.id}` : `/auction/${res.id}`);
+		} catch (e) {
+			alert(e instanceof Error ? e.message : '템플릿 생성 실패');
+		} finally {
+			isCreating = false;
+		}
+	}
 
 	// --- 옵션 상수 ---
 	const GAME_OPTIONS: { value: GameType; label: string }[] = [
@@ -539,8 +576,15 @@
 
 				<!-- Bottom Bar -->
 				<div class="flex items-center justify-end gap-3 border-t border-gray-700 px-14 py-4">
-					<Button variant="SECONDARY" size="MD" onclick={handleSoloPlay}>혼자 하기</Button>
-					<Button variant="PRIMARY" size="MD">방 만들기</Button>
+					<Button variant="SECONDARY" size="MD" disabled>혼자 하기</Button>
+					<Button
+						variant="PRIMARY"
+						size="MD"
+						onclick={handleCreateRoom}
+						disabled={!canSubmit || isCreating}
+					>
+						{isCreating ? '생성 중...' : '방 만들기'}
+					</Button>
 				</div>
 			</main>
 

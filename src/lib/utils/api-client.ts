@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/public';
 import type { ApiResponse } from '$lib/types/api';
 
 export class ApiClientError extends Error {
@@ -13,7 +14,7 @@ export class ApiClientError extends Error {
 }
 
 function getBaseUrl(): string {
-	return import.meta.env['PUBLIC_API_URL'] ?? '';
+	return env.PUBLIC_API_URL ?? '';
 }
 
 function unwrap<T>(body: ApiResponse<T>, status: number): T {

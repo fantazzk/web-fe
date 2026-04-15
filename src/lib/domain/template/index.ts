@@ -13,3 +13,7 @@ export type {
 	PlayerParams,
 	TemplateParams
 } from './types.ts';
+export { validateTemplateInput } from './validate.ts';
+export type { TemplateInputType, TemplateValidationErrorType } from './validate.ts';
+export { toCreateTemplateRequest } from './mapper.ts';
+export type { CreateTemplateRequestType, TemplateResponseType } from './mapper.ts';
