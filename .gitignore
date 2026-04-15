@@ -33,3 +33,4 @@ docs/superpowers/
 
 # Screenshots (임시)
 *.png
+!static/*.png
