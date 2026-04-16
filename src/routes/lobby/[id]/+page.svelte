@@ -10,11 +10,11 @@
 	};
 
 	const settingsItems = [
-		{ label: 'MODE', value: 'AUCTION' },
-		{ label: 'TEAMS', value: '4' },
-		{ label: 'POINTS', value: '1,000 PTS' },
-		{ label: 'TIME', value: '30 SEC' },
-		{ label: 'ROSTER', value: '5 PLAYERS' }
+		{ label: '모드', value: 'AUCTION' },
+		{ label: '팀', value: '4' },
+		{ label: '포인트', value: '1,000P' },
+		{ label: '시간', value: '30초' },
+		{ label: '로스터', value: '5명' }
 	];
 
 	interface Participant {
@@ -98,7 +98,7 @@
 		<header class="flex h-[72px] items-center justify-between border-b border-gray-700 px-14">
 			<div class="flex items-center gap-6">
 				<h1 class="font-heading text-3xl font-semibold tracking-wider text-gray-50">
-					MULTIPLAYER LOBBY
+					멀티플레이어 로비
 				</h1>
 				<span
 					class="border border-accent px-4 py-2 font-mono text-sm font-semibold tracking-wider text-accent"
@@ -112,7 +112,7 @@
 					class="flex items-center gap-2 bg-accent px-6 py-2.5 font-mono text-sm font-semibold tracking-wider text-bg-primary"
 				>
 					<Icon name="link" size={14} />
-					COPY LINK
+					링크 복사
 				</button>
 				<span class="font-mono text-base font-semibold text-muted">
 					{participants.length}/{maxPlayers}
@@ -126,9 +126,7 @@
 			<div class="flex flex-1 flex-col gap-8">
 				<!-- Participants -->
 				<section>
-					<h2 class="mb-4 font-mono text-sm font-semibold tracking-[2px] text-accent">
-						PARTICIPANTS
-					</h2>
+					<h2 class="mb-4 font-mono text-sm font-semibold tracking-[2px] text-accent">참가자</h2>
 					<ul class="flex list-none flex-col gap-2">
 						{#each participants as p, i (p.nickname)}
 							<li class="flex items-center justify-between border border-gray-700 px-4 py-3">

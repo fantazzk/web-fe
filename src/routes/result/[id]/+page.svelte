@@ -174,7 +174,7 @@
 									<span
 										class="font-mono text-[10px] font-semibold tracking-[2px] text-bg-primary opacity-50"
 									>
-										CAPTAIN
+										감독
 									</span>
 								</div>
 
@@ -197,7 +197,7 @@
 									class="flex items-center justify-between border-t border-gray-700 bg-bg-elevated px-4 py-3"
 								>
 									<span class="font-mono text-xs font-semibold tracking-wider text-subtle">
-										TOTAL
+										합계
 									</span>
 									<span class="font-mono text-base font-bold text-accent">
 										{team.total}
