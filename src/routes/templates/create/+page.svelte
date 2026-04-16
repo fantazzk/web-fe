@@ -4,6 +4,8 @@
 	import { Template } from '$lib/domain/template';
 	import type { GameType, TemplateModeType, DraftModeType, TierType } from '$lib/domain/template';
 	import { POSITIONS_BY_GAME } from '$lib/domain/template';
+	import * as cache from '$lib/utils/cache';
+	import type { TemplateSnapshotType } from '$lib/types/snapshot';
 
 	// --- State ---
 	let name = $state('');
@@ -22,11 +24,19 @@
 
 	function handleSoloPlay(): void {
 		const templateId = crypto.randomUUID();
-		if (mode === 'DRAFT') {
-			goto(`/draft/${templateId}`);
-		} else {
-			goto(`/auction/${templateId}`);
-		}
+		const snapshot: TemplateSnapshotType = {
+			name,
+			gameType,
+			captainsCount: captainsNeeded,
+			players: players.map((p) => ({
+				id: crypto.randomUUID(),
+				name: p.name,
+				position: (p.position as string) || null,
+				tier: p.tier
+			}))
+		};
+		cache.set(`template:${templateId}`, snapshot, 60 * 60 * 1000);
+		goto(`/sandbox/${templateId}`);
 	}
 
 	// --- 선수 관련 ---
