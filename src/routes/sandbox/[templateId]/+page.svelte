@@ -6,8 +6,7 @@
 	import { SandboxBoard } from '$lib/domain/sandbox';
 	import * as cache from '$lib/utils/cache';
 	import { sandboxStore } from '$lib/features/sandbox/stores/sandbox-store.svelte';
-	import type { TemplateSnapshotType } from '$lib/features/sandbox/types';
-	import type { ResultSnapshotType } from '$lib/features/result/types';
+	import type { TemplateSnapshotType, ResultSnapshotType } from '$lib/types/snapshot';
 	import type { GameType } from '$lib/domain/template';
 	import CaptainRoster from '$lib/features/sandbox/components/CaptainRoster.svelte';
 	import PlayerPool from '$lib/features/sandbox/components/PlayerPool.svelte';
@@ -79,10 +78,10 @@
 </svelte:head>
 
 {#if error}
-	<div class="flex h-screen flex-col items-center justify-center gap-4 bg-bg-primary">
+	<main class="flex h-screen flex-col items-center justify-center gap-4 bg-bg-primary" role="alert">
 		<p class="font-mono text-sm text-muted">템플릿 정보를 찾을 수 없습니다</p>
 		<Button variant="PRIMARY" size="MD" onclick={() => goto('/')}>홈으로 돌아가기</Button>
-	</div>
+	</main>
 {:else if loaded && sandboxStore.board}
 	<div class="flex h-screen flex-col bg-bg-primary">
 		<!-- Top Bar -->
@@ -94,8 +93,10 @@
 		<!-- Captain Rosters (top) -->
 		<section
 			class="flex gap-3 overflow-x-auto border-b border-gray-700 p-4"
+			aria-labelledby="captain-roster-heading"
 			style="max-height: 45vh;"
 		>
+			<h2 id="captain-roster-heading" class="sr-only">감독 로스터</h2>
 			{#each sandboxStore.board.captains as captain (captain.id)}
 				<CaptainRoster
 					{captain}
@@ -106,7 +107,7 @@
 		</section>
 
 		<!-- Player Pool (bottom) -->
-		<section class="flex-1 overflow-y-auto">
+		<section class="flex-1 overflow-y-auto" aria-label="선수풀">
 			<PlayerPool
 				pool={sandboxStore.board.pool}
 				{gameType}
@@ -117,7 +118,11 @@
 		</section>
 	</div>
 {:else}
-	<div class="flex h-screen items-center justify-center bg-bg-primary">
+	<div
+		class="flex h-screen items-center justify-center bg-bg-primary"
+		role="status"
+		aria-live="polite"
+	>
 		<span class="font-mono text-sm text-muted">로딩 중...</span>
 	</div>
 {/if}

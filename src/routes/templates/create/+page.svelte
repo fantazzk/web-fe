@@ -5,7 +5,7 @@
 	import type { GameType, TemplateModeType, DraftModeType, TierType } from '$lib/domain/template';
 	import { POSITIONS_BY_GAME } from '$lib/domain/template';
 	import * as cache from '$lib/utils/cache';
-	import type { TemplateSnapshotType } from '$lib/features/sandbox/types';
+	import type { TemplateSnapshotType } from '$lib/types/snapshot';
 
 	// --- State ---
 	let name = $state('');

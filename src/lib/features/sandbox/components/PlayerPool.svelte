@@ -51,6 +51,8 @@
 	ondragenter={handleDragEnter}
 	ondragleave={handleDragLeave}
 	ondrop={handleDrop}
+	role="region"
+	aria-label="선수풀 — 선수를 여기로 드래그하여 배정 해제"
 >
 	<!-- Header + Position Filter -->
 	<div class="flex items-center gap-4">

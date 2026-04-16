@@ -40,8 +40,8 @@
 	ondragenter={handleDragEnter}
 	ondragleave={handleDragLeave}
 	ondrop={handleDrop}
-	role="list"
-	aria-label="{captain.name} 로스터"
+	role="group"
+	aria-label="{captain.name} 감독"
 >
 	<!-- Header -->
 	<div class="flex items-center justify-between border-b border-gray-700 px-4 py-3">
@@ -52,11 +52,15 @@
 	</div>
 
 	<!-- Player list -->
-	<div class="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
+	<div
+		class="flex flex-1 flex-col gap-1 overflow-y-auto p-2"
+		role="list"
+		aria-label="{captain.name} 로스터"
+	>
 		{#each players as player (player.id)}
 			<PlayerCard {player} />
 		{:else}
-			<div class="flex flex-1 items-center justify-center p-4">
+			<div class="flex flex-1 items-center justify-center p-4" role="listitem">
 				<span class="font-mono text-xs text-dim">선수를 드래그하세요</span>
 			</div>
 		{/each}

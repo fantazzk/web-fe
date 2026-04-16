@@ -105,12 +105,12 @@
 </svelte:head>
 
 {#if loaded && !snapshot}
-	<div class="flex h-screen flex-col items-center justify-center gap-4 bg-bg-primary">
+	<main class="flex h-screen flex-col items-center justify-center gap-4 bg-bg-primary" role="alert">
 		<p class="font-mono text-sm text-muted">결과 데이터를 찾을 수 없습니다</p>
 		<a href="/" class="font-mono text-sm text-accent hover:underline">홈으로 돌아가기</a>
-	</div>
+	</main>
 {:else if snapshot?.mode === 'SANDBOX'}
-	<div class="flex min-h-screen flex-col gap-8 bg-bg-primary px-14 py-12">
+	<main class="flex min-h-screen flex-col gap-8 bg-bg-primary px-14 py-12">
 		<h1 class="font-heading text-3xl font-bold text-gray-50">샌드박스 결과</h1>
 		<div class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
 			{#each snapshot.teams as team}
@@ -118,23 +118,25 @@
 					<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">
 						{team.captain.toUpperCase()}
 					</span>
-					{#each team.players as player}
-						<div class="flex items-center gap-2 font-mono text-sm">
-							<span class="w-8 text-center text-xs font-semibold text-accent">
-								{player.tier}
-							</span>
-							<span class="flex-1 text-gray-50">{player.name}</span>
-							{#if player.position}
-								<span class="text-xs text-muted">{player.position}</span>
-							{/if}
-						</div>
-					{:else}
-						<span class="font-mono text-xs text-dim">배정된 선수 없음</span>
-					{/each}
+					<ul class="flex list-none flex-col gap-1">
+						{#each team.players as player}
+							<li class="flex items-center gap-2 font-mono text-sm">
+								<span class="w-8 text-center text-xs font-semibold text-accent">
+									{player.tier}
+								</span>
+								<span class="flex-1 text-gray-50">{player.name}</span>
+								{#if player.position}
+									<span class="text-xs text-muted">{player.position}</span>
+								{/if}
+							</li>
+						{:else}
+							<li class="font-mono text-xs text-dim">배정된 선수 없음</li>
+						{/each}
+					</ul>
 				</div>
 			{/each}
 		</div>
-	</div>
+	</main>
 {:else}
 	<main class="flex h-screen flex-col bg-bg-primary">
 		<!-- Result Card (이미지 캡처 대상 영역) -->
