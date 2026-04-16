@@ -110,6 +110,19 @@ describe('SandboxBoard', () => {
 			expect(unassigned.rosters[captainId]).toHaveLength(0);
 		});
 
+		it('원본 보드는 변경되지 않는다 (불변)', () => {
+			const board = SandboxBoard.create({
+				templateId: 'tpl-1',
+				captainsCount: 2,
+				players: PLAYERS
+			});
+			const captainId = board.captains[0]!.id;
+			const assigned = board.assign('p1', captainId);
+			assigned.unassign('p1');
+			expect(assigned.rosters[captainId]).toHaveLength(1);
+			expect(assigned.pool).toHaveLength(3);
+		});
+
 		it('어느 로스터에도 없는 선수는 PLAYER_NOT_IN_ROSTER 에러', () => {
 			const board = SandboxBoard.create({
 				templateId: 'tpl-1',
@@ -153,6 +166,20 @@ describe('SandboxBoard', () => {
 			const same = assigned.move('p1', cap1);
 			expect(same).not.toBe(assigned);
 			expect(same.rosters[cap1]).toHaveLength(1);
+		});
+
+		it('원본 보드는 변경되지 않는다 (불변)', () => {
+			const board = SandboxBoard.create({
+				templateId: 'tpl-1',
+				captainsCount: 2,
+				players: PLAYERS
+			});
+			const cap1 = board.captains[0]!.id;
+			const cap2 = board.captains[1]!.id;
+			const assigned = board.assign('p1', cap1);
+			assigned.move('p1', cap2);
+			expect(assigned.rosters[cap1]).toHaveLength(1);
+			expect(assigned.rosters[cap2]).toHaveLength(0);
 		});
 
 		it('로스터에 없는 선수를 move하면 PLAYER_NOT_IN_ROSTER 에러', () => {

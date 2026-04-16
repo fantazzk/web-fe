@@ -41,7 +41,8 @@
 		try {
 			const next = sandboxStore.board.assign(playerId, captainId);
 			sandboxStore.apply(next);
-		} catch {
+		} catch (e) {
+			if (!(e instanceof Error) || !('code' in e) || e.code !== 'PLAYER_NOT_IN_POOL') return;
 			try {
 				const next = sandboxStore.board.move(playerId, captainId);
 				sandboxStore.apply(next);

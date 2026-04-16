@@ -10,10 +10,12 @@
 	let saving = $state(false);
 	let saveMessage = $state('');
 	let snapshot = $state<ResultSnapshotType | null>(null);
+	let loaded = $state(false);
 
 	onMount(() => {
 		const entry = cache.consume<ResultSnapshotType>(`result:${$page.params.id}`);
 		if (entry) snapshot = entry.data;
+		loaded = true;
 		// TODO: 캐시 miss 시 GET /api/v1/results/:id (백엔드 미구현)
 	});
 
@@ -102,7 +104,12 @@
 	<title>결과 | Fantazzk</title>
 </svelte:head>
 
-{#if snapshot?.mode === 'SANDBOX'}
+{#if loaded && !snapshot}
+	<div class="flex h-screen flex-col items-center justify-center gap-4 bg-bg-primary">
+		<p class="font-mono text-sm text-muted">결과 데이터를 찾을 수 없습니다</p>
+		<a href="/" class="font-mono text-sm text-accent hover:underline">홈으로 돌아가기</a>
+	</div>
+{:else if snapshot?.mode === 'SANDBOX'}
 	<div class="flex min-h-screen flex-col gap-8 bg-bg-primary px-14 py-12">
 		<h1 class="font-heading text-3xl font-bold text-gray-50">샌드박스 결과</h1>
 		<div class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
