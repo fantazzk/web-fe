@@ -103,7 +103,7 @@
 				<span
 					class="border border-accent px-4 py-2 font-mono text-sm font-semibold tracking-wider text-accent"
 				>
-					ROOM {room.code}
+					방 {room.code}
 				</span>
 			</div>
 			<div class="flex items-center gap-4">
