@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toPng } from 'html-to-image';
 	import { Button, Icon } from '$lib/components';
-	import type { ResultTeam } from '$lib/features/result/types';
+	import type { AuctionResultTeamType } from '$lib/features/result/types';
 
 	let cardEl: HTMLDivElement;
 	let saving = $state(false);
@@ -34,7 +34,7 @@
 		mode: 'AUCTION' as const
 	};
 
-	const teams: ResultTeam[] = [
+	const teams: AuctionResultTeamType[] = [
 		{
 			captain: '풍월량',
 			players: [

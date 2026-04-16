@@ -1,8 +1,8 @@
 /** 세션 생명주기: 대기 → 진행 중 → 완료 */
 export type SessionStatus = 'WAITING' | 'IN_PROGRESS' | 'COMPLETED';
 
-/** 게임 진행 방식: 경매(포인트 입찰) 또는 드래프트(순차 픽) */
-export type SessionMode = 'AUCTION' | 'DRAFT';
+/** 게임 진행 방식: 경매(포인트 입찰), 드래프트(순차 픽), 샌드박스(자유 배치) */
+export type SessionMode = 'AUCTION' | 'DRAFT' | 'SANDBOX';
 
 /** 참가자 유형: 실제 유저 또는 솔로 모드 AI */
 export type ParticipantType = 'HUMAN' | 'AI';
