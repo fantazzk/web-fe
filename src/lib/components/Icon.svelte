@@ -1,5 +1,5 @@
 <script lang="ts">
-	type IconName =
+	export type IconName =
 		| 'layout-grid'
 		| 'file-text'
 		| 'trending-up'
