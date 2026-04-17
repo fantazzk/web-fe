@@ -71,4 +71,4 @@
 	</div>
 </aside>
 
-<SettingsModal bind:open={settingsOpen} onclose={() => (settingsOpen = false)} />
+<SettingsModal open={settingsOpen} onclose={() => (settingsOpen = false)} />

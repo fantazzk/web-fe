@@ -7,7 +7,7 @@
 		onclose: () => void;
 	}
 
-	let { open = $bindable(), onclose }: Props = $props();
+	let { open, onclose }: Props = $props();
 
 	function handleBackdropClick(e: MouseEvent) {
 		if (e.target === e.currentTarget) {
@@ -22,15 +22,15 @@
 	}
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
-
 {#if open}
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
 		role="dialog"
 		aria-modal="true"
 		aria-label="설정"
+		tabindex="-1"
 		onclick={handleBackdropClick}
+		onkeydown={handleKeydown}
 	>
 		<div class="w-[400px] border border-gray-700 bg-bg-primary p-6">
 			<!-- Header -->

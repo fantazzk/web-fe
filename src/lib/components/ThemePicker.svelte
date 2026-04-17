@@ -1,5 +1,9 @@
 <script lang="ts">
-	let currentTheme = $state('gold');
+	import { browser } from '$app/environment';
+
+	let currentTheme = $state(
+		browser ? (document.documentElement.dataset['theme'] ?? 'gold') : 'gold'
+	);
 
 	const themes = [
 		{ name: 'gold', color: '#c9a962' },
