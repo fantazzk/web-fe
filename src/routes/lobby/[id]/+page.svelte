@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Sidebar, Icon, Badge, ThemePicker } from '$lib/components';
+	import { Sidebar, Icon, Badge } from '$lib/components';
 
 	const room = {
 		code: 'ABC-7742',
@@ -55,42 +55,7 @@
 
 <div class="flex h-screen bg-bg-primary">
 	<!-- Sidebar -->
-	<Sidebar logo="BD">
-		{#snippet nav()}
-			<a
-				href="/"
-				class="flex h-12 w-12 items-center justify-center rounded-sm bg-bg-primary/8 text-bg-primary"
-				aria-label="대시보드"
-				title="대시보드"
-			>
-				<Icon name="layout-grid" />
-			</a>
-			<button
-				type="button"
-				class="flex h-12 w-12 items-center justify-center text-bg-primary"
-				aria-label="참가자"
-			>
-				<Icon name="users" />
-			</button>
-			<button
-				type="button"
-				class="flex h-12 w-12 items-center justify-center text-bg-primary"
-				aria-label="트렌드"
-			>
-				<Icon name="trending-up" />
-			</button>
-			<button
-				type="button"
-				class="flex h-12 w-12 items-center justify-center text-bg-primary"
-				aria-label="설정"
-			>
-				<Icon name="settings" />
-			</button>
-		{/snippet}
-		{#snippet footer()}
-			<ThemePicker />
-		{/snippet}
-	</Sidebar>
+	<Sidebar />
 
 	<!-- Main Content -->
 	<main class="flex flex-1 flex-col overflow-hidden">
