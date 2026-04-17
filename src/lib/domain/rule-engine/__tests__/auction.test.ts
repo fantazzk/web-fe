@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { Auction } from '../auction.ts';
 import type { AuctionConfig } from '../types.ts';
 
@@ -128,18 +127,40 @@ describe('다음 선수 진행', () => {
 });
 
 describe('유찰', () => {
-	it('markUnsold()하면 UNSOLD가 되고 선수는 버려진다', () => {
+	it('markUnsold()하면 UNSOLD가 되고 유찰 선수는 remainingPool 끝에 재삽입된다', () => {
 		const auction = Auction.create(createConfig());
 		const unsold = auction.markUnsold();
 		expect(unsold.phase).toBe('UNSOLD');
 		expect(unsold.currentPlayer).toBeNull();
 		expect(unsold.soldPlayers).toHaveLength(0);
+		expect(unsold.remainingPool.at(-1)?.name).toBe('선수A');
 	});
 
 	it('유찰 후 startNext()로 다음 선수가 올라온다', () => {
 		const next = Auction.create(createConfig()).markUnsold().startNext();
 		expect(next.phase).toBe('BIDDING');
 		expect(next.currentPlayer?.name).toBe('선수B');
+	});
+
+	it('유찰된 선수는 나중에 다시 경매에 올라온다', () => {
+		const config = createConfig({
+			playerPool: [
+				{ name: '선수A', position: 'TOP' },
+				{ name: '선수B', position: 'MID' }
+			]
+		});
+		// 선수A 유찰 → 선수B 낙찰 → 선수A 재경매
+		let auction = Auction.create(config);
+		auction = auction.markUnsold().startNext(); // 선수A 유찰, 선수B로 진행
+		expect(auction.currentPlayer?.name).toBe('선수B');
+
+		auction = auction.placeBid('team-1', 10).settle().startNext(); // 선수B 낙찰
+		expect(auction.currentPlayer?.name).toBe('선수A'); // 선수A 재경매
+		expect(auction.phase).toBe('BIDDING');
+
+		// 선수A 낙찰 → 경매 완료
+		auction = auction.placeBid('team-2', 10).settle().startNext();
+		expect(auction.isCompleted).toBe(true);
 	});
 });
 

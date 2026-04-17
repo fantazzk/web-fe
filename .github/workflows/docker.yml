@@ -1,0 +1,70 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [dev, main]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: asia-northeast3
+  IMAGE: asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/web-fe/app
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker asia-northeast3-docker.pkg.dev --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Determine service name
+        id: service
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "name=web-fe" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=web-fe-dev" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ steps.service.outputs.name }}
+          image: ${{ env.IMAGE }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          flags: |
+            --port=3000
+            --cpu-boost
+            --min-instances=0
+            --max-instances=10
+            --allow-unauthenticated

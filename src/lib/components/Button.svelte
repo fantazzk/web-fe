@@ -23,7 +23,7 @@
 	}: Props & Omit<HTMLButtonAttributes & HTMLAnchorAttributes, keyof Props> = $props();
 
 	const base =
-		'font-mono text-xs font-semibold tracking-wider inline-flex items-center justify-center';
+		'font-mono text-sm font-semibold tracking-wider inline-flex items-center justify-center';
 
 	const variants: Record<Variant, string> = {
 		PRIMARY: 'bg-accent text-bg-primary',
@@ -46,7 +46,7 @@
 		{@render children()}
 	</a>
 {:else}
-	<button {disabled} class={classes} {...rest}>
+	<button type="button" {disabled} class={classes} {...rest}>
 		{@render children()}
 	</button>
 {/if}

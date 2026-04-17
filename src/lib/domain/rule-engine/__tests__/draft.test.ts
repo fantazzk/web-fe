@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { Draft } from '../draft.ts';
 import type { DraftConfig } from '../draft-types.ts';
 

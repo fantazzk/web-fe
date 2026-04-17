@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { Participant } from '../participant.ts';
 
 describe('Participant', () => {

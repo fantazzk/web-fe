@@ -1,122 +1,199 @@
 <script lang="ts">
-	import { Icon } from '$lib/components';
+	import { onDestroy, onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { Badge, Button } from '$lib/components';
+	import { draftStore } from '$lib/features/draft/stores/draft-store.svelte';
+	import { processPick, processAutoPick } from '$lib/domain/rule-engine/draft-driver';
+	import { calcRemaining, createEndTime } from '$lib/utils/countdown';
+	import { DRAFT_ERROR_MESSAGES } from '$lib/features/draft/types';
+	import type { DraftConfig } from '$lib/domain/rule-engine/draft-types';
+	import type { CaptainType } from '$lib/features/draft/types';
+	import { apiGet } from '$lib/utils/api-client';
+	import { SvelteSet } from 'svelte/reactivity';
 
-	const draftOrder = [
-		{ team: 'T1', pick: '1st', done: true },
-		{ team: 'GEN', pick: '2nd', done: true },
-		{ team: 'HLE', pick: '3rd', done: false, current: true },
-		{ team: 'DK', pick: '4th', done: false },
-		{ team: 'T1', pick: '5th', done: false },
-		{ team: 'DK', pick: '6th', done: false },
-		{ team: 'HLE', pick: '7th', done: false }
-	];
+	const store = draftStore;
 
-	const positions = ['ALL', 'TOP', 'JG', 'MID', 'ADC', 'SUP'];
+	let remainingSeconds = $state(0);
+	let timerInterval: ReturnType<typeof setInterval> | null = null;
+	let loading = $state(true);
+	let expandedTeams = $state<SvelteSet<string>>(new SvelteSet());
 
-	const players = [
-		[
-			{ pos: 'TOP', name: 'Zeus', team: 'T1' },
-			{ pos: 'JGL', name: 'Oner', team: 'T1' },
-			{ pos: 'MID', name: 'Faker', team: 'T1', selected: true },
-			{ pos: 'ADC', name: 'Gumayusi', team: 'T1' },
-			{ pos: 'SUP', name: 'Keria', team: 'T1' }
-		],
-		[
-			{ pos: 'TOP', name: 'Kiin', team: 'DK' },
-			{ pos: 'JGL', name: 'Canyon', team: 'DK' },
-			{ pos: 'MID', name: 'Chovy', team: 'GEN' },
-			{ pos: 'ADC', name: 'Peyz', team: 'GEN' },
-			{ pos: 'SUP', name: 'Lehends', team: 'GEN' }
-		],
-		[
-			{ pos: 'TOP', name: 'Doran', team: 'HLE' },
-			{ pos: 'JGL', name: 'Peanut', team: 'HLE' },
-			{ pos: 'MID', name: 'Zeka', team: 'HLE' },
-			{ pos: 'ADC', name: 'Viper', team: 'HLE' },
-			{ pos: 'SUP', name: 'Delight', team: 'HLE' }
-		],
-		[
-			{ pos: 'MID', name: 'BdDu', team: 'KT' },
-			{ pos: 'JGL', name: 'Lucid', team: 'KT' },
-			{ pos: 'MID', name: 'ShowMaker', team: 'DK' },
-			{ pos: 'SUP', name: 'Aiming', team: 'KT' },
-			{ pos: 'SUP', name: 'BeryL', team: 'DK' }
-		]
-	];
+	// ─── Timer ───
 
-	interface Slot {
-		filled: boolean;
-		name?: string;
-		pos?: string;
-		current?: boolean;
-	}
-
-	interface Team {
-		name: string;
-		count: string;
-		current: boolean;
-		badge?: string;
-		slots: Slot[];
-	}
-
-	const teams: Team[] = [
-		{
-			name: 'T1',
-			count: '1/5',
-			current: false,
-			slots: [
-				{ filled: true, name: 'Zeus', pos: 'TOP' },
-				{ filled: false },
-				{ filled: false },
-				{ filled: false },
-				{ filled: false }
-			]
-		},
-		{
-			name: 'GEN',
-			count: '1/5',
-			current: false,
-			slots: [
-				{ filled: true, name: 'Chovy', pos: 'MID' },
-				{ filled: false },
-				{ filled: false },
-				{ filled: false },
-				{ filled: false }
-			]
-		},
-		{
-			name: 'HLE',
-			count: '0/5',
-			current: true,
-			badge: '내 차례',
-			slots: [
-				{ filled: false, current: true },
-				{ filled: false },
-				{ filled: false },
-				{ filled: false },
-				{ filled: false }
-			]
-		},
-		{
-			name: 'DK',
-			count: '0/5',
-			current: false,
-			slots: [
-				{ filled: false },
-				{ filled: false },
-				{ filled: false },
-				{ filled: false },
-				{ filled: false }
-			]
+	function tickTimer(): void {
+		if (!store.endTime) return;
+		remainingSeconds = calcRemaining(store.endTime);
+		if (remainingSeconds <= 0) {
+			stopTimer();
+			handleTimerExpiry();
 		}
-	];
+	}
 
-	const pickHistory = [
-		{ num: '01', name: 'Zeus', team: 'T1 → T1', done: true },
-		{ num: '02', name: 'Chovy', team: 'GEN → GEN', done: true },
-		{ num: '03', name: '—', team: 'HLE 선택 중', done: false, current: true },
-		{ num: '04', name: '—', team: 'DK 대기', done: false }
-	];
+	function startTimer(): void {
+		const endTime = createEndTime(store.pickBanTime);
+		store.setEndTime(endTime);
+		remainingSeconds = store.pickBanTime;
+		timerInterval = setInterval(tickTimer, 100);
+	}
+
+	function stopTimer(): void {
+		if (timerInterval) {
+			clearInterval(timerInterval);
+			timerInterval = null;
+		}
+	}
+
+	// ─── Handlers ───
+
+	function handleTimerExpiry(): void {
+		const next = processAutoPick(store.draft);
+		store.updateDraft(next);
+
+		if (next.isCompleted) {
+			store.setUIPhase('FINISHED');
+			store.setEndTime(null);
+		} else {
+			startTimer();
+		}
+	}
+
+	function handleStart(): void {
+		store.setUIPhase('PLAYING');
+		startTimer();
+	}
+
+	function handlePickPlayer(playerName: string): void {
+		if (store.uiPhase !== 'PLAYING') return;
+
+		const teamId = store.draft.currentTeamId;
+		if (!teamId) return;
+
+		const result = processPick(store.draft, teamId, playerName);
+		if (result.errorCode) {
+			store.setError(result.errorCode);
+			return;
+		}
+
+		store.updateDraft(result.draft);
+		store.setError(null);
+
+		if (result.draft.isCompleted) {
+			stopTimer();
+			store.setUIPhase('FINISHED');
+			store.setEndTime(null);
+		} else {
+			stopTimer();
+			startTimer();
+		}
+	}
+
+	function handlePositionFilter(position: string): void {
+		store.setPositionFilter(position);
+	}
+
+	function toggleTeamExpand(teamId: string): void {
+		if (expandedTeams.has(teamId)) {
+			expandedTeams.delete(teamId);
+		} else {
+			expandedTeams.add(teamId);
+		}
+	}
+
+	// ─── Lifecycle ───
+
+	onMount(async () => {
+		try {
+			const templateId = $page.params['id'];
+			const data = await apiGet<{
+				template: {
+					teamCount: number;
+					teamSize: number;
+					draftOrderStrategy: 'SNAKE' | 'FIXED';
+					pickBanTime: number;
+					players: { name: string; position: string; displayOrder: number }[];
+				};
+				captains: CaptainType[];
+			}>(globalThis.fetch, `/api/v1/solo/draft/${templateId}`);
+
+			const t = data.template;
+			const captains = data.captains;
+			const teamIds = captains.map((c) => c.id);
+			const rounds = Math.floor(t.players.length / t.teamCount);
+
+			const config: DraftConfig = {
+				teamCount: t.teamCount,
+				draftType: t.draftOrderStrategy === 'SNAKE' ? 'SNAKE' : 'SEQUENTIAL',
+				rounds,
+				playerPool: t.players.map((p) => ({ name: p.name, position: p.position })),
+				teamIds
+			};
+
+			store.init(config, captains, t.pickBanTime ?? 30);
+			loading = false;
+		} catch (e) {
+			console.error('드래프트 데이터 로드 실패', e);
+			loading = false;
+		}
+	});
+
+	onDestroy(() => {
+		stopTimer();
+	});
+
+	// ─── Derived ───
+
+	const timerDisplay = $derived(
+		`${String(Math.floor(remainingSeconds / 60)).padStart(2, '0')}:${String(remainingSeconds % 60).padStart(2, '0')}`
+	);
+
+	const timerProgress = $derived(store.pickBanTime > 0 ? remainingSeconds / store.pickBanTime : 0);
+
+	/** 선수풀에서 고유 포지션 추출 (순서 유지) */
+	const positions = $derived(() => {
+		if (!store.draft) return ['ALL'];
+		const unique = [...new Set(store.draft.config.playerPool.map((p) => p.position))];
+		return ['ALL', ...unique];
+	});
+
+	const filteredPool = $derived(
+		store.draft
+			? store.positionFilter === 'ALL'
+				? store.draft.remainingPool
+				: store.draft.remainingPool.filter((p) => p.position === store.positionFilter)
+			: []
+	);
+
+	const errorMessage = $derived(
+		store.errorCode ? (DRAFT_ERROR_MESSAGES[store.errorCode] ?? store.errorCode) : null
+	);
+
+	/** 선수풀을 5열 그리드 행으로 변환 */
+	const playerRows = $derived(() => {
+		const rows: (typeof filteredPool)[] = [];
+		for (let i = 0; i < filteredPool.length; i += 5) {
+			rows.push(filteredPool.slice(i, i + 5));
+		}
+		return rows;
+	});
+
+	/** 드래프트 순서 표시용 */
+	const draftOrderDisplay = $derived(
+		store.draft
+			? store.draft.pickOrder.map((teamId, i) => {
+					const teamIndex = store.draft.config.teamIds.indexOf(teamId);
+					const captain = store.captains[teamIndex];
+					return {
+						teamName: captain?.name ?? `팀 ${teamIndex + 1}`,
+						pick: `${i + 1}`,
+						done: i < store.draft.currentPickIndex,
+						current: i === store.draft.currentPickIndex
+					};
+				})
+			: []
+	);
+
+	const PREVIEW_COUNT = 3;
 </script>
 
 <svelte:head>
@@ -124,181 +201,327 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="flex h-screen flex-col bg-bg-primary">
-	<!-- Top Bar -->
-	<header class="flex h-16 items-center justify-between border-b border-gray-700 px-8">
-		<span class="font-heading text-xl font-bold tracking-wider text-accent">
-			LCK 2026 모의 드래프트
-		</span>
-		<div class="flex items-center gap-6">
-			<span class="font-mono text-xs font-semibold tracking-wider text-muted">라운드 1</span>
-			<span class="font-mono text-xs font-semibold tracking-wider text-gray-50"> 픽 3 / 10 </span>
-		</div>
-		<div class="flex items-center gap-2">
-			<Icon name="settings" size={16} color="#C9A962" />
-			<span class="font-heading text-2xl font-bold text-accent">00:27</span>
-		</div>
-	</header>
+<a
+	href="#main-content"
+	class="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:p-2 focus:text-accent"
+	>본문으로 바로가기</a
+>
 
-	<!-- Body -->
-	<div class="flex flex-1 overflow-hidden">
-		<!-- Main Content -->
-		<main class="flex flex-1 flex-col overflow-y-auto px-8 py-6">
-			<!-- 드래프트 순서 -->
-			<div class="flex flex-col gap-2">
-				<span class="font-mono text-xs font-semibold tracking-wider text-muted">
-					드래프트 순서
-				</span>
-				<div class="flex items-center gap-1">
-					{#each draftOrder as d, i (i)}
-						{#if i === 5}
-							<span class="px-1 text-muted">
-								<Icon name="settings" size={16} color="#777777" />
-							</span>
-						{/if}
-						<div
-							class="flex h-10 w-[88px] items-center justify-center border {d.current
-								? 'border-accent'
-								: 'border-gray-700'}"
-						>
-							<div class="flex flex-col items-center">
-								<span
-									class="font-mono text-xs font-semibold {d.current
-										? 'text-accent'
-										: d.done
-											? 'text-gray-50'
-											: 'text-muted'}"
-								>
-									{d.team}
-								</span>
-								<span class="font-mono text-xs text-muted">{d.pick}</span>
-							</div>
-						</div>
-					{/each}
+{#if loading}
+	<div
+		role="status"
+		aria-live="polite"
+		class="flex h-screen items-center justify-center bg-bg-primary"
+	>
+		<span class="font-mono text-base text-muted">로딩 중...</span>
+	</div>
+{:else}
+	<div class="relative h-screen">
+		<!-- Dim Overlay: READY -->
+		{#if store.uiPhase === 'READY'}
+			<div
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="overlay-ready-title"
+				class="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
+			>
+				<div class="flex flex-col items-center gap-6">
+					<h2 id="overlay-ready-title" class="font-heading text-3xl font-bold text-gray-50">
+						드래프트를 시작합니다
+					</h2>
+					<Button variant="PRIMARY" size="MD" onclick={handleStart} autofocus>시작</Button>
 				</div>
 			</div>
+		{/if}
 
-			<!-- 현재 턴 배너 -->
+		<!-- Dim Overlay: FINISHED -->
+		{#if store.uiPhase === 'FINISHED'}
 			<div
-				class="mt-4 flex h-14 items-center gap-3 bg-accent px-5 font-mono text-sm font-semibold text-bg-primary"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="overlay-finished-title"
+				class="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
 			>
-				<span>→</span>
-				<span class="tracking-wider">내 픽 — 한화생명 이스포츠</span>
-				<span class="ml-auto tracking-wider">선수를 선택하세요</span>
-			</div>
-
-			<!-- 포지션 필터 탭 -->
-			<div class="mt-4 flex">
-				{#each positions as pos, i (i)}
-					<button
-						class="flex h-10 w-20 items-center justify-center font-mono text-sm font-semibold tracking-wider {i ===
-						0
-							? 'bg-accent text-bg-primary'
-							: 'border border-gray-700 text-muted'}"
+				<div class="flex flex-col items-center gap-6">
+					<h2 id="overlay-finished-title" class="font-heading text-3xl font-bold text-gray-50">
+						드래프트가 종료되었습니다
+					</h2>
+					<Button
+						variant="PRIMARY"
+						size="MD"
+						onclick={() => goto(`/result/${$page.params['id']}`)}
+						autofocus
 					>
-						{pos}
-					</button>
-				{/each}
+						결과 보기
+					</Button>
+				</div>
 			</div>
+		{/if}
 
-			<!-- 선수 그리드 -->
-			<div class="mt-4 flex flex-1 flex-col gap-2 overflow-y-auto">
-				{#each players as row, ri (ri)}
-					<div class="flex gap-2">
-						{#each row as p, ci (ci)}
-							<div
-								class="flex h-28 flex-1 flex-col justify-center gap-2 border px-5 py-4 {p.selected
-									? 'border-accent'
-									: 'border-gray-700'}"
-							>
-								<span class="font-mono text-sm font-semibold tracking-wider text-accent">
-									{p.pos}
+		<div
+			class="flex h-full flex-col bg-bg-primary"
+			inert={store.uiPhase === 'READY' || store.uiPhase === 'FINISHED' ? true : undefined}
+		>
+			<h1 class="sr-only">드래프트방</h1>
+			<!-- Top Bar -->
+			<header class="flex h-[60px] items-center justify-between border-b border-gray-700 px-8">
+				<div class="flex items-center gap-4">
+					<span class="h-2 w-2 rounded-full bg-accent" aria-hidden="true"></span>
+					<span class="font-mono text-sm font-semibold tracking-[2px] text-accent"
+						>솔로 드래프트</span
+					>
+				</div>
+				<div class="flex items-center gap-3">
+					<span class="font-mono text-sm font-semibold tracking-wider text-muted">
+						라운드 {store.currentRound}
+					</span>
+					<span class="font-mono text-sm text-muted">—</span>
+					<span class="font-mono text-sm font-semibold tracking-wider text-gray-50">
+						픽 {String(store.currentPickNumber).padStart(2, '0')} / {String(
+							store.totalPicks
+						).padStart(2, '0')}
+					</span>
+					<Badge variant="STATUS">LIVE</Badge>
+				</div>
+				<span class="font-mono text-sm font-semibold text-gray-50">{timerDisplay}</span>
+			</header>
+
+			<!-- Body -->
+			<div class="flex flex-1 overflow-hidden">
+				<!-- Left Panel: 팀 로스터 -->
+				<aside
+					aria-label="팀 로스터"
+					class="flex w-[280px] flex-col gap-4 overflow-y-auto border-r border-gray-700 px-5 py-6"
+				>
+					<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">팀 로스터</span>
+
+					{#each store.draft.teams as team, i (team.id)}
+						{@const captain = store.captains[i]}
+						{@const isCurrent = team.id === store.draft.currentTeamId}
+						{@const slotsNeeded = store.draft.config.rounds}
+						{@const isExpanded = expandedTeams.has(team.id)}
+						{@const hasOverflow = team.roster.length > PREVIEW_COUNT}
+						{@const visibleRoster = isExpanded ? team.roster : team.roster.slice(0, PREVIEW_COUNT)}
+						<div class="flex flex-col gap-1.5 {i > 0 ? 'pt-3' : ''}">
+							<!-- 팀 헤더 -->
+							<div class="flex items-center justify-between">
+								<span
+									class="font-heading text-base font-semibold {isCurrent
+										? 'text-accent'
+										: 'text-gray-50'}"
+								>
+									{captain?.name ?? `팀 ${i + 1}`}
 								</span>
-								<span class="font-heading text-lg font-semibold text-gray-50">
-									{p.name}
-								</span>
-								<span class="font-mono text-sm text-muted">{p.team}</span>
+								<div class="flex items-center gap-2">
+									<span class="font-mono text-sm text-muted">
+										{team.roster.length}/{slotsNeeded}
+									</span>
+									{#if isCurrent}
+										<span
+											class="bg-accent-20 px-2 py-1 font-mono text-xs font-semibold text-accent"
+										>
+											내 차례
+										</span>
+									{/if}
+								</div>
 							</div>
-						{/each}
-					</div>
-				{/each}
-			</div>
-		</main>
 
-		<!-- Side Panel: 팀 로스터 -->
-		<aside class="flex w-[320px] flex-col gap-4 overflow-y-auto border-l border-gray-700 px-5 py-6">
-			<span class="font-mono text-sm font-semibold tracking-wider text-accent"> 팀 로스터 </span>
-
-			{#each teams as t, i (i)}
-				<div class="flex flex-col gap-2 {i > 0 ? 'pt-3' : ''}">
-					<div class="flex items-center justify-between">
-						<span
-							class="font-heading text-base font-semibold {t.current
-								? 'text-accent'
-								: 'text-gray-50'}"
-						>
-							{t.name}
-						</span>
-						<div class="flex items-center gap-2">
-							<span class="font-mono text-xs text-muted">{t.count}</span>
-							{#if t.badge}
-								<span class="bg-accent-20 px-2 py-1 font-mono text-xs font-semibold text-accent">
-									{t.badge}
-								</span>
+							<!-- 선수 세로 리스트 -->
+							{#if team.roster.length > 0}
+								<ul class="flex flex-col gap-1">
+									{#each visibleRoster as player, si (si)}
+										<li
+											class="flex items-center gap-2 border px-3 py-1.5 {isCurrent
+												? 'border-gray-700 bg-accent-20'
+												: 'border-gray-700'}"
+										>
+											<span class="w-10 font-mono text-xs text-muted">{player.position}</span>
+											<span class="flex-1 truncate font-heading text-sm font-semibold text-gray-50">
+												{player.name}
+											</span>
+										</li>
+									{/each}
+									{#if hasOverflow}
+										<li>
+											<button
+												type="button"
+												class="flex w-full items-center justify-center py-1 font-mono text-xs text-muted hover:text-accent"
+												onclick={() => toggleTeamExpand(team.id)}
+											>
+												{#if isExpanded}
+													접기
+												{:else}
+													… 외 {team.roster.length - PREVIEW_COUNT}명 더보기
+												{/if}
+											</button>
+										</li>
+									{/if}
+								</ul>
+							{:else}
+								<span class="font-mono text-xs text-dim">선수 없음</span>
 							{/if}
 						</div>
+					{/each}
+				</aside>
+
+				<!-- Main Content -->
+				<main id="main-content" class="flex flex-1 flex-col overflow-y-auto px-8 py-6">
+					<!-- 타이머 (대형) -->
+					<div class="flex flex-col items-center gap-2">
+						<span class="font-mono text-xs font-semibold tracking-[2px] text-muted">남은 시간</span>
+						<span
+							aria-live="off"
+							aria-label={`남은 시간 ${timerDisplay}`}
+							class="font-heading text-6xl font-bold text-accent">{timerDisplay}</span
+						>
+						<div
+							role="progressbar"
+							aria-label="드래프트 타이머 진행률"
+							aria-valuenow={remainingSeconds}
+							aria-valuemin={0}
+							aria-valuemax={store.pickBanTime}
+							class="h-1 w-full max-w-md bg-gray-700"
+						>
+							<div class="h-full bg-accent" style="width: {timerProgress * 100}%"></div>
+						</div>
 					</div>
-					<div class="flex gap-1">
-						{#each t.slots as s, si (si)}
-							<div
-								class="flex h-9 flex-1 items-center justify-center border {s.current
-									? 'border-accent'
-									: 'border-gray-700'} {s.filled ? 'bg-accent-20' : ''}"
+
+					<!-- 드래프트 순서 -->
+					<div class="mt-5 flex flex-col gap-2">
+						<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">
+							드래프트 순서
+						</span>
+						<ol class="flex items-center gap-1 overflow-x-auto">
+							{#each draftOrderDisplay as d, i (i)}
+								<li
+									class="flex h-11 w-[96px] shrink-0 items-center justify-center border {d.current
+										? 'border-accent'
+										: 'border-gray-700'}"
+								>
+									<div class="flex flex-col items-center">
+										<span
+											class="font-mono text-sm font-semibold {d.current
+												? 'text-accent'
+												: d.done
+													? 'text-gray-50'
+													: 'text-muted'}"
+										>
+											{d.teamName}
+										</span>
+										<span class="font-mono text-xs text-muted">{d.pick}</span>
+									</div>
+								</li>
+							{/each}
+						</ol>
+					</div>
+
+					<!-- 현재 턴 배너 -->
+					{#if store.draft.currentTeamId}
+						<div
+							class="mt-4 flex h-14 items-center gap-3 bg-accent px-5 font-mono text-base font-semibold text-bg-primary"
+						>
+							<span class="tracking-wider">{store.currentCaptainName} 님의 차례입니다.</span>
+							<span class="ml-auto tracking-wider">선수를 선택하세요</span>
+						</div>
+					{/if}
+
+					<!-- 에러 메시지 -->
+					{#if errorMessage}
+						<span role="alert" class="mt-2 font-mono text-sm text-red-400">{errorMessage}</span>
+					{/if}
+
+					<!-- 포지션 필터 탭 -->
+					<div role="radiogroup" aria-label="포지션 필터" class="mt-4 flex">
+						{#each positions() as pos (pos)}
+							<button
+								type="button"
+								role="radio"
+								aria-checked={store.positionFilter === pos}
+								class="flex h-11 w-24 items-center justify-center font-mono text-sm font-semibold tracking-wider {store.positionFilter ===
+								pos
+									? 'bg-accent text-bg-primary'
+									: 'border border-gray-700 text-muted'}"
+								onclick={() => handlePositionFilter(pos)}
 							>
-								{#if s.filled}
-									<span class="font-mono text-xs font-semibold text-gray-50">
-										{s.name}
-									</span>
-								{/if}
+								{pos}
+							</button>
+						{/each}
+					</div>
+
+					<!-- 선수 그리드 -->
+					<div class="mt-4 flex flex-1 flex-col gap-2 overflow-y-auto">
+						{#each playerRows() as row, ri (ri)}
+							<div class="flex gap-2">
+								{#each row as player (player.name)}
+									<button
+										type="button"
+										class="flex h-28 flex-1 flex-col justify-center gap-2 border border-gray-700 px-5 py-4 text-left hover:border-accent"
+										onclick={() => handlePickPlayer(player.name)}
+										disabled={store.uiPhase !== 'PLAYING'}
+									>
+										<span class="font-mono text-sm font-semibold tracking-wider text-accent">
+											{player.position}
+										</span>
+										<span class="font-heading text-lg font-semibold text-gray-50">
+											{player.name}
+										</span>
+									</button>
+								{/each}
+								<!-- 빈 셀로 행 폭 맞추기 -->
+								{#each Array(5 - row.length) as _item}
+									<div class="flex-1"></div>
+								{/each}
 							</div>
 						{/each}
 					</div>
-				</div>
-			{/each}
+				</main>
 
-			<div class="h-px w-full bg-gray-700"></div>
+				<!-- Right Panel: 픽 히스토리 -->
+				<aside
+					aria-label="픽 히스토리"
+					class="flex w-[280px] flex-col gap-3 overflow-y-auto border-l border-gray-700 px-5 py-6"
+				>
+					<span class="font-mono text-xs font-semibold tracking-[2px] text-accent">
+						픽 히스토리
+					</span>
+					<ol class="flex flex-col gap-3">
+						{#each store.draft.pickHistory as record, i (i)}
+							{@const teamIndex = store.draft.config.teamIds.indexOf(record.teamId)}
+							{@const captainName = store.captains[teamIndex]?.name ?? `팀 ${teamIndex + 1}`}
+							<li class="flex items-center gap-3">
+								<span class="font-mono text-sm font-semibold text-dim">
+									{String(i + 1).padStart(2, '0')}
+								</span>
+								<div class="flex flex-col gap-0.5">
+									<span class="font-heading text-sm font-semibold text-gray-50">
+										{record.player.name}
+									</span>
+									<span class="font-mono text-xs text-muted">
+										{record.player.position} → {captainName}
+									</span>
+								</div>
+							</li>
+						{/each}
 
-			<!-- 픽 히스토리 -->
-			<div class="flex flex-col gap-3">
-				<span class="font-mono text-sm font-semibold tracking-wider text-accent">
-					픽 히스토리
-				</span>
-				{#each pickHistory as h, i (i)}
-					<div class="flex items-center gap-3">
-						<span
-							class="font-mono text-xs font-semibold {h.current
-								? 'text-accent'
-								: h.done
-									? 'text-dim'
-									: 'text-gray-700'}"
-						>
-							{h.num}
-						</span>
-						<div class="flex flex-col gap-0.5">
-							<span
-								class="font-heading text-sm font-semibold {h.current
-									? 'text-accent'
-									: h.done
-										? 'text-gray-50'
-										: 'text-muted'}"
-							>
-								{h.name}
-							</span>
-							<span class="font-mono text-xs text-muted">{h.team}</span>
-						</div>
-					</div>
-				{/each}
+						<!-- 현재 진행 중 표시 -->
+						{#if store.draft.currentTeamId}
+							{@const currentTeamIndex = store.draft.config.teamIds.indexOf(
+								store.draft.currentTeamId
+							)}
+							{@const currentName = store.captains[currentTeamIndex]?.name ?? ''}
+							<li class="flex items-center gap-3">
+								<span class="font-mono text-sm font-semibold text-accent">
+									{String(store.draft.pickHistory.length + 1).padStart(2, '0')}
+								</span>
+								<div class="flex flex-col gap-0.5">
+									<span class="font-heading text-sm font-semibold text-accent">—</span>
+									<span class="font-mono text-xs text-muted">{currentName} 선택 중</span>
+								</div>
+							</li>
+						{/if}
+					</ol>
+				</aside>
 			</div>
-		</aside>
+		</div>
 	</div>
-</div>
+{/if}
