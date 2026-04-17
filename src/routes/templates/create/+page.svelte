@@ -521,7 +521,7 @@
 				<!-- Bottom Bar -->
 				<div class="flex items-center justify-end gap-3 border-t border-gray-700 px-14 py-4">
 					<Button variant="SECONDARY" size="MD" onclick={handleSoloPlay}>혼자 하기</Button>
-					<Button variant="PRIMARY" size="MD">방 만들기</Button>
+					<Button variant="PRIMARY" size="MD" disabled>방 만들기</Button>
 				</div>
 			</main>
 
