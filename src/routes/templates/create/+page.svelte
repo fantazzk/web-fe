@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Sidebar, Icon, Button, ThemePicker, Toggle } from '$lib/components';
+	import { Sidebar, Icon, Button, Toggle } from '$lib/components';
 	import { Template } from '$lib/domain/template';
 	import type { GameType, TemplateModeType, DraftModeType, TierType } from '$lib/domain/template';
 	import { POSITIONS_BY_GAME } from '$lib/domain/template';
@@ -117,36 +117,7 @@
 
 <div class="flex h-screen bg-bg-primary">
 	<!-- Sidebar -->
-	<Sidebar logo="MD">
-		{#snippet nav()}
-			<a
-				href="/"
-				class="flex h-12 w-12 items-center justify-center"
-				aria-label="대시보드"
-				title="대시보드"
-			>
-				<Icon name="layout-grid" color="#0A0A0A" />
-			</a>
-			<a
-				href="/templates/create"
-				class="flex h-12 w-12 items-center justify-center rounded-sm bg-bg-primary/8"
-				aria-label="템플릿 만들기"
-				aria-current="page"
-				title="템플릿 만들기"
-			>
-				<Icon name="file-text" color="#0A0A0A" />
-			</a>
-			<button class="flex h-12 w-12 items-center justify-center" aria-label="트렌드">
-				<Icon name="trending-up" color="#0A0A0A" />
-			</button>
-			<button class="flex h-12 w-12 items-center justify-center" aria-label="사용자">
-				<Icon name="users" color="#0A0A0A" />
-			</button>
-		{/snippet}
-		{#snippet footer()}
-			<ThemePicker />
-		{/snippet}
-	</Sidebar>
+	<Sidebar />
 
 	<!-- Main -->
 	<div class="flex flex-1 flex-col">
