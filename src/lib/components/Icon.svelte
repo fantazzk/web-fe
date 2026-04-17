@@ -1,5 +1,5 @@
 <script lang="ts">
-	type IconName =
+	export type IconName =
 		| 'layout-grid'
 		| 'file-text'
 		| 'trending-up'
@@ -7,7 +7,13 @@
 		| 'settings'
 		| 'palette'
 		| 'droplet'
-		| 'close';
+		| 'close'
+		| 'download'
+		| 'link'
+		| 'refresh-cw'
+		| 'play'
+		| 'info'
+		| 'file-check';
 
 	interface Props {
 		name: IconName;
@@ -29,7 +35,7 @@
 	stroke-width="2"
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	aria-hidden={!label}
+	aria-hidden={label ? undefined : true}
 	role={label ? 'img' : undefined}
 	aria-label={label}
 >
@@ -74,5 +80,27 @@
 	{:else if name === 'close'}
 		<path d="M18 6 6 18" />
 		<path d="m6 6 12 12" />
+	{:else if name === 'download'}
+		<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+		<polyline points="7 10 12 15 17 10" />
+		<line x1="12" x2="12" y1="15" y2="3" />
+	{:else if name === 'link'}
+		<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+		<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+	{:else if name === 'refresh-cw'}
+		<polyline points="23 4 23 10 17 10" />
+		<polyline points="1 20 1 14 7 14" />
+		<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10" />
+		<path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14" />
+	{:else if name === 'play'}
+		<polygon points="5 3 19 12 5 21 5 3" />
+	{:else if name === 'info'}
+		<circle cx="12" cy="12" r="10" />
+		<line x1="12" y1="16" x2="12" y2="12" />
+		<line x1="12" y1="8" x2="12.01" y2="8" />
+	{:else if name === 'file-check'}
+		<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+		<path d="M14 2v4a2 2 0 0 0 2 2h4" />
+		<path d="m9 15 2 2 4-4" />
 	{/if}
 </svg>

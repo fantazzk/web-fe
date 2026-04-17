@@ -1,0 +1,11 @@
+node_modules
+.svelte-kit
+build
+.git
+.github
+.claude
+.husky
+docs
+README.md
+CLAUDE.md
+.env*

@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest';
 import { Session } from '../session.ts';
 import { Participant } from '../participant.ts';
 

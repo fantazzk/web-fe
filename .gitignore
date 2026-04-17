@@ -21,3 +21,16 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Backend requests (로컬 전용, 절대 커밋/push 금지)
+backend-requests/
+
+# Superpowers specs (로컬 전용, 절대 커밋/push 금지)
+docs/superpowers/
+
+# Playwright MCP
+.playwright-mcp/
+
+# Screenshots (임시)
+*.png
+!static/*.png

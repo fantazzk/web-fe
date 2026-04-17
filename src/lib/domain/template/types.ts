@@ -1,21 +1,54 @@
 /** 게임 종목 */
-export type GameType = 'LEAGUE_OF_LEGENDS' | 'VALORANT' | 'PUBG';
+export type GameType = 'LEAGUE_OF_LEGENDS' | 'VALORANT' | 'OVERWATCH_2' | 'BATTLEGROUNDS';
 
 /** 팀 구성 방식: 경매(포인트 입찰) 또는 드래프트(순차 픽) */
-export type TemplateMode = 'AUCTION' | 'DRAFT';
+export type TemplateModeType = 'AUCTION' | 'DRAFT';
 
-/** 대회 매치 포맷 */
-export type MatchFormat = 'BO1' | 'BO3' | 'BO5';
+/** 드래프트 방식 */
+export type DraftModeType = 'SEQUENTIAL' | 'SNAKE';
 
-/** 티어 밸런싱 방식 */
-export type TierBalancing = 'AUTO' | 'MANUAL';
+/** 선수 등급 */
+export type TierType = 'S+' | 'S' | 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D+' | 'D';
 
-/** 팀장 선출 방식 */
-export type CaptainSelectMode = 'VOTE' | 'ADMIN_PICK';
+/** 종목별 포지션 */
+export type LeaguePositionType = 'TOP' | 'JUNGLE' | 'MID' | 'ADC' | 'SUPPORT';
+export type ValorantPositionType = 'DUELIST' | 'INITIATOR' | 'CONTROLLER' | 'SENTINEL';
+export type OverwatchPositionType = 'TANK' | 'DPS' | 'SUPPORT';
+
+export type GamePositionType = LeaguePositionType | ValorantPositionType | OverwatchPositionType;
+
+interface PositionOptionType {
+	readonly value: GamePositionType;
+	readonly label: string;
+}
+
+/** 종목별 포지션 목록 */
+export const POSITIONS_BY_GAME: Record<GameType, readonly PositionOptionType[]> = {
+	LEAGUE_OF_LEGENDS: [
+		{ value: 'TOP', label: 'TOP' },
+		{ value: 'JUNGLE', label: 'JGL' },
+		{ value: 'MID', label: 'MID' },
+		{ value: 'ADC', label: 'ADC' },
+		{ value: 'SUPPORT', label: 'SUP' }
+	],
+	VALORANT: [
+		{ value: 'DUELIST', label: 'DUE' },
+		{ value: 'INITIATOR', label: 'INI' },
+		{ value: 'CONTROLLER', label: 'CON' },
+		{ value: 'SENTINEL', label: 'SEN' }
+	],
+	OVERWATCH_2: [
+		{ value: 'TANK', label: 'TANK' },
+		{ value: 'DPS', label: 'DPS' },
+		{ value: 'SUPPORT', label: 'SUP' }
+	],
+	BATTLEGROUNDS: []
+};
 
 export interface PlayerParams {
 	readonly name: string;
 	readonly position: string;
+	readonly tier?: TierType;
 }
 
 export interface TemplateParams {
@@ -23,15 +56,19 @@ export interface TemplateParams {
 	readonly name: string;
 	readonly gameType: GameType;
 	readonly creatorId: string;
-	readonly mode: TemplateMode;
-	readonly matchFormat: MatchFormat;
+	readonly mode: TemplateModeType;
 	readonly pickBanTime: number;
-	readonly restrictions: string;
 	readonly playerPool: readonly PlayerParams[];
-	readonly tierBalancing: TierBalancing;
-	readonly captainSelectMode: CaptainSelectMode;
 	readonly captainsNeeded: number;
-	readonly isPublic: boolean;
+	readonly creatorAsCaptain: boolean;
+
+	/** 경매 전용 */
+	readonly totalPoints?: number;
+	readonly minBidUnit?: number;
+
+	/** 드래프트 전용 */
+	readonly draftMode?: DraftModeType;
+
 	readonly usageCount?: number;
 	readonly createdAt?: Date;
 	readonly updatedAt?: Date;
