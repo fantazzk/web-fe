@@ -9,3 +9,4 @@ export { default as FormField } from './FormField.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
 export { default as ThemePicker } from './ThemePicker.svelte';
 export { default as Toggle } from './Toggle.svelte';
+export { default as SettingsModal } from './SettingsModal.svelte';
