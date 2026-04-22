@@ -10,7 +10,17 @@ import type {
 	JoinableRoomResponse,
 	AuctionTargetResponse,
 	DraftOrderPreviewResponse,
-	DraftOrderSlotResponse
+	DraftOrderSlotResponse,
+	RoomDetailResponse,
+	RoomCreateResponse,
+	RoomJoinResponse,
+	RoomStartResponse,
+	GameDetailResponse,
+	GameParticipantResponse,
+	GamePlayerResponse,
+	GameMemberResponse,
+	DraftProgressResponse,
+	AuctionProgressResponse
 } from '$lib/types/api';
 
 // ─── 응답 래퍼 ───
@@ -292,6 +302,175 @@ export function createRoomSessionResponse(
 			role: 'HOST',
 			actionToken: 'mock-action-token-abc123'
 		},
+		...overrides
+	};
+}
+
+// ─── Room Detail / Session (OpenAPI) ───
+
+export function createRoomDetailResponse(
+	overrides?: Partial<RoomDetailResponse>
+): RoomDetailResponse {
+	return {
+		roomCode: 'ROOM01',
+		status: 'WAITING',
+		mode: 'DRAFT',
+		teamCount: 2,
+		teamSize: 3,
+		draftOrderStrategy: 'SNAKE',
+		startReadiness: 'WAITING_FOR_DRAFT_POSITIONS',
+		draftOrder: {
+			slots: [
+				{ draftPosition: 1, leaderId: 'leader-host', nickname: '호스트' },
+				{ draftPosition: 2, leaderId: 'leader-guest', nickname: '게스트' }
+			]
+		},
+		leaders: [
+			{ id: 'leader-host', nickname: '호스트', draftPosition: 1 },
+			{ id: 'leader-guest', nickname: '게스트', draftPosition: 2 }
+		],
+		playerPool: [
+			{ name: '선수1', position: 'TOP', displayOrder: 0, status: 'AVAILABLE' },
+			{ name: '선수2', position: 'JUNGLE', displayOrder: 1, status: 'AVAILABLE' }
+		],
+		...overrides
+	};
+}
+
+export function createRoomCreateResponse(
+	overrides?: Partial<RoomCreateResponse>
+): RoomCreateResponse {
+	return {
+		room: createRoomDetailResponse(),
+		teamLeaderSession: {
+			leaderId: 'leader-host',
+			role: 'HOST',
+			actionToken: 'room-action-token'
+		},
+		...overrides
+	};
+}
+
+export function createRoomJoinResponse(overrides?: Partial<RoomJoinResponse>): RoomJoinResponse {
+	return {
+		room: createRoomDetailResponse({
+			leaders: [
+				{ id: 'leader-host', nickname: '호스트', draftPosition: 1 },
+				{ id: 'leader-guest', nickname: '게스트' }
+			]
+		}),
+		teamLeaderSession: {
+			leaderId: 'leader-guest',
+			role: 'LEADER',
+			actionToken: 'guest-room-action-token'
+		},
+		...overrides
+	};
+}
+
+export function createRoomStartResponse(overrides?: Partial<RoomStartResponse>): RoomStartResponse {
+	return {
+		gameId: '00000000-0000-0000-0000-000000000201',
+		...overrides
+	};
+}
+
+// ─── Game ───
+
+export function createGameParticipantResponse(
+	overrides?: Partial<GameParticipantResponse>
+): GameParticipantResponse {
+	return {
+		teamLeaderId: 'leader-host',
+		nickname: '호스트',
+		draftPosition: 1,
+		...overrides
+	};
+}
+
+export function createGamePlayerResponse(
+	overrides?: Partial<GamePlayerResponse>
+): GamePlayerResponse {
+	return {
+		name: '선수1',
+		position: 'TOP',
+		displayOrder: 0,
+		status: 'AVAILABLE',
+		...overrides
+	};
+}
+
+export function createGameMemberResponse(
+	overrides?: Partial<GameMemberResponse>
+): GameMemberResponse {
+	return {
+		teamLeaderId: 'leader-host',
+		playerName: '선수1',
+		assignOrder: 0,
+		...overrides
+	};
+}
+
+export function createDraftProgressResponse(
+	overrides?: Partial<DraftProgressResponse>
+): DraftProgressResponse {
+	return {
+		currentTurnIndex: 1,
+		currentRound: 1,
+		currentLeaderId: 'leader-guest',
+		currentRoundLeaderIds: ['leader-host', 'leader-guest'],
+		...overrides
+	};
+}
+
+export function createAuctionProgressResponse(
+	overrides?: Partial<AuctionProgressResponse>
+): AuctionProgressResponse {
+	return {
+		currentRound: 2,
+		currentAuctionRoundEndsAt: '2026-04-19T12:00:45Z',
+		currentAuctionTarget: { name: '선수2', position: 'JUNGLE' },
+		highestBidAmount: 150,
+		leadingLeaderId: 'leader-guest',
+		bidCount: 2,
+		...overrides
+	};
+}
+
+export function createGameDetailResponse(
+	overrides?: Partial<GameDetailResponse>
+): GameDetailResponse {
+	return {
+		gameId: '00000000-0000-0000-0000-000000000202',
+		roomCode: 'ROOM01',
+		mode: 'DRAFT',
+		status: 'IN_PROGRESS',
+		teamCount: 2,
+		teamSize: 3,
+		draftOrderStrategy: 'SNAKE',
+		participants: [
+			createGameParticipantResponse({
+				teamLeaderId: 'leader-host',
+				nickname: '호스트',
+				draftPosition: 1
+			}),
+			createGameParticipantResponse({
+				teamLeaderId: 'leader-guest',
+				nickname: '게스트',
+				draftPosition: 2
+			})
+		],
+		playerPool: [
+			createGamePlayerResponse({ name: '선수1', displayOrder: 0, status: 'ASSIGNED' }),
+			createGamePlayerResponse({
+				name: '선수2',
+				position: 'JUNGLE',
+				displayOrder: 1,
+				status: 'AVAILABLE'
+			})
+		],
+		roster: [createGameMemberResponse({ playerName: '선수1', assignOrder: 0 })],
+		draftProgress: createDraftProgressResponse(),
 		...overrides
 	};
 }
