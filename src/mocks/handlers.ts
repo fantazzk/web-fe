@@ -6,8 +6,12 @@ import {
 	createDraftTemplateDetailResponse,
 	createTemplateResponse,
 	createRoomResponse,
-	createRoomSessionResponse,
-	createJoinableRoomListResponse
+	createJoinableRoomListResponse,
+	createRoomDetailResponse,
+	createRoomCreateResponse,
+	createRoomJoinResponse,
+	createRoomStartResponse,
+	createGameDetailResponse
 } from './factories';
 
 const BASE_URL = import.meta.env['PUBLIC_API_URL'] ?? '';
@@ -38,60 +42,50 @@ export const handlers = [
 	}),
 
 	http.post(`${BASE_URL}/api/v1/rooms`, () => {
-		return HttpResponse.json(success(createRoomSessionResponse()), { status: 201 });
+		return HttpResponse.json(success(createRoomCreateResponse()), { status: 201 });
 	}),
 
 	http.get(`${BASE_URL}/api/v1/rooms/:code`, ({ params }) => {
 		const code = params['code'] as string;
-		return HttpResponse.json(success(createRoomResponse({ code })));
+		return HttpResponse.json(success(createRoomDetailResponse({ roomCode: code })));
 	}),
 
 	http.post(`${BASE_URL}/api/v1/rooms/:code/join`, ({ params }) => {
 		const code = params['code'] as string;
 		return HttpResponse.json(
 			success(
-				createRoomSessionResponse({
-					room: createRoomResponse({
-						code,
-						teamLeaders: [
-							{ id: 'tl-1', nickname: 'DragonSlayer', remainingBudget: 1000 },
-							{ id: 'tl-2', nickname: 'NightHawk_KR', remainingBudget: 1000 },
-							{ id: 'tl-3', nickname: '참가자', remainingBudget: 1000 }
-						]
-					})
+				createRoomJoinResponse({
+					room: createRoomDetailResponse({ roomCode: code })
 				})
 			)
 		);
 	}),
 
-	http.post(`${BASE_URL}/api/v1/rooms/:code/start`, ({ params }) => {
-		const code = params['code'] as string;
-		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	http.post(`${BASE_URL}/api/v1/rooms/:code/start`, () => {
+		return HttpResponse.json(success(createRoomStartResponse()));
 	}),
 
-	http.put(`${BASE_URL}/api/v1/rooms/:code/draft-position`, ({ params }) => {
-		const code = params['code'] as string;
-		return HttpResponse.json(success(createRoomResponse({ code })));
+	http.put(`${BASE_URL}/api/v1/rooms/:code/draft-position`, () => {
+		return HttpResponse.json(success(null));
 	}),
 
-	http.delete(`${BASE_URL}/api/v1/rooms/:code/draft-position`, ({ params }) => {
-		const code = params['code'] as string;
-		return HttpResponse.json(success(createRoomResponse({ code })));
+	http.delete(`${BASE_URL}/api/v1/rooms/:code/draft-position`, () => {
+		return HttpResponse.json(success(null));
 	}),
 
-	http.post(`${BASE_URL}/api/v1/rooms/:code/draft-picks`, ({ params }) => {
-		const code = params['code'] as string;
-		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	// ─── Game Play API ───
+
+	http.get(`${BASE_URL}/api/v1/games/:gameId`, ({ params }) => {
+		const gameId = params['gameId'] as string;
+		return HttpResponse.json(success(createGameDetailResponse({ gameId })));
 	}),
 
-	http.post(`${BASE_URL}/api/v1/rooms/:code/bids`, ({ params }) => {
-		const code = params['code'] as string;
-		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	http.post(`${BASE_URL}/api/v1/games/:gameId/draft-picks`, () => {
+		return HttpResponse.json(success(null));
 	}),
 
-	http.post(`${BASE_URL}/api/v1/rooms/:code/auction/progress`, ({ params }) => {
-		const code = params['code'] as string;
-		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	http.post(`${BASE_URL}/api/v1/games/:gameId/bids`, () => {
+		return HttpResponse.json(success(null));
 	}),
 
 	// ─── Solo API ───
@@ -117,6 +111,21 @@ export const handlers = [
 	}),
 
 	// ─── Front-only (not in OpenAPI spec) ───
+
+	http.post(`${BASE_URL}/api/v1/rooms/:code/draft-picks`, ({ params }) => {
+		const code = params['code'] as string;
+		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	}),
+
+	http.post(`${BASE_URL}/api/v1/rooms/:code/bids`, ({ params }) => {
+		const code = params['code'] as string;
+		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	}),
+
+	http.post(`${BASE_URL}/api/v1/rooms/:code/auction/progress`, ({ params }) => {
+		const code = params['code'] as string;
+		return HttpResponse.json(success(createRoomResponse({ code, status: 'IN_PROGRESS' })));
+	}),
 
 	http.post(`${BASE_URL}/api/v1/rooms/:code/bid`, ({ params }) => {
 		const code = params['code'] as string;

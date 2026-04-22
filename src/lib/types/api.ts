@@ -167,6 +167,106 @@ export interface PlaceBidRequest {
 	amount: number;
 }
 
+// ─── Room Detail / Session API ───
+
+export type RoomDetailStatus = 'WAITING' | 'STARTED';
+export type RoomMode = 'DRAFT' | 'AUCTION';
+export type RoomPlayerStatus = 'AVAILABLE' | 'ASSIGNED';
+export type StartReadiness =
+	| 'WAITING_FOR_LEADERS'
+	| 'WAITING_FOR_DRAFT_POSITIONS'
+	| 'STARTABLE'
+	| 'NOT_WAITING';
+export type TeamLeaderRole = 'HOST' | 'LEADER';
+export type DraftOrderStrategy = 'SNAKE' | 'FIXED';
+
+export interface RoomDetailResponse {
+	roomCode: string;
+	status: RoomDetailStatus;
+	mode: RoomMode;
+	teamCount: number;
+	teamSize: number;
+	budget?: number;
+	minBidUnit?: number;
+	draftOrderStrategy?: DraftOrderStrategy;
+	startReadiness: StartReadiness;
+	startedGameId?: string;
+	draftOrder?: DraftOrderPreviewResponse;
+	leaders: TeamLeaderResponse[];
+	playerPool: RoomPlayerResponse[];
+}
+
+export interface RoomCreateResponse {
+	room: RoomDetailResponse;
+	teamLeaderSession: TeamLeaderSessionResponse;
+}
+
+export interface RoomJoinResponse {
+	room: RoomDetailResponse;
+	teamLeaderSession: TeamLeaderSessionResponse;
+}
+
+export interface RoomStartResponse {
+	gameId: string;
+}
+
+// ─── Game API ───
+
+export type GameStatus = 'IN_PROGRESS' | 'COMPLETED';
+
+export interface GameParticipantResponse {
+	teamLeaderId: string;
+	nickname: string;
+	draftPosition?: number;
+	remainingBudget?: number;
+}
+
+export interface GamePlayerResponse {
+	name: string;
+	position?: string;
+	displayOrder: number;
+	status: RoomPlayerStatus;
+}
+
+export interface GameMemberResponse {
+	teamLeaderId: string;
+	playerName: string;
+	assignOrder: number;
+}
+
+export interface DraftProgressResponse {
+	currentTurnIndex: number;
+	currentRound: number;
+	currentLeaderId: string;
+	currentRoundLeaderIds: string[];
+}
+
+export interface AuctionProgressResponse {
+	currentRound: number;
+	currentAuctionRoundEndsAt?: string;
+	currentAuctionTarget?: AuctionTargetResponse;
+	highestBidAmount?: number;
+	leadingLeaderId?: string;
+	bidCount?: number;
+}
+
+export interface GameDetailResponse {
+	gameId: string;
+	roomCode: string;
+	mode: RoomMode;
+	status: GameStatus;
+	teamCount: number;
+	teamSize: number;
+	budget?: number;
+	minBidUnit?: number;
+	draftOrderStrategy?: DraftOrderStrategy;
+	participants: GameParticipantResponse[];
+	playerPool: GamePlayerResponse[];
+	roster: GameMemberResponse[];
+	draftProgress?: DraftProgressResponse;
+	auctionProgress?: AuctionProgressResponse;
+}
+
 // ─── Front-only (not in OpenAPI spec) ───
 
 export interface BidRequest {
