@@ -25,44 +25,75 @@ bun run lint           # Prettier + ESLint 검사
 bun run format         # Prettier 자동 포맷
 ```
 
-## 아키텍처
+## 리팩터링 진행 중 (#78)
+
+DDD 4계층 아키텍처 도입 + MarketEngine Bounded Context 정의 작업이 진행 중이다 (이슈 [#78](https://github.com/fantazzk/web-fe/issues/78)). 아래 **"아키텍처" 섹션은 목표 상태**이며, 마이그레이션이 끝날 때까지 구·신 구조가 공존한다.
+
+- **새 코드는 항상 새 구조에 따라 작성**한다 (예: 새 도메인 로직 → `src/lib/market-engine/domain/...`).
+- 기존 코드(`src/lib/domain/{rule-engine, session, sandbox, template}/`, `src/lib/server/`)는 단계별 PR로 이전 중.
+- 자세한 설계는 이슈 #78 본문 참조.
+
+## 아키텍처 (목표 상태)
 
 ```
 src/lib/
-├── domain/        # 순수 비즈니스 로직 (UI 무관, 서버/클라이언트 공유 가능)
-│   ├── rule-engine/   # 경매/드래프트 규칙 검증, 상태 전이
-│   ├── session/       # 세션(방) 생명주기 및 참가자 관리
-│   ├── ai/            # 솔로 모드 AI 입찰/픽 전략
-│   └── template/      # 템플릿 스키마, 검증
-├── server/        # 서버 전용 (Supabase, DB 쿼리, Realtime)
-├── features/      # UI 기능 모듈 (각각 components/, stores/, types.ts 포함)
-│   ├── auction/       # 경매 진행 화면
-│   ├── draft/         # 드래프트 진행 화면
-│   ├── lobby/         # 대기실 (방 생성, 참가자 목록)
-│   ├── template/      # 템플릿 탐색/생성 UI
-│   └── result/        # 결과 화면, 공유 카드
-├── components/    # 공용 UI (2개+ feature에서 사용하는 것)
-├── stores/        # 공용 상태
-├── utils/         # 순수 헬퍼 (도메인 무관)
-└── types/         # 공유 타입
+├── core.ts                  # DDD primitives — Identity, AggregateRoot, Entity, ValueObject, Association
+│
+├── market-engine/           # Bounded Context (현재 단일 BC)
+│   ├── domain/              # 비즈니스 규칙 (UI·인프라 무관)
+│   │   ├── shared/          # BC 내부 공용 (Character, Team, Category, GameType, ...)
+│   │   ├── template/        # Template aggregate
+│   │   ├── auction/         # Auction aggregate
+│   │   ├── draft/           # Draft aggregate
+│   │   ├── sandbox-board/   # SandboxBoard aggregate
+│   │   └── services/        # Domain Services (cross-aggregate, 예: Factory)
+│   ├── application/         # Application Services (use case 오케스트레이션)
+│   ├── infrastructure/      # Repository 구현, Supabase·MSW 어댑터
+│   └── presentation/        # Controllers (DTO 변환, 라우트 어댑터)
+│
+├── components/              # cross-BC UI (도메인 무관)
+├── stores/                  # cross-BC 전역 store
+├── utils/                   # 순수 헬퍼
+├── types/                   # 제너릭/유틸 타입
+└── features/                # SvelteKit UI 모듈 (이번 리팩터링 범위 외)
 ```
 
 ### 모듈 배치 규칙
 
-| 질문                   | 위치               |
-| ---------------------- | ------------------ |
-| UI 없는 비즈니스 로직? | `domain/`          |
-| 서버에서만 실행?       | `server/`          |
-| 특정 화면 전용 UI?     | `features/{name}/` |
-| 2개+ feature 공용 UI?  | `components/`      |
-| 도메인 무관 순수 함수? | `utils/`           |
+| 질문                                                   | 위치                                |
+| ------------------------------------------------------ | ----------------------------------- |
+| Aggregate Root / Entity / VO 신규 추가?                | `market-engine/domain/<aggregate>/` |
+| 여러 aggregate를 걸치는 도메인 로직 (예: Factory)?     | `market-engine/domain/services/`    |
+| Repository 인터페이스?                                 | `market-engine/domain/<aggregate>/` |
+| Use case 오케스트레이션 (load → domain method → save)? | `market-engine/application/`        |
+| Repository 구현, Supabase 어댑터?                      | `market-engine/infrastructure/`     |
+| Controller (DTO 변환·라우트 어댑터)?                   | `market-engine/presentation/`       |
+| 특정 화면 전용 UI?                                     | `features/<name>/`                  |
+| 2개+ feature 공용 UI?                                  | `components/`                       |
+| 도메인 무관 순수 함수?                                 | `utils/`                            |
 
-### import 경계 (위반 시 커밋 차단됨)
+### 계층 의존 룰 (위반 시 커밋 차단)
 
-- `domain/` → svelte import 금지 (순수 로직)
-- `features/A/` → `features/B/` 직접 import 금지 (공유 필요 시 `lib/`으로 승격)
-- `components/` → `features/` import 금지
-- `utils/` → 다른 `lib/` 모듈 import 금지
+```
+presentation  →  application  →  domain
+                       ↓
+                infrastructure (구현만, interface는 domain에)
+
+core.ts ← 모든 계층이 의존 가능 (BC 무관)
+```
+
+**금지 (계층)**:
+
+- `domain/` → `application/`, `infrastructure/`, `presentation/`
+- `application/` → `presentation/`
+- `application/` → `infrastructure/` **구현** 직접 의존 (인터페이스 import만 OK)
+- `domain/` → svelte (UI 라이브러리)
+
+**금지 (기존 룰 유지)**:
+
+- `features/A/` → `features/B/` 직접 import (공유 필요 시 `lib/`으로 승격)
+- `components/` → `features/` import
+- `utils/` → 다른 `lib/` 모듈 import
 
 자세한 규칙: `.claude/agents/reviewer/arch.md`
 
