@@ -2,9 +2,7 @@ import { describe, it, expect } from 'bun:test';
 import { AuctionFactory } from '../auction-factory';
 import { Template } from '../../template/template';
 import { Character } from '../../shared/character';
-import { Category } from '../../shared/category';
-
-const S = new Category('S');
+import { Role } from '../../shared/role';
 
 const AUCTION_TEMPLATE = Template.restore({
 	id: 'tpl-1',
@@ -13,9 +11,9 @@ const AUCTION_TEMPLATE = Template.restore({
 	creatorId: 'user-1',
 	rule: { mode: 'AUCTION', pickBanTime: 30, totalPoints: 1000, minBidUnit: 10, positionLimit: 1 },
 	characters: [
-		Character.create('c1', 'Faker', 'MID', S),
-		Character.create('c2', 'Zeus', 'TOP', S),
-		Character.create('c3', 'Oner', 'JG', S)
+		Character.create('c1', 'Faker', 'MID', Role.PLAYER),
+		Character.create('c2', 'Zeus', 'TOP', Role.PLAYER),
+		Character.create('c3', 'Oner', 'JG', Role.PLAYER)
 	],
 	captainsNeeded: 2,
 	creatorAsCaptain: false,
@@ -52,9 +50,11 @@ describe('AuctionFactory', () => {
 		expect(auction.positionLimit).toBe(1);
 	});
 
-	it('captainsNeeded만큼 감독이 생성된다', () => {
+	it('captainsNeeded만큼 감독이 Character로 생성된다', () => {
 		const auction = AuctionFactory.create(AUCTION_TEMPLATE, 'auction-1');
 		expect(auction.captains).toHaveLength(2);
+		expect(auction.captains[0]!.role.equals(Role.CAPTAIN)).toBe(true);
+		expect(auction.captains[0]!.name).toBe('감독 1');
 	});
 
 	it('AUCTION 모드가 아닌 템플릿은 거부한다', () => {

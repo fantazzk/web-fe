@@ -1,6 +1,7 @@
 import { Auction } from '$lib/market-engine/domain/auction/auction';
 import type { AuctionId } from '$lib/market-engine/domain/auction/auction';
-import { Captain } from '$lib/market-engine/domain/shared/captain';
+import { Character } from '$lib/market-engine/domain/shared/character';
+import { Role } from '$lib/market-engine/domain/shared/role';
 import type { Template } from '$lib/market-engine/domain/template/template';
 
 class AuctionFactory {
@@ -10,7 +11,7 @@ class AuctionFactory {
 		}
 
 		const captains = Array.from({ length: template.captainsNeeded }, (_, i) =>
-			Captain.create(`captain-${i + 1}`, `감독 ${i + 1}`)
+			Character.create(`captain-${i + 1}`, `감독 ${i + 1}`, null, Role.CAPTAIN)
 		);
 
 		return Auction.create({

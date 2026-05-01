@@ -1,6 +1,6 @@
 import type { Identity } from '$lib/core';
 import { Entity } from '$lib/core';
-import type { Category } from '$lib/market-engine/domain/shared/category';
+import { Role } from '$lib/market-engine/domain/shared/role';
 
 type CharacterId = Identity;
 
@@ -9,18 +9,13 @@ class Character extends Entity<CharacterId> {
 		readonly id: CharacterId,
 		readonly name: string,
 		readonly position: string | null,
-		readonly category: Category
+		readonly role: Role
 	) {
 		super();
 	}
 
-	static create(
-		id: CharacterId,
-		name: string,
-		position: string | null,
-		category: Category
-	): Character {
-		return new Character(id, name, position, category);
+	static create(id: CharacterId, name: string, position: string | null, role: Role): Character {
+		return new Character(id, name, position, role);
 	}
 }
 

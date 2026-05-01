@@ -2,9 +2,7 @@ import { describe, it, expect } from 'bun:test';
 import { SandboxFactory } from '../sandbox-factory';
 import { Template } from '../../template/template';
 import { Character } from '../../shared/character';
-import { Category } from '../../shared/category';
-
-const S = new Category('S');
+import { Role } from '../../shared/role';
 
 const TEMPLATE = Template.restore({
 	id: 'tpl-1',
@@ -13,9 +11,9 @@ const TEMPLATE = Template.restore({
 	creatorId: 'user-1',
 	rule: { mode: 'SANDBOX' },
 	characters: [
-		Character.create('c1', 'Faker', 'MID', S),
-		Character.create('c2', 'Zeus', 'TOP', S),
-		Character.create('c3', 'Oner', 'JG', S)
+		Character.create('c1', 'Faker', 'MID', Role.PLAYER),
+		Character.create('c2', 'Zeus', 'TOP', Role.PLAYER),
+		Character.create('c3', 'Oner', 'JG', Role.PLAYER)
 	],
 	captainsNeeded: 2,
 	creatorAsCaptain: false,
@@ -31,9 +29,10 @@ describe('SandboxFactory', () => {
 		expect(board.templateId).toBe('tpl-1');
 	});
 
-	it('템플릿의 captainsNeeded만큼 감독이 생성된다', () => {
+	it('템플릿의 captainsNeeded만큼 감독 Character가 생성된다', () => {
 		const board = SandboxFactory.create(TEMPLATE, 'board-1');
 		expect(board.captains).toHaveLength(2);
+		expect(board.captains[0]!.role.equals(Role.CAPTAIN)).toBe(true);
 	});
 
 	it('템플릿의 characters가 pool에 들어간다', () => {

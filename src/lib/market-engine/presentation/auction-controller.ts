@@ -2,12 +2,14 @@ import { AuctionService } from '$lib/market-engine/application/auction-service';
 import type { IAuctionRepository } from '$lib/market-engine/domain/auction/repository-interface';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { Auction, AuctionPhase } from '$lib/market-engine/domain/auction/auction';
+import type { Character } from '$lib/market-engine/domain/shared/character';
+import type { RoleName } from '$lib/market-engine/domain/shared/role';
 
 interface CharacterDto {
 	id: string;
 	name: string;
 	position: string | null;
-	category: string;
+	role: RoleName;
 }
 
 interface BidDto {
@@ -23,7 +25,7 @@ interface AuctionDto {
 	phase: AuctionPhase;
 	currentCharacter: CharacterDto | null;
 	currentBid: BidDto | null;
-	captains: { id: string; name: string }[];
+	captains: CharacterDto[];
 	remainingPoints: Record<string, number>;
 	rosters: Record<string, CharacterDto[]>;
 	pendingQueue: CharacterDto[];
@@ -80,13 +82,8 @@ class AuctionController {
 		return AuctionController.toDto(auction!);
 	}
 
-	private static toCharacterDto(c: {
-		id: string;
-		name: string;
-		position: string | null;
-		category: { name: string };
-	}): CharacterDto {
-		return { id: c.id, name: c.name, position: c.position, category: c.category.name };
+	private static toCharacterDto(c: Character): CharacterDto {
+		return { id: c.id, name: c.name, position: c.position, role: c.role.name };
 	}
 
 	private static toDto(auction: Auction): AuctionDto {
@@ -105,7 +102,7 @@ class AuctionController {
 						amount: auction.currentBid.amount
 					}
 				: null,
-			captains: auction.captains.map((c) => ({ id: c.id, name: c.name })),
+			captains: auction.captains.map(AuctionController.toCharacterDto),
 			remainingPoints: { ...auction.remainingPoints },
 			rosters: Object.fromEntries(
 				auction.captains.map((c) => [

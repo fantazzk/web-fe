@@ -2,19 +2,23 @@ import { apiGet, apiPost } from '$lib/utils/api-client';
 import type { ISandboxBoardRepository } from '$lib/market-engine/domain/sandbox-board/repository-interface';
 import { SandboxBoard } from '$lib/market-engine/domain/sandbox-board/sandbox-board';
 import type { SandboxBoardId } from '$lib/market-engine/domain/sandbox-board/sandbox-board';
-import { Captain } from '$lib/market-engine/domain/shared/captain';
 import { Character } from '$lib/market-engine/domain/shared/character';
-import { Category } from '$lib/market-engine/domain/shared/category';
+import { Role } from '$lib/market-engine/domain/shared/role';
+import type { RoleName } from '$lib/market-engine/domain/shared/role';
+
+interface CharacterRow {
+	id: string;
+	name: string;
+	position: string | null;
+	role: RoleName;
+}
 
 interface SandboxBoardResponse {
 	id: string;
 	templateId: string;
-	captains: { id: string; name: string }[];
-	pool: { id: string; name: string; position: string | null; category: string }[];
-	rosters: Record<
-		string,
-		{ id: string; name: string; position: string | null; category: string }[]
-	>;
+	captains: CharacterRow[];
+	pool: CharacterRow[];
+	rosters: Record<string, CharacterRow[]>;
 }
 
 class SandboxBoardApiRepository implements ISandboxBoardRepository {
@@ -37,16 +41,20 @@ class SandboxBoardApiRepository implements ISandboxBoardRepository {
 		);
 	}
 
+	private static toCharacter(row: CharacterRow): Character {
+		return Character.create(row.id, row.name, row.position, Role.of(row.role));
+	}
+
+	private static toCharacterRow(c: Character): CharacterRow {
+		return { id: c.id, name: c.name, position: c.position, role: c.role.name };
+	}
+
 	private static toDomain(data: SandboxBoardResponse): SandboxBoard {
-		const captains = data.captains.map((c) => Captain.create(c.id, c.name));
-		const pool = data.pool.map((c) =>
-			Character.create(c.id, c.name, c.position, new Category(c.category))
-		);
+		const captains = data.captains.map(SandboxBoardApiRepository.toCharacter);
+		const pool = data.pool.map(SandboxBoardApiRepository.toCharacter);
 		const rosters: Record<string, readonly Character[]> = {};
 		for (const [captainId, chars] of Object.entries(data.rosters)) {
-			rosters[captainId] = chars.map((c) =>
-				Character.create(c.id, c.name, c.position, new Category(c.category))
-			);
+			rosters[captainId] = chars.map(SandboxBoardApiRepository.toCharacter);
 		}
 		return SandboxBoard.restore({
 			id: data.id,
@@ -61,22 +69,12 @@ class SandboxBoardApiRepository implements ISandboxBoardRepository {
 		return {
 			id: board.id,
 			templateId: board.templateId,
-			captains: board.captains.map((c) => ({ id: c.id, name: c.name })),
-			pool: board.pool.map((c) => ({
-				id: c.id,
-				name: c.name,
-				position: c.position,
-				category: c.category.name
-			})),
+			captains: board.captains.map(SandboxBoardApiRepository.toCharacterRow),
+			pool: board.pool.map(SandboxBoardApiRepository.toCharacterRow),
 			rosters: Object.fromEntries(
 				board.captains.map((c) => [
 					c.id,
-					(board.rosters[c.id] ?? []).map((ch) => ({
-						id: ch.id,
-						name: ch.name,
-						position: ch.position,
-						category: ch.category.name
-					}))
+					(board.rosters[c.id] ?? []).map(SandboxBoardApiRepository.toCharacterRow)
 				])
 			)
 		};
