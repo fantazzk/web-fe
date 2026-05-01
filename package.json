@@ -1,5 +1,7 @@
 {
 	"name": "web-fe",
+	"description": "자낳대·치지직 대회 모의 드래프트/경매 시뮬레이터",
+	"homepage": "https://fantazzk.com",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
