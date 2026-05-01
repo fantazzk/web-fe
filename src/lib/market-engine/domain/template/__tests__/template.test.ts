@@ -30,7 +30,13 @@ describe('Template', () => {
 		it('AUCTION rule이면 mode는 AUCTION이다', () => {
 			const template = Template.restore({
 				...BASE,
-				rule: { mode: 'AUCTION', pickBanTime: 90, totalPoints: 1000, minBidUnit: 10 }
+				rule: {
+					mode: 'AUCTION',
+					pickBanTime: 90,
+					totalPoints: 1000,
+					minBidUnit: 10,
+					positionLimit: 1
+				}
 			});
 			expect(template.mode).toBe('AUCTION');
 		});
@@ -70,7 +76,13 @@ describe('Template', () => {
 
 	describe('rule 접근', () => {
 		it('AUCTION rule에서 totalPoints에 접근할 수 있다', () => {
-			const rule = { mode: 'AUCTION' as const, pickBanTime: 90, totalPoints: 1000, minBidUnit: 10 };
+			const rule = {
+				mode: 'AUCTION' as const,
+				pickBanTime: 90,
+				totalPoints: 1000,
+				minBidUnit: 10,
+				positionLimit: 1
+			};
 			const template = Template.restore({ ...BASE, rule });
 			if (template.rule.mode === 'AUCTION') {
 				expect(template.rule.totalPoints).toBe(1000);
