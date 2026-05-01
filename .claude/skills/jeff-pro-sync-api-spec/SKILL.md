@@ -83,11 +83,11 @@ git checkout dev && git pull origin dev
 
 ### 비교 대상
 
-| yaml (source of truth) | 프론트엔드 파일 |
-|-------------------------|-----------------|
-| `paths` | `src/mocks/handlers.ts` 핸들러 목록 |
-| `components.schemas` (Request/Response) | `src/lib/types/api.ts` 타입 정의 |
-| `components.schemas` (Response 기본값) | `src/mocks/factories.ts` 팩토리 함수 |
+| yaml (source of truth)                  | 프론트엔드 파일                      |
+| --------------------------------------- | ------------------------------------ |
+| `paths`                                 | `src/mocks/handlers.ts` 핸들러 목록  |
+| `components.schemas` (Request/Response) | `src/lib/types/api.ts` 타입 정의     |
+| `components.schemas` (Response 기본값)  | `src/mocks/factories.ts` 팩토리 함수 |
 
 ### diff 결과 분류
 
@@ -116,16 +116,16 @@ git checkout dev && git pull origin dev
 
 ### 타입 매핑
 
-| OpenAPI | TypeScript |
-|---------|------------|
-| `string` | `string` |
-| `string` + `format: uuid` | `string` |
-| `string` + `enum` | 리터럴 유니온 (`'A' \| 'B'`) |
-| `integer` / `int32` | `number` |
-| `boolean` | `boolean` |
-| `array` + `items.$ref` | `TypeName[]` |
-| `object` | `Record<string, unknown>` |
-| `$ref` | 참조된 타입명 |
+| OpenAPI                   | TypeScript                   |
+| ------------------------- | ---------------------------- |
+| `string`                  | `string`                     |
+| `string` + `format: uuid` | `string`                     |
+| `string` + `enum`         | 리터럴 유니온 (`'A' \| 'B'`) |
+| `integer` / `int32`       | `number`                     |
+| `boolean`                 | `boolean`                    |
+| `array` + `items.$ref`    | `TypeName[]`                 |
+| `object`                  | `Record<string, unknown>`    |
+| `$ref`                    | 참조된 타입명                |
 
 ---
 
@@ -148,10 +148,10 @@ git checkout dev && git pull origin dev
 
 ### 팩토리 함수 네이밍
 
-| 응답 형태 | 팩토리 함수명 |
-|-----------|--------------|
-| `FooResponse` | `createFooResponse()` |
-| `FooResponse[]` | `createFooListResponse()` |
+| 응답 형태                  | 팩토리 함수명               |
+| -------------------------- | --------------------------- |
+| `FooResponse`              | `createFooResponse()`       |
+| `FooResponse[]`            | `createFooListResponse()`   |
 | 상세 조회 (`:id` 파라미터) | `createFooDetailResponse()` |
 
 ---
@@ -165,11 +165,11 @@ git checkout dev && git pull origin dev
 1. 새 Response 타입마다 팩토리 함수 추가:
    ```typescript
    export function createFooResponse(overrides?: Partial<FooResponse>): FooResponse {
-     return {
-       field1: '기본값',
-       field2: 0,
-       ...overrides
-     };
+   	return {
+   		field1: '기본값',
+   		field2: 0,
+   		...overrides
+   	};
    }
    ```
 2. **기본값**: 의미 있는 더미 데이터 (선수명, 대회명 등 한글/영문), 현실적 숫자, enum은 첫 번째 값, array는 2~3개
@@ -220,17 +220,21 @@ PR 본문에 다음 형식으로 변경 사항을 작성한다:
 ## sync-api-spec
 
 ### 머지된 OpenAPI PR
+
 - #<number> — <title>
 
 ### 타입 변경 (src/lib/types/api.ts)
+
 - 추가: FooRequest, BarResponse
 - 수정: RoomResponse (draftPosition 필드 추가)
 
 ### 핸들러 변경 (src/mocks/handlers.ts)
+
 - 추가: PUT /api/v1/rooms/:code/draft-position
 - 추가: DELETE /api/v1/rooms/:code/draft-position
 
 ### 팩토리 변경 (src/mocks/factories.ts)
+
 - 추가: createRoomSessionResponse()
 - 수정: createRoomResponse() (mode, teamCount 기본값 추가)
 ```
