@@ -21,19 +21,15 @@ src/lib/
 │
 ├── market-engine/           # Bounded Context
 │   ├── domain/
-│   │   ├── shared/          # BC 내부 공용 (Character, Team, Category, GameType, ...)
-│   │   ├── template/        # Template aggregate root + rule.ts + repository interface
+│   │   ├── shared/          # BC 내부 공용 (Character, Category, GameType, ...)
+│   │   ├── template/        # Template aggregate root + template-rule.ts + repository interface
 │   │   ├── auction/         # Auction aggregate + 내부 VO + repository interface
 │   │   ├── draft/           # Draft aggregate + 내부 VO + repository interface
 │   │   ├── sandbox-board/   # SandboxBoard aggregate + 내부 VO + repository interface
-│   │   └── services/        # Domain Services (cross-aggregate, 예: AuctionFactory)
+│   │   └── services/        # Domain Services (cross-aggregate, 예: SandboxFactory)
 │   ├── application/         # Application Services (use case 오케스트레이션)
-│   ├── infrastructure/      # Repository 구현, Supabase·MSW 어댑터
-│   │   ├── repositories/
-│   │   └── adapters/
-│   └── presentation/        # Controllers (DTO 변환, 라우트 어댑터)
-│       ├── mappers/
-│       └── dto/
+│   ├── infrastructure/      # Repository 구현, Supabase·MSW 어댑터 (flat)
+│   └── presentation/        # Controllers (DTO 변환, 라우트 어댑터, flat)
 │
 ├── components/              # cross-BC UI (도메인 무관)
 ├── stores/                  # cross-BC 전역 store
@@ -71,14 +67,22 @@ src/lib/
 
 ```
 market-engine/domain/<aggregate>/
-├── <aggregate>.ts            # Aggregate Root
+├── <aggregate>.ts            # Aggregate Root (자기 ID 타입은 여기서 export)
+├── <aggregate>-rule.ts       # 도메인 규칙 VO (선택, 필요한 aggregate에만 — 예: template-rule.ts)
 ├── <vo>.ts                   # 내부 Value Object (예: bid.ts, settlement.ts)
 ├── repository-interface.ts   # Repository interface (폴더명이 aggregate 식별)
-├── types.ts                  # ID 타입, status 등
 ├── errors.ts
-├── __tests__/
-└── index.ts                  # 외부 노출 API
+└── __tests__/
 ```
+
+**Cross-aggregate ID 참조**: 다른 aggregate의 ID(예: SandboxBoard가 보유한 TemplateId)는 원본 aggregate 파일(`template/template.ts`)에서 직접 import한다. 보관 시 그대로 노출(re-export)할 수 있다.
+
+### 규칙 3-1: infrastructure / presentation 파일명 컨벤션
+
+flat 구조에서 파일명으로 소속을 식별한다.
+
+- infrastructure: `<aggregate>-<adapter>-repository.ts` (예: `template-api-repository.ts`, `template-local-storage-repository.ts`)
+- presentation: `<aggregate>-controller.ts` (예: `sandbox-board-controller.ts`)
 
 ### 규칙 4: feature 내부 구조 (변경 없음)
 
@@ -144,7 +148,7 @@ FAIL: 아키텍처 규칙 위반 발견
 
 [위반 1] 규칙 5 위반 — 계층 의존 방향
   파일: src/lib/market-engine/domain/auction/auction.ts
-  문제: $lib/market-engine/infrastructure/repositories/auction-repository를 import
+  문제: $lib/market-engine/infrastructure/auction-api-repository를 import
   제안: domain은 인프라에 의존하면 안 됨. Repository 인터페이스를 domain에 정의하고 그것만 의존
 
 [위반 2] 규칙 2 위반 — 잘못된 파일 위치
