@@ -2,11 +2,11 @@ import type { Identity } from '$lib/core';
 import { AggregateRoot } from '$lib/core';
 import type { Character } from '$lib/market-engine/domain/shared/character';
 import type { Captain, CaptainId } from '$lib/market-engine/domain/shared/captain';
+import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { Bid } from '$lib/market-engine/domain/auction/bid';
 import { AuctionError } from '$lib/market-engine/domain/auction/errors';
 
 type AuctionId = Identity;
-type TemplateId = Identity;
 
 type AuctionPhase = 'BIDDING' | 'SOLD' | 'UNSOLD' | 'COMPLETED';
 
@@ -257,4 +257,4 @@ class Auction extends AggregateRoot<Auction, AuctionId> {
 }
 
 export { Auction };
-export type { AuctionId, AuctionPhase, TemplateId };
+export type { AuctionId, AuctionPhase };
