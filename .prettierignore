@@ -7,3 +7,6 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+# Auto-generated (backend CI source of truth)
+docs/swagger/fantazzk.yaml
