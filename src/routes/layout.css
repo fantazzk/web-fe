@@ -18,6 +18,8 @@
 	--color-accent: #c9a962;
 	--color-accent-light: #ffd166;
 	--color-accent-20: #c9a96220;
+	--color-accent-deep: #201d16;
+	--color-accent-dark: #8c7747;
 
 	/* Gray */
 	--color-gray-900: #141414;
@@ -59,24 +61,32 @@
 	--color-accent: #ec4899;
 	--color-accent-light: #f9a8d4;
 	--color-accent-20: #ec489920;
+	--color-accent-deep: #2a0d1c;
+	--color-accent-dark: #9d3372;
 }
 
 [data-theme='cyan'] {
 	--color-accent: #06b6d4;
 	--color-accent-light: #67e8f9;
 	--color-accent-20: #06b6d420;
+	--color-accent-deep: #052e35;
+	--color-accent-dark: #0e7e8e;
 }
 
 [data-theme='magenta'] {
 	--color-accent: #d946ef;
 	--color-accent-light: #e879f9;
 	--color-accent-20: #d946ef20;
+	--color-accent-deep: #2a0e30;
+	--color-accent-dark: #9d3aae;
 }
 
 [data-theme='orange'] {
 	--color-accent: #f97316;
 	--color-accent-light: #fdba74;
 	--color-accent-20: #f9731620;
+	--color-accent-deep: #2a1408;
+	--color-accent-dark: #b35714;
 }
 
 /* ─── Global Styles ─── */
