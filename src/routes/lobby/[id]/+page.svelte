@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { Sidebar, Icon, Badge } from '$lib/components';
+	import { buildMeta } from '$lib/seo/meta.ts';
+
+	const meta = buildMeta({ path: '/lobby', title: '대기실 — FANTAZZK' });
 
 	const room = {
 		code: 'ABC-7742',
@@ -50,7 +53,13 @@
 </script>
 
 <svelte:head>
-	<title>로비 | Fantazzk</title>
+	<title>{meta.title}</title>
+	<meta name="description" content={meta.description} />
+	<link rel="canonical" href={meta.canonical} />
+	<meta property="og:title" content={meta.title} />
+	<meta property="og:description" content={meta.description} />
+	<meta property="og:url" content={meta.canonical} />
+	<meta property="og:image" content={meta.image} />
 </svelte:head>
 
 <div class="flex h-screen bg-bg-primary">

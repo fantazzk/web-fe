@@ -11,6 +11,9 @@
 	import type { CaptainType } from '$lib/features/draft/types';
 	import { apiGet } from '$lib/utils/api-client';
 	import { SvelteSet } from 'svelte/reactivity';
+	import { buildMeta } from '$lib/seo/meta.ts';
+
+	const meta = buildMeta({ path: '/draft', title: '드래프트 진행 — FANTAZZK' });
 
 	const store = draftStore;
 
@@ -197,7 +200,13 @@
 </script>
 
 <svelte:head>
-	<title>드래프트방 | Fantazzk</title>
+	<title>{meta.title}</title>
+	<meta name="description" content={meta.description} />
+	<link rel="canonical" href={meta.canonical} />
+	<meta property="og:title" content={meta.title} />
+	<meta property="og:description" content={meta.description} />
+	<meta property="og:url" content={meta.canonical} />
+	<meta property="og:image" content={meta.image} />
 </svelte:head>
 
 <a

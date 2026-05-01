@@ -7,6 +7,9 @@
 		TemplateCard,
 		ResultListItem
 	} from '$lib/components';
+	import { buildMeta } from '$lib/seo/meta.ts';
+
+	const meta = buildMeta({ path: '/' });
 
 	const templates = [
 		{
@@ -52,7 +55,13 @@
 </script>
 
 <svelte:head>
-	<title>Fantazzk</title>
+	<title>{meta.title}</title>
+	<meta name="description" content={meta.description} />
+	<link rel="canonical" href={meta.canonical} />
+	<meta property="og:title" content={meta.title} />
+	<meta property="og:description" content={meta.description} />
+	<meta property="og:url" content={meta.canonical} />
+	<meta property="og:image" content={meta.image} />
 </svelte:head>
 
 <div class="flex h-screen bg-bg-primary">

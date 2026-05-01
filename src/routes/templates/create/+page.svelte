@@ -6,6 +6,13 @@
 	import { POSITIONS_BY_GAME } from '$lib/domain/template';
 	import * as cache from '$lib/utils/cache';
 	import type { TemplateSnapshotType } from '$lib/types/snapshot';
+	import { buildMeta } from '$lib/seo/meta.ts';
+
+	const meta = buildMeta({
+		path: '/templates/create',
+		title: '새 템플릿 만들기 — FANTAZZK',
+		description: '선수풀과 규칙을 등록하고 친구들과 공유하세요.'
+	});
 
 	// --- State ---
 	let name = $state('');
@@ -112,7 +119,13 @@
 <svelte:window onclick={handleGlobalClick} />
 
 <svelte:head>
-	<title>템플릿 생성 | Fantazzk</title>
+	<title>{meta.title}</title>
+	<meta name="description" content={meta.description} />
+	<link rel="canonical" href={meta.canonical} />
+	<meta property="og:title" content={meta.title} />
+	<meta property="og:description" content={meta.description} />
+	<meta property="og:url" content={meta.canonical} />
+	<meta property="og:image" content={meta.image} />
 </svelte:head>
 
 <div class="flex h-screen bg-bg-primary">
