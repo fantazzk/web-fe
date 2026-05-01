@@ -1,0 +1,84 @@
+<script lang="ts">
+	type LogoPropsType = { size?: number };
+	let { size = 40 }: LogoPropsType = $props();
+</script>
+
+<svg
+	width={size}
+	height={size}
+	viewBox="0 0 150 150"
+	fill="none"
+	xmlns="http://www.w3.org/2000/svg"
+	role="img"
+	aria-label="FANTAZZK"
+>
+	<rect x="0.5" y="0.5" width="149" height="149" rx="28" fill="rgba(0,0,0,0.08)" />
+	<rect x="25" y="25" width="100" height="100" rx="50" fill="var(--color-accent-deep)" />
+	<line
+		x1="50"
+		y1="50.8359"
+		x2="103"
+		y2="50.8359"
+		stroke="var(--color-accent-light)"
+		stroke-width="8"
+	/>
+	<line x1="65" y1="49" x2="65" y2="110.548" stroke="var(--color-accent)" stroke-width="8" />
+	<line
+		x1="64"
+		y1="78.1953"
+		x2="99.9032"
+		y2="78.1953"
+		stroke="var(--color-accent)"
+		stroke-width="8"
+	/>
+	<line
+		x1="124"
+		y1="123.891"
+		x2="108"
+		y2="123.891"
+		stroke="var(--color-accent-dark)"
+		stroke-width="3"
+	/>
+	<line x1="123.5" y1="125" x2="123.5" y2="111.087" stroke="var(--color-accent)" stroke-width="3" />
+	<line
+		y1="-1.5"
+		x2="16"
+		y2="-1.5"
+		transform="matrix(-1 0 0 1 124 27.6094)"
+		stroke="var(--color-accent-dark)"
+		stroke-width="3"
+	/>
+	<line
+		y1="-1.5"
+		x2="13.913"
+		y2="-1.5"
+		transform="matrix(-4.37115e-08 1 1 4.37115e-08 125 25)"
+		stroke="var(--color-accent)"
+		stroke-width="3"
+	/>
+	<line x1="26" y1="26.1094" x2="42" y2="26.1094" stroke="var(--color-accent)" stroke-width="3" />
+	<line
+		x1="26.5"
+		y1="25"
+		x2="26.5"
+		y2="38.913"
+		stroke="var(--color-accent-dark)"
+		stroke-width="3"
+	/>
+	<line
+		y1="-1.5"
+		x2="16"
+		y2="-1.5"
+		transform="matrix(1 0 0 -1 26 122.391)"
+		stroke="var(--color-accent-dark)"
+		stroke-width="3"
+	/>
+	<line
+		y1="-1.5"
+		x2="13.913"
+		y2="-1.5"
+		transform="matrix(4.37115e-08 -1 -1 -4.37115e-08 25 125)"
+		stroke="var(--color-accent)"
+		stroke-width="3"
+	/>
+</svg>
