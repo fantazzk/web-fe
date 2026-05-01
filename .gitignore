@@ -31,6 +31,9 @@ docs/superpowers/
 # Playwright MCP
 .playwright-mcp/
 
+# Lighthouse CI 결과
+.lighthouseci/
+
 # Screenshots (임시)
 *.png
 !static/*.png
