@@ -1,7 +1,7 @@
 import type { ISandboxBoardRepository } from '$lib/market-engine/domain/sandbox-board/repository-interface';
 import type { SandboxBoardId } from '$lib/market-engine/domain/sandbox-board/sandbox-board';
 import type { CharacterId } from '$lib/market-engine/domain/shared/character';
-import type { CaptainId } from '$lib/market-engine/domain/sandbox-board/captain';
+import type { CaptainId } from '$lib/market-engine/domain/shared/captain';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { SandboxFactory } from '$lib/market-engine/domain/services/sandbox-factory';

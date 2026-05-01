@@ -2,7 +2,7 @@ import { apiGet, apiPost } from '$lib/utils/api-client';
 import type { ISandboxBoardRepository } from '$lib/market-engine/domain/sandbox-board/repository-interface';
 import { SandboxBoard } from '$lib/market-engine/domain/sandbox-board/sandbox-board';
 import type { SandboxBoardId } from '$lib/market-engine/domain/sandbox-board/sandbox-board';
-import { Captain } from '$lib/market-engine/domain/sandbox-board/captain';
+import { Captain } from '$lib/market-engine/domain/shared/captain';
 import { Character } from '$lib/market-engine/domain/shared/character';
 import { Category } from '$lib/market-engine/domain/shared/category';
 
