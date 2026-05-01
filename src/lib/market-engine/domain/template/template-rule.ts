@@ -3,6 +3,7 @@ type AuctionRule = {
 	readonly pickBanTime: number;
 	readonly totalPoints: number;
 	readonly minBidUnit: number;
+	readonly positionLimit: number;
 };
 
 type DraftRule = {

@@ -79,7 +79,8 @@ class TemplateApiRepository implements ITemplateRepository {
 				mode: 'AUCTION',
 				pickBanTime: row.pickBanTime ?? 0,
 				totalPoints: row.budget ?? 0,
-				minBidUnit: row.minBidUnit ?? 0
+				minBidUnit: row.minBidUnit ?? 0,
+				positionLimit: row.positionLimit ?? 1
 			};
 		}
 		return {

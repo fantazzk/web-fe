@@ -1,8 +1,8 @@
 import type { Identity } from '$lib/core';
 import { AggregateRoot } from '$lib/core';
 import type { Character, CharacterId } from '$lib/market-engine/domain/shared/character';
-import type { CaptainId } from '$lib/market-engine/domain/sandbox-board/captain';
-import { Captain } from '$lib/market-engine/domain/sandbox-board/captain';
+import type { CaptainId } from '$lib/market-engine/domain/shared/captain';
+import { Captain } from '$lib/market-engine/domain/shared/captain';
 import { SandboxBoardError } from '$lib/market-engine/domain/sandbox-board/errors';
 
 type SandboxBoardId = Identity;
