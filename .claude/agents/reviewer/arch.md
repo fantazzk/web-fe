@@ -73,7 +73,7 @@ src/lib/
 market-engine/domain/<aggregate>/
 ├── <aggregate>.ts            # Aggregate Root
 ├── <vo>.ts                   # 내부 Value Object (예: bid.ts, settlement.ts)
-├── <aggregate>-repository.ts # Repository interface
+├── repository-interface.ts   # Repository interface (폴더명이 aggregate 식별)
 ├── types.ts                  # ID 타입, status 등
 ├── errors.ts
 ├── __tests__/
