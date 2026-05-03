@@ -46,14 +46,13 @@ export interface PlayerRequest {
 
 export interface CreateTemplateRequest {
 	name: string;
-	gameType: GameType;
+	gameType?: string;
 	mode: 'AUCTION' | 'DRAFT';
 	teamCount: number;
 	teamSize: number;
 	pickBanTime?: number;
 	budget?: number;
 	minBidUnit?: number;
-	positionLimit?: number;
 	draftOrderStrategy?: 'SNAKE' | 'FIXED';
 	players: PlayerRequest[];
 }
@@ -104,6 +103,7 @@ export interface RoomProgressResponse {
 
 export interface JoinableRoomResponse {
 	code: string;
+	gameType?: string;
 	mode: string;
 	teamCount: number;
 	joinedLeaderCount: number;
@@ -182,6 +182,7 @@ export type DraftOrderStrategy = 'SNAKE' | 'FIXED';
 
 export interface RoomDetailResponse {
 	roomCode: string;
+	gameType?: string;
 	status: RoomDetailStatus;
 	mode: RoomMode;
 	teamCount: number;
@@ -253,6 +254,7 @@ export interface AuctionProgressResponse {
 export interface GameDetailResponse {
 	gameId: string;
 	roomCode: string;
+	gameType?: string;
 	mode: RoomMode;
 	status: GameStatus;
 	teamCount: number;

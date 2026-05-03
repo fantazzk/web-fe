@@ -233,6 +233,7 @@ export function createJoinableRoomResponse(
 ): JoinableRoomResponse {
 	return {
 		code: 'ABC774',
+		gameType: 'LEAGUE_OF_LEGENDS',
 		mode: 'AUCTION',
 		teamCount: 8,
 		joinedLeaderCount: 3,
@@ -313,6 +314,7 @@ export function createRoomDetailResponse(
 ): RoomDetailResponse {
 	return {
 		roomCode: 'ROOM01',
+		gameType: 'LEAGUE_OF_LEGENDS',
 		status: 'WAITING',
 		mode: 'DRAFT',
 		teamCount: 2,
@@ -443,6 +445,7 @@ export function createGameDetailResponse(
 	return {
 		gameId: '00000000-0000-0000-0000-000000000202',
 		roomCode: 'ROOM01',
+		gameType: 'LEAGUE_OF_LEGENDS',
 		mode: 'DRAFT',
 		status: 'IN_PROGRESS',
 		teamCount: 2,
