@@ -7,9 +7,7 @@ import { Template } from '$lib/market-engine/domain/template/template';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import { Character } from '$lib/market-engine/domain/shared/character';
-import { Category } from '$lib/market-engine/domain/shared/category';
-
-// --- In-memory stubs ---
+import { Role } from '$lib/market-engine/domain/shared/role';
 
 class InMemoryBoardRepository implements ISandboxBoardRepository {
 	private store = new Map<SandboxBoardId, SandboxBoard>();
@@ -37,25 +35,22 @@ class InMemoryTemplateRepository implements ITemplateRepository {
 	async save(_template: Template) {}
 }
 
-// --- Fixtures ---
-
-const S = new Category('S');
-
 const TEMPLATE = Template.restore({
 	id: 'tpl-1',
 	name: '자낳대',
 	gameType: 'LEAGUE_OF_LEGENDS',
 	creatorId: 'user-1',
 	rule: { mode: 'SANDBOX' },
-	characters: [Character.create('c1', 'Faker', 'MID', S), Character.create('c2', 'Zeus', 'TOP', S)],
+	characters: [
+		Character.create('c1', 'Faker', 'MID', Role.PLAYER),
+		Character.create('c2', 'Zeus', 'TOP', Role.PLAYER)
+	],
 	captainsNeeded: 2,
 	creatorAsCaptain: false,
 	usageCount: 0,
 	createdAt: new Date('2026-01-01'),
 	updatedAt: new Date('2026-01-01')
 });
-
-// ---
 
 describe('SandboxBoardService', () => {
 	let boardRepo: InMemoryBoardRepository;

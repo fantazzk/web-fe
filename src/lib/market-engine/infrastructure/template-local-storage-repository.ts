@@ -4,7 +4,7 @@ import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import type { TemplateRule } from '$lib/market-engine/domain/template/template-rule';
 import type { GameType } from '$lib/market-engine/domain/shared/game-type';
 import { Character } from '$lib/market-engine/domain/shared/character';
-import { Category } from '$lib/market-engine/domain/shared/category';
+import { Role } from '$lib/market-engine/domain/shared/role';
 
 interface TemplateLocalRow {
 	id: string;
@@ -12,7 +12,7 @@ interface TemplateLocalRow {
 	gameType: GameType;
 	creatorId: string;
 	rule: TemplateRule;
-	characters: { id: string; name: string; position: string | null; category: string }[];
+	characters: { id: string; name: string; position: string | null }[];
 	captainsNeeded: number;
 	creatorAsCaptain: boolean;
 	usageCount: number;
@@ -58,7 +58,7 @@ class TemplateLocalStorageRepository implements ITemplateRepository {
 			creatorId: row.creatorId,
 			rule: row.rule,
 			characters: row.characters.map((c) =>
-				Character.create(c.id, c.name, c.position, new Category(c.category))
+				Character.create(c.id, c.name, c.position, Role.PLAYER)
 			),
 			captainsNeeded: row.captainsNeeded,
 			creatorAsCaptain: row.creatorAsCaptain,
@@ -78,8 +78,7 @@ class TemplateLocalStorageRepository implements ITemplateRepository {
 			characters: template.characters.map((c) => ({
 				id: c.id,
 				name: c.name,
-				position: c.position,
-				category: c.category.name
+				position: c.position
 			})),
 			captainsNeeded: template.captainsNeeded,
 			creatorAsCaptain: template.creatorAsCaptain,

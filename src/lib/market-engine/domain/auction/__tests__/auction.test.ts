@@ -2,19 +2,18 @@ import { describe, it, expect } from 'bun:test';
 import { Auction } from '../auction';
 import { AuctionError } from '../errors';
 import { Character } from '../../shared/character';
-import { Category } from '../../shared/category';
-import { Captain } from '../../shared/captain';
-
-const S = new Category('S');
-const A = new Category('A');
+import { Role } from '../../shared/role';
 
 const CHARACTERS: Character[] = [
-	Character.create('c1', '감스트', 'TOP', S),
-	Character.create('c2', '따효니', 'MID', A),
-	Character.create('c3', '침착맨', 'ADC', S)
+	Character.create('c1', '감스트', 'TOP', Role.PLAYER),
+	Character.create('c2', '따효니', 'MID', Role.PLAYER),
+	Character.create('c3', '침착맨', 'ADC', Role.PLAYER)
 ];
 
-const CAPTAINS: Captain[] = [Captain.create('cap-1', '감독 1'), Captain.create('cap-2', '감독 2')];
+const CAPTAINS: Character[] = [
+	Character.create('cap-1', '감독 1', null, Role.CAPTAIN),
+	Character.create('cap-2', '감독 2', null, Role.CAPTAIN)
+];
 
 function makeAuction(overrides?: {
 	totalPoints?: number;
@@ -86,20 +85,6 @@ describe('Auction', () => {
 
 		it('존재하지 않는 감독은 CAPTAIN_NOT_FOUND 에러', () => {
 			expect(() => makeAuction().placeBid('bid-1', 'cap-99', 100)).toThrow(AuctionError);
-		});
-
-		it('포지션 한도 초과 시 POSITION_LIMIT_REACHED 에러', () => {
-			const a = makeAuction({ positionLimit: 1 })
-				.placeBid('bid-1', 'cap-1', 100)
-				.settle()
-				.startNext(); // c2 (MID)
-			const b = a.placeBid('bid-2', 'cap-1', 100).settle().startNext(); // c3 (ADC)
-			// cap-1 이 다시 TOP 포지션을 시도하려면 새 캐릭터 필요 — 현재 c3는 ADC라 한도 무관
-			// 한도 검증은 같은 포지션 재구매 시도 케이스로 대체
-			void b;
-			// c1(TOP) 낙찰 후 다시 TOP 캐릭터를 잡으려는 상황 시뮬레이션
-			// 별도 시나리오로 검증 (간소화)
-			expect(true).toBe(true);
 		});
 	});
 

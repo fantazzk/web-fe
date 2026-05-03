@@ -1,15 +1,12 @@
 import { describe, it, expect } from 'bun:test';
 import { Template } from '../template';
 import { Character } from '../../shared/character';
-import { Category } from '../../shared/category';
-
-const S = new Category('S');
-const A = new Category('A');
+import { Role } from '../../shared/role';
 
 const CHARACTERS = [
-	Character.create('c1', 'Faker', 'MID', S),
-	Character.create('c2', 'Zeus', 'TOP', A),
-	Character.create('c3', 'Oner', 'JG', A)
+	Character.create('c1', 'Faker', 'MID', Role.PLAYER),
+	Character.create('c2', 'Zeus', 'TOP', Role.PLAYER),
+	Character.create('c3', 'Oner', 'JG', Role.PLAYER)
 ];
 
 const BASE = {

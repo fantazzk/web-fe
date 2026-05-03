@@ -2,23 +2,25 @@ import { describe, it, expect } from 'bun:test';
 import { SandboxBoard } from '../sandbox-board';
 import { SandboxBoardError } from '../errors';
 import { Character } from '../../shared/character';
-import { Category } from '../../shared/category';
-
-const S = new Category('S');
-const A = new Category('A');
+import { Role } from '../../shared/role';
 
 const CHARACTERS: Character[] = [
-	Character.create('p1', '감스트', 'TOP', S),
-	Character.create('p2', '따효니', 'MID', A),
-	Character.create('p3', '침착맨', 'ADC', S),
-	Character.create('p4', '우왁굳', 'SUPPORT', A)
+	Character.create('p1', '감스트', 'TOP', Role.PLAYER),
+	Character.create('p2', '따효니', 'MID', Role.PLAYER),
+	Character.create('p3', '침착맨', 'ADC', Role.PLAYER),
+	Character.create('p4', '우왁굳', 'SUPPORT', Role.PLAYER)
 ];
 
-function makeBoard(captainsCount = 2) {
+const CAPTAINS: Character[] = [
+	Character.create('cap-1', '감독 1', null, Role.CAPTAIN),
+	Character.create('cap-2', '감독 2', null, Role.CAPTAIN)
+];
+
+function makeBoard(captains: readonly Character[] = CAPTAINS) {
 	return SandboxBoard.create({
 		id: 'board-1',
 		templateId: 'tpl-1',
-		captainsCount,
+		captains,
 		characters: CHARACTERS
 	});
 }
@@ -26,10 +28,14 @@ function makeBoard(captainsCount = 2) {
 describe('SandboxBoard', () => {
 	describe('create', () => {
 		it('감독 수만큼 빈 로스터가 생성된다', () => {
-			const board = makeBoard(3);
+			const captains = [
+				Character.create('cap-1', '감독 1', null, Role.CAPTAIN),
+				Character.create('cap-2', '감독 2', null, Role.CAPTAIN),
+				Character.create('cap-3', '감독 3', null, Role.CAPTAIN)
+			];
+			const board = makeBoard(captains);
 			expect(board.captains).toHaveLength(3);
 			expect(board.captains[0]!.name).toBe('감독 1');
-			expect(board.captains[1]!.name).toBe('감독 2');
 			expect(board.captains[2]!.name).toBe('감독 3');
 			expect(board.pool).toHaveLength(4);
 			for (const captain of board.captains) {

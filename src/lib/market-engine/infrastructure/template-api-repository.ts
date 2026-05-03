@@ -5,7 +5,7 @@ import { Template } from '$lib/market-engine/domain/template/template';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import type { TemplateRule } from '$lib/market-engine/domain/template/template-rule';
 import { Character } from '$lib/market-engine/domain/shared/character';
-import { Category } from '$lib/market-engine/domain/shared/category';
+import { Role } from '$lib/market-engine/domain/shared/role';
 
 class TemplateApiRepository implements ITemplateRepository {
 	constructor(private readonly fetch: typeof globalThis.fetch) {}
@@ -53,7 +53,7 @@ class TemplateApiRepository implements ITemplateRepository {
 
 	private static toDomain(row: TemplateResponse): Template {
 		const characters = (row.players ?? []).map((p, i) =>
-			Character.create(`${row.id}-c${i}`, p.name, p.position ?? null, new Category(''))
+			Character.create(`${row.id}-c${i}`, p.name, p.position ?? null, Role.PLAYER)
 		);
 
 		const rule = TemplateApiRepository.toRule(row);

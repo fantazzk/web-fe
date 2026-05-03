@@ -2,16 +2,15 @@ import { SandboxBoardService } from '$lib/market-engine/application/sandbox-boar
 import type { ISandboxBoardRepository } from '$lib/market-engine/domain/sandbox-board/repository-interface';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { SandboxBoard } from '$lib/market-engine/domain/sandbox-board/sandbox-board';
+import { toCharacterDto } from '$lib/market-engine/presentation/character-dto';
+import type { CharacterDto } from '$lib/market-engine/presentation/character-dto';
 
 interface SandboxBoardDto {
 	id: string;
 	templateId: string;
-	captains: { id: string; name: string }[];
-	pool: { id: string; name: string; position: string | null; category: string }[];
-	rosters: Record<
-		string,
-		{ id: string; name: string; position: string | null; category: string }[]
-	>;
+	captains: CharacterDto[];
+	pool: CharacterDto[];
+	rosters: Record<string, CharacterDto[]>;
 }
 
 class SandboxBoardController {
@@ -62,28 +61,14 @@ class SandboxBoardController {
 		return SandboxBoardController.toDto(board!);
 	}
 
-	/** SandboxBoard 도메인 객체를 클라이언트 응답용 DTO로 변환한다. */
 	private static toDto(board: SandboxBoard): SandboxBoardDto {
 		return {
 			id: board.id,
 			templateId: board.templateId,
-			captains: board.captains.map((c) => ({ id: c.id, name: c.name })),
-			pool: board.pool.map((c) => ({
-				id: c.id,
-				name: c.name,
-				position: c.position,
-				category: c.category.name
-			})),
+			captains: board.captains.map(toCharacterDto),
+			pool: board.pool.map(toCharacterDto),
 			rosters: Object.fromEntries(
-				board.captains.map((c) => [
-					c.id,
-					(board.rosters[c.id] ?? []).map((ch) => ({
-						id: ch.id,
-						name: ch.name,
-						position: ch.position,
-						category: ch.category.name
-					}))
-				])
+				board.captains.map((c) => [c.id, (board.rosters[c.id] ?? []).map(toCharacterDto)])
 			)
 		};
 	}

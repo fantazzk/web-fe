@@ -3,15 +3,15 @@ import type { IAuctionRepository } from '$lib/market-engine/domain/auction/repos
 import { Auction } from '$lib/market-engine/domain/auction/auction';
 import type { AuctionId, AuctionPhase } from '$lib/market-engine/domain/auction/auction';
 import { Bid } from '$lib/market-engine/domain/auction/bid';
-import { Captain } from '$lib/market-engine/domain/shared/captain';
 import { Character } from '$lib/market-engine/domain/shared/character';
-import { Category } from '$lib/market-engine/domain/shared/category';
+import { Role } from '$lib/market-engine/domain/shared/role';
+import type { RoleName } from '$lib/market-engine/domain/shared/role';
 
 interface CharacterRow {
 	id: string;
 	name: string;
 	position: string | null;
-	category: string;
+	role: RoleName;
 }
 
 interface BidRow {
@@ -27,7 +27,7 @@ interface AuctionResponse {
 	phase: AuctionPhase;
 	currentCharacter: CharacterRow | null;
 	currentBid: BidRow | null;
-	captains: { id: string; name: string }[];
+	captains: CharacterRow[];
 	remainingPoints: Record<string, number>;
 	rosters: Record<string, CharacterRow[]>;
 	pendingQueue: CharacterRow[];
@@ -58,11 +58,11 @@ class AuctionApiRepository implements IAuctionRepository {
 	}
 
 	private static toCharacter(row: CharacterRow): Character {
-		return Character.create(row.id, row.name, row.position, new Category(row.category));
+		return Character.create(row.id, row.name, row.position, Role.of(row.role));
 	}
 
 	private static toCharacterRow(c: Character): CharacterRow {
-		return { id: c.id, name: c.name, position: c.position, category: c.category.name };
+		return { id: c.id, name: c.name, position: c.position, role: c.role.name };
 	}
 
 	private static toBid(row: BidRow): Bid {
@@ -79,7 +79,7 @@ class AuctionApiRepository implements IAuctionRepository {
 	}
 
 	private static toDomain(data: AuctionResponse): Auction {
-		const captains = data.captains.map((c) => Captain.create(c.id, c.name));
+		const captains = data.captains.map(AuctionApiRepository.toCharacter);
 		const rosters: Record<string, readonly Character[]> = {};
 		for (const [captainId, rows] of Object.entries(data.rosters)) {
 			rosters[captainId] = rows.map(AuctionApiRepository.toCharacter);
@@ -116,7 +116,7 @@ class AuctionApiRepository implements IAuctionRepository {
 				? AuctionApiRepository.toCharacterRow(auction.currentCharacter)
 				: null,
 			currentBid: auction.currentBid ? AuctionApiRepository.toBidRow(auction.currentBid) : null,
-			captains: auction.captains.map((c) => ({ id: c.id, name: c.name })),
+			captains: auction.captains.map(AuctionApiRepository.toCharacterRow),
 			remainingPoints: { ...auction.remainingPoints },
 			rosters: Object.fromEntries(
 				auction.captains.map((c) => [
