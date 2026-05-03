@@ -14,14 +14,7 @@
 >
 	<rect x="0.5" y="0.5" width="149" height="149" rx="28" fill="rgba(0,0,0,0.08)" />
 	<rect x="25" y="25" width="100" height="100" rx="50" fill="var(--color-accent-deep)" />
-	<line
-		x1="50"
-		y1="50.8359"
-		x2="103"
-		y2="50.8359"
-		stroke="var(--color-accent-light)"
-		stroke-width="8"
-	/>
+	<line x1="50" y1="50.8359" x2="103" y2="50.8359" stroke="var(--color-accent)" stroke-width="8" />
 	<line x1="65" y1="49" x2="65" y2="110.548" stroke="var(--color-accent)" stroke-width="8" />
 	<line
 		x1="64"
