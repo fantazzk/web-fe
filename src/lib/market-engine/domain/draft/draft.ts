@@ -1,6 +1,6 @@
 import type { Identity } from '$lib/core';
 import { AggregateRoot } from '$lib/core';
-import type { Character, CharacterId } from '$lib/market-engine/domain/shared/character';
+import type { CaptainId, Character, CharacterId } from '$lib/market-engine/domain/shared/character';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { Pick } from '$lib/market-engine/domain/draft/pick';
 import { DraftError } from '$lib/market-engine/domain/draft/errors';
@@ -17,7 +17,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		readonly templateId: TemplateId,
 		readonly phase: DraftPhase,
 		readonly currentPickIndex: number,
-		readonly pickOrder: readonly CharacterId[],
+		readonly pickOrder: readonly CaptainId[],
 		readonly captains: readonly Character[],
 		readonly pendingQueue: readonly Character[],
 		readonly pickHistory: readonly Pick[],
@@ -26,7 +26,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		super();
 	}
 
-	get currentCaptainId(): CharacterId | null {
+	get currentCaptainId(): CaptainId | null {
 		if (this.phase === 'COMPLETED') return null;
 		return this.pickOrder[this.currentPickIndex] ?? null;
 	}
@@ -44,7 +44,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		templateId: TemplateId;
 		phase: DraftPhase;
 		currentPickIndex: number;
-		pickOrder: readonly CharacterId[];
+		pickOrder: readonly CaptainId[];
 		captains: readonly Character[];
 		pendingQueue: readonly Character[];
 		pickHistory: readonly Pick[];
@@ -90,7 +90,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		);
 	}
 
-	pick(pickId: Identity, captainId: CharacterId, characterId: CharacterId): Draft {
+	pick(pickId: Identity, captainId: CaptainId, characterId: CharacterId): Draft {
 		if (this.phase !== 'PICKING') throw new DraftError('NOT_PICKING_PHASE');
 		if (captainId !== this.currentCaptainId) throw new DraftError('NOT_YOUR_TURN');
 		if (!this.captains.some((c) => c.id === captainId)) {
@@ -130,11 +130,11 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 }
 
 function buildPickOrder(
-	captainIds: readonly CharacterId[],
+	captainIds: readonly CaptainId[],
 	rounds: number,
 	draftMode: DraftMode
-): CharacterId[] {
-	const order: CharacterId[] = [];
+): CaptainId[] {
+	const order: CaptainId[] = [];
 	for (let round = 0; round < rounds; round++) {
 		if (draftMode === 'SNAKE' && round % 2 === 1) {
 			order.push(...[...captainIds].reverse());

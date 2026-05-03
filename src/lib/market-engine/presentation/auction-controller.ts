@@ -2,15 +2,8 @@ import { AuctionService } from '$lib/market-engine/application/auction-service';
 import type { IAuctionRepository } from '$lib/market-engine/domain/auction/repository-interface';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { Auction, AuctionPhase } from '$lib/market-engine/domain/auction/auction';
-import type { Character } from '$lib/market-engine/domain/shared/character';
-import type { RoleName } from '$lib/market-engine/domain/shared/role';
-
-interface CharacterDto {
-	id: string;
-	name: string;
-	position: string | null;
-	role: RoleName;
-}
+import { toCharacterDto } from '$lib/market-engine/presentation/character-dto';
+import type { CharacterDto } from '$lib/market-engine/presentation/character-dto';
 
 interface BidDto {
 	id: string;
@@ -82,18 +75,12 @@ class AuctionController {
 		return AuctionController.toDto(auction!);
 	}
 
-	private static toCharacterDto(c: Character): CharacterDto {
-		return { id: c.id, name: c.name, position: c.position, role: c.role.name };
-	}
-
 	private static toDto(auction: Auction): AuctionDto {
 		return {
 			id: auction.id,
 			templateId: auction.templateId,
 			phase: auction.phase,
-			currentCharacter: auction.currentCharacter
-				? AuctionController.toCharacterDto(auction.currentCharacter)
-				: null,
+			currentCharacter: auction.currentCharacter ? toCharacterDto(auction.currentCharacter) : null,
 			currentBid: auction.currentBid
 				? {
 						id: auction.currentBid.id,
@@ -102,17 +89,14 @@ class AuctionController {
 						amount: auction.currentBid.amount
 					}
 				: null,
-			captains: auction.captains.map(AuctionController.toCharacterDto),
+			captains: auction.captains.map(toCharacterDto),
 			remainingPoints: { ...auction.remainingPoints },
 			rosters: Object.fromEntries(
-				auction.captains.map((c) => [
-					c.id,
-					(auction.rosters[c.id] ?? []).map(AuctionController.toCharacterDto)
-				])
+				auction.captains.map((c) => [c.id, (auction.rosters[c.id] ?? []).map(toCharacterDto)])
 			),
-			pendingQueue: auction.pendingQueue.map(AuctionController.toCharacterDto),
+			pendingQueue: auction.pendingQueue.map(toCharacterDto),
 			soldHistory: auction.soldHistory.map((h) => ({
-				character: AuctionController.toCharacterDto(h.character),
+				character: toCharacterDto(h.character),
 				bid: {
 					id: h.bid.id,
 					characterId: h.bid.characterId,

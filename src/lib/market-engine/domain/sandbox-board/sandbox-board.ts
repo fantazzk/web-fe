@@ -1,6 +1,6 @@
 import type { Identity } from '$lib/core';
 import { AggregateRoot } from '$lib/core';
-import type { Character, CharacterId } from '$lib/market-engine/domain/shared/character';
+import type { CaptainId, Character, CharacterId } from '$lib/market-engine/domain/shared/character';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { SandboxBoardError } from '$lib/market-engine/domain/sandbox-board/errors';
 
@@ -12,7 +12,7 @@ class SandboxBoard extends AggregateRoot<SandboxBoard, SandboxBoardId> {
 		readonly templateId: TemplateId,
 		readonly captains: readonly Character[],
 		readonly pool: readonly Character[],
-		readonly rosters: Readonly<Record<CharacterId, readonly Character[]>>
+		readonly rosters: Readonly<Record<CaptainId, readonly Character[]>>
 	) {
 		super();
 	}
@@ -22,7 +22,7 @@ class SandboxBoard extends AggregateRoot<SandboxBoard, SandboxBoardId> {
 		templateId: TemplateId;
 		captains: readonly Character[];
 		pool: readonly Character[];
-		rosters: Readonly<Record<CharacterId, readonly Character[]>>;
+		rosters: Readonly<Record<CaptainId, readonly Character[]>>;
 	}): SandboxBoard {
 		return new SandboxBoard(
 			params.id,
@@ -39,7 +39,7 @@ class SandboxBoard extends AggregateRoot<SandboxBoard, SandboxBoardId> {
 		captains: readonly Character[];
 		characters: readonly Character[];
 	}): SandboxBoard {
-		const rosters: Record<CharacterId, readonly Character[]> = {};
+		const rosters: Record<CaptainId, readonly Character[]> = {};
 		for (const captain of params.captains) {
 			rosters[captain.id] = [];
 		}
@@ -52,7 +52,7 @@ class SandboxBoard extends AggregateRoot<SandboxBoard, SandboxBoardId> {
 		);
 	}
 
-	assign(characterId: CharacterId, toCaptainId: CharacterId): SandboxBoard {
+	assign(characterId: CharacterId, toCaptainId: CaptainId): SandboxBoard {
 		if (!this.captains.some((c) => c.id === toCaptainId)) {
 			throw new SandboxBoardError('CAPTAIN_NOT_FOUND');
 		}
@@ -69,7 +69,7 @@ class SandboxBoard extends AggregateRoot<SandboxBoard, SandboxBoardId> {
 
 	unassign(characterId: CharacterId): SandboxBoard {
 		let found: Character | null = null;
-		let fromCaptainId: CharacterId | null = null;
+		let fromCaptainId: CaptainId | null = null;
 		for (const captain of this.captains) {
 			const character = (this.rosters[captain.id] ?? []).find((c) => c.id === characterId);
 			if (character) {
@@ -94,12 +94,12 @@ class SandboxBoard extends AggregateRoot<SandboxBoard, SandboxBoardId> {
 		);
 	}
 
-	move(characterId: CharacterId, toCaptainId: CharacterId): SandboxBoard {
+	move(characterId: CharacterId, toCaptainId: CaptainId): SandboxBoard {
 		if (!this.captains.some((c) => c.id === toCaptainId)) {
 			throw new SandboxBoardError('CAPTAIN_NOT_FOUND');
 		}
 		let found: Character | null = null;
-		let fromCaptainId: CharacterId | null = null;
+		let fromCaptainId: CaptainId | null = null;
 		for (const captain of this.captains) {
 			const character = (this.rosters[captain.id] ?? []).find((c) => c.id === characterId);
 			if (character) {

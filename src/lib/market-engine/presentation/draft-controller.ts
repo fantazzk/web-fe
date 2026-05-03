@@ -2,15 +2,8 @@ import { DraftService } from '$lib/market-engine/application/draft-service';
 import type { IDraftRepository } from '$lib/market-engine/domain/draft/repository-interface';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { Draft, DraftMode, DraftPhase } from '$lib/market-engine/domain/draft/draft';
-import type { Character } from '$lib/market-engine/domain/shared/character';
-import type { RoleName } from '$lib/market-engine/domain/shared/role';
-
-interface CharacterDto {
-	id: string;
-	name: string;
-	position: string | null;
-	role: RoleName;
-}
+import { toCharacterDto } from '$lib/market-engine/presentation/character-dto';
+import type { CharacterDto } from '$lib/market-engine/presentation/character-dto';
 
 interface PickDto {
 	id: string;
@@ -70,10 +63,6 @@ class DraftController {
 		return DraftController.toDto(draft!);
 	}
 
-	private static toCharacterDto(c: Character): CharacterDto {
-		return { id: c.id, name: c.name, position: c.position, role: c.role.name };
-	}
-
 	private static toDto(draft: Draft): DraftDto {
 		return {
 			id: draft.id,
@@ -83,8 +72,8 @@ class DraftController {
 			currentCaptainId: draft.currentCaptainId,
 			currentRound: draft.currentRound,
 			pickOrder: [...draft.pickOrder],
-			captains: draft.captains.map(DraftController.toCharacterDto),
-			pendingQueue: draft.pendingQueue.map(DraftController.toCharacterDto),
+			captains: draft.captains.map(toCharacterDto),
+			pendingQueue: draft.pendingQueue.map(toCharacterDto),
 			pickHistory: draft.pickHistory.map((p) => ({
 				id: p.id,
 				characterId: p.characterId,

@@ -1,6 +1,6 @@
 import type { ISandboxBoardRepository } from '$lib/market-engine/domain/sandbox-board/repository-interface';
 import type { SandboxBoardId } from '$lib/market-engine/domain/sandbox-board/sandbox-board';
-import type { CharacterId } from '$lib/market-engine/domain/shared/character';
+import type { CaptainId, CharacterId } from '$lib/market-engine/domain/shared/character';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { SandboxFactory } from '$lib/market-engine/domain/services/sandbox-factory';
@@ -23,7 +23,7 @@ class SandboxBoardService {
 		repo: ISandboxBoardRepository,
 		boardId: SandboxBoardId,
 		characterId: CharacterId,
-		captainId: CharacterId
+		captainId: CaptainId
 	): Promise<void> {
 		const board = await repo.findById(boardId);
 		if (!board) throw new Error(`SandboxBoard not found: ${boardId}`);
@@ -46,7 +46,7 @@ class SandboxBoardService {
 		repo: ISandboxBoardRepository,
 		boardId: SandboxBoardId,
 		characterId: CharacterId,
-		toCaptainId: CharacterId
+		toCaptainId: CaptainId
 	): Promise<void> {
 		const board = await repo.findById(boardId);
 		if (!board) throw new Error(`SandboxBoard not found: ${boardId}`);

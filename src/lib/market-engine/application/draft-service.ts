@@ -1,7 +1,7 @@
 import type { Identity } from '$lib/core';
 import type { IDraftRepository } from '$lib/market-engine/domain/draft/repository-interface';
 import type { DraftId } from '$lib/market-engine/domain/draft/draft';
-import type { CharacterId } from '$lib/market-engine/domain/shared/character';
+import type { CaptainId, CharacterId } from '$lib/market-engine/domain/shared/character';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { DraftFactory } from '$lib/market-engine/domain/services/draft-factory';
@@ -24,7 +24,7 @@ class DraftService {
 		repo: IDraftRepository,
 		draftId: DraftId,
 		pickId: Identity,
-		captainId: CharacterId,
+		captainId: CaptainId,
 		characterId: CharacterId
 	): Promise<void> {
 		const draft = await repo.findById(draftId);

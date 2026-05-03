@@ -2,15 +2,8 @@ import { SandboxBoardService } from '$lib/market-engine/application/sandbox-boar
 import type { ISandboxBoardRepository } from '$lib/market-engine/domain/sandbox-board/repository-interface';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { SandboxBoard } from '$lib/market-engine/domain/sandbox-board/sandbox-board';
-import type { Character } from '$lib/market-engine/domain/shared/character';
-import type { RoleName } from '$lib/market-engine/domain/shared/role';
-
-interface CharacterDto {
-	id: string;
-	name: string;
-	position: string | null;
-	role: RoleName;
-}
+import { toCharacterDto } from '$lib/market-engine/presentation/character-dto';
+import type { CharacterDto } from '$lib/market-engine/presentation/character-dto';
 
 interface SandboxBoardDto {
 	id: string;
@@ -68,21 +61,14 @@ class SandboxBoardController {
 		return SandboxBoardController.toDto(board!);
 	}
 
-	private static toCharacterDto(c: Character): CharacterDto {
-		return { id: c.id, name: c.name, position: c.position, role: c.role.name };
-	}
-
 	private static toDto(board: SandboxBoard): SandboxBoardDto {
 		return {
 			id: board.id,
 			templateId: board.templateId,
-			captains: board.captains.map(SandboxBoardController.toCharacterDto),
-			pool: board.pool.map(SandboxBoardController.toCharacterDto),
+			captains: board.captains.map(toCharacterDto),
+			pool: board.pool.map(toCharacterDto),
 			rosters: Object.fromEntries(
-				board.captains.map((c) => [
-					c.id,
-					(board.rosters[c.id] ?? []).map(SandboxBoardController.toCharacterDto)
-				])
+				board.captains.map((c) => [c.id, (board.rosters[c.id] ?? []).map(toCharacterDto)])
 			)
 		};
 	}
