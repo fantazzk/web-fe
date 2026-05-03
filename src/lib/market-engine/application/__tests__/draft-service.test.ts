@@ -86,7 +86,7 @@ describe('DraftService', () => {
 	});
 
 	describe('pick', () => {
-		it('현재 감독이 캐릭터를 픽한다', async () => {
+		it('현재 감독이 캐릭터를 픽하면 rosters에도 반영된다', async () => {
 			await DraftService.create(draftRepo, templateRepo, 'tpl-1', 'draft-1');
 			const before = await draftRepo.findById('draft-1');
 			const cap1 = before!.captains[0]!.id;
@@ -98,6 +98,8 @@ describe('DraftService', () => {
 			expect(after!.pickHistory[0]!.id).toBe('pick-1');
 			expect(after!.pickHistory[0]!.characterId).toBe('c1');
 			expect(after!.pendingQueue).toHaveLength(3);
+			expect(after!.rosters[cap1]).toHaveLength(1);
+			expect(after!.rosters[cap1]![0]!.id).toBe('c1');
 		});
 	});
 

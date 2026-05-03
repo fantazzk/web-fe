@@ -30,6 +30,7 @@ interface DraftResponse {
 	captains: CharacterRow[];
 	pendingQueue: CharacterRow[];
 	pickHistory: PickRow[];
+	rosters: Record<string, CharacterRow[]>;
 	draftMode: DraftMode;
 }
 
@@ -71,6 +72,10 @@ class DraftApiRepository implements IDraftRepository {
 	}
 
 	private static toDomain(data: DraftResponse): Draft {
+		const rosters: Record<string, readonly Character[]> = {};
+		for (const [captainId, rows] of Object.entries(data.rosters)) {
+			rosters[captainId] = rows.map(DraftApiRepository.toCharacter);
+		}
 		return Draft.restore({
 			id: data.id,
 			templateId: data.templateId,
@@ -80,6 +85,7 @@ class DraftApiRepository implements IDraftRepository {
 			captains: data.captains.map(DraftApiRepository.toCharacter),
 			pendingQueue: data.pendingQueue.map(DraftApiRepository.toCharacter),
 			pickHistory: data.pickHistory.map(DraftApiRepository.toPick),
+			rosters,
 			draftMode: data.draftMode
 		});
 	}
@@ -94,6 +100,12 @@ class DraftApiRepository implements IDraftRepository {
 			captains: draft.captains.map(DraftApiRepository.toCharacterRow),
 			pendingQueue: draft.pendingQueue.map(DraftApiRepository.toCharacterRow),
 			pickHistory: draft.pickHistory.map(DraftApiRepository.toPickRow),
+			rosters: Object.fromEntries(
+				draft.captains.map((c) => [
+					c.id,
+					(draft.rosters[c.id] ?? []).map(DraftApiRepository.toCharacterRow)
+				])
+			),
 			draftMode: draft.draftMode
 		};
 	}

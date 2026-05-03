@@ -2,7 +2,8 @@ type DraftErrorCode =
 	| 'NOT_PICKING_PHASE'
 	| 'NOT_YOUR_TURN'
 	| 'CAPTAIN_NOT_FOUND'
-	| 'CHARACTER_NOT_IN_QUEUE';
+	| 'CHARACTER_NOT_IN_QUEUE'
+	| 'DRAFT_ALREADY_COMPLETED';
 
 class DraftError extends Error {
 	readonly code: DraftErrorCode;

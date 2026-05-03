@@ -1,8 +1,7 @@
 type SandboxBoardErrorCode =
 	| 'CHARACTER_NOT_IN_POOL'
 	| 'CHARACTER_NOT_IN_ROSTER'
-	| 'CAPTAIN_NOT_FOUND'
-	| 'DUPLICATE_ASSIGNMENT';
+	| 'CAPTAIN_NOT_FOUND';
 
 class SandboxBoardError extends Error {
 	readonly code: SandboxBoardErrorCode;

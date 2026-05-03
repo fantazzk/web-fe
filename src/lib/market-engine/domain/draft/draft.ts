@@ -21,6 +21,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		readonly captains: readonly Character[],
 		readonly pendingQueue: readonly Character[],
 		readonly pickHistory: readonly Pick[],
+		readonly rosters: Readonly<Record<CaptainId, readonly Character[]>>,
 		readonly draftMode: DraftMode
 	) {
 		super();
@@ -48,6 +49,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		captains: readonly Character[];
 		pendingQueue: readonly Character[];
 		pickHistory: readonly Pick[];
+		rosters: Readonly<Record<CaptainId, readonly Character[]>>;
 		draftMode: DraftMode;
 	}): Draft {
 		return new Draft(
@@ -59,6 +61,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 			params.captains,
 			params.pendingQueue,
 			params.pickHistory,
+			params.rosters,
 			params.draftMode
 		);
 	}
@@ -76,6 +79,10 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 			params.rounds,
 			params.draftMode
 		);
+		const rosters: Record<CaptainId, readonly Character[]> = {};
+		for (const captain of params.captains) {
+			rosters[captain.id] = [];
+		}
 		const isEmpty = params.characters.length === 0 || pickOrder.length === 0;
 		return new Draft(
 			params.id,
@@ -86,11 +93,13 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 			[...params.captains],
 			[...params.characters],
 			[],
+			rosters,
 			params.draftMode
 		);
 	}
 
 	pick(pickId: Identity, captainId: CaptainId, characterId: CharacterId): Draft {
+		if (this.phase === 'COMPLETED') throw new DraftError('DRAFT_ALREADY_COMPLETED');
 		if (this.phase !== 'PICKING') throw new DraftError('NOT_PICKING_PHASE');
 		if (captainId !== this.currentCaptainId) throw new DraftError('NOT_YOUR_TURN');
 		if (!this.captains.some((c) => c.id === captainId)) {
@@ -103,6 +112,8 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		const character = this.pendingQueue[idx]!;
 		const record = Pick.create(pickId, character.id, captainId, this.currentRound);
 		const nextQueue = [...this.pendingQueue.slice(0, idx), ...this.pendingQueue.slice(idx + 1)];
+		const nextRosters = { ...this.rosters };
+		nextRosters[captainId] = [...(nextRosters[captainId] ?? []), character];
 		const nextIndex = this.currentPickIndex + 1;
 		const isComplete = nextIndex >= this.pickOrder.length;
 
@@ -115,11 +126,13 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 			this.captains,
 			nextQueue,
 			[...this.pickHistory, record],
+			nextRosters,
 			this.draftMode
 		);
 	}
 
 	autoPick(pickId: Identity): Draft {
+		if (this.phase === 'COMPLETED') throw new DraftError('DRAFT_ALREADY_COMPLETED');
 		if (this.phase !== 'PICKING') throw new DraftError('NOT_PICKING_PHASE');
 		const captainId = this.currentCaptainId;
 		if (!captainId) throw new DraftError('NOT_PICKING_PHASE');
@@ -145,5 +158,5 @@ function buildPickOrder(
 	return order;
 }
 
-export { Draft, buildPickOrder };
+export { Draft };
 export type { DraftId, DraftPhase, DraftMode };

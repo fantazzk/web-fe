@@ -23,6 +23,7 @@ interface DraftDto {
 	captains: CharacterDto[];
 	pendingQueue: CharacterDto[];
 	pickHistory: PickDto[];
+	rosters: Record<string, CharacterDto[]>;
 	draftMode: DraftMode;
 }
 
@@ -80,6 +81,9 @@ class DraftController {
 				captainId: p.captainId,
 				round: p.round
 			})),
+			rosters: Object.fromEntries(
+				draft.captains.map((c) => [c.id, (draft.rosters[c.id] ?? []).map(toCharacterDto)])
+			),
 			draftMode: draft.draftMode
 		};
 	}

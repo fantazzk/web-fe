@@ -40,10 +40,13 @@ describe('DraftFactory', () => {
 		expect(draft.templateId).toBe('tpl-1');
 	});
 
-	it('captainsNeeded만큼 감독 Character가 생성된다', () => {
+	it('captainsNeeded만큼 감독 Character가 생성되고 rosters는 빈 상태로 초기화된다', () => {
 		const draft = DraftFactory.create(makeTemplate({ captainsNeeded: 2 }), 'draft-1');
 		expect(draft.captains).toHaveLength(2);
 		expect(draft.captains[0]!.role.equals(Role.CAPTAIN)).toBe(true);
+		for (const captain of draft.captains) {
+			expect(draft.rosters[captain.id]).toEqual([]);
+		}
 	});
 
 	it('템플릿의 characters가 pendingQueue에 들어간다', () => {
