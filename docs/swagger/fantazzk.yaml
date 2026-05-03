@@ -169,7 +169,6 @@ paths:
                   budget: null
                   pickBanTime: 30
                   minBidUnit: null
-                  positionLimit: null
                   draftOrderStrategy: SNAKE
                   players:
                   - name: 선수1
@@ -209,7 +208,6 @@ paths:
                   budget: null
                   pickBanTime: 30
                   minBidUnit: null
-                  positionLimit: null
                   draftOrderStrategy: SNAKE
                   players:
                   - name: 선수1
@@ -256,6 +254,7 @@ paths:
                 success:
                   room:
                     roomCode: ROOM01
+                    gameType: LEAGUE_OF_LEGENDS
                     status: WAITING
                     mode: DRAFT
                     teamCount: 2
@@ -405,6 +404,7 @@ paths:
                 success:
                   room:
                     roomCode: ROOM01
+                    gameType: LEAGUE_OF_LEGENDS
                     status: WAITING
                     mode: DRAFT
                     teamCount: 2
@@ -647,7 +647,6 @@ paths:
                   budget: null
                   pickBanTime: 30
                   minBidUnit: null
-                  positionLimit: null
                   draftOrderStrategy: SNAKE
                   players:
                   - name: 선수1
@@ -680,6 +679,7 @@ paths:
                 resultType: SUCCESS
                 success:
                   roomCode: ROOM01
+                  gameType: LEAGUE_OF_LEGENDS
                   status: WAITING
                   mode: DRAFT
                   teamCount: 2
@@ -750,6 +750,7 @@ paths:
                     success:
                       gameId: 00000000-0000-0000-0000-000000000202
                       roomCode: ROOM01
+                      gameType: LEAGUE_OF_LEGENDS
                       mode: DRAFT
                       status: IN_PROGRESS
                       teamCount: 2
@@ -795,6 +796,7 @@ paths:
                     success:
                       gameId: 00000000-0000-0000-0000-000000000201
                       roomCode: ROOM01
+                      gameType: LEAGUE_OF_LEGENDS
                       mode: AUCTION
                       status: IN_PROGRESS
                       teamCount: 2
@@ -897,10 +899,7 @@ components:
           minLength: 1
         gameType:
           type: string
-          description: 게임 타입
-          enum:
-          - LEAGUE_OF_LEGENDS
-          - OVERWATCH_2
+          description: FE가 관리하는 게임 타입 메타데이터
           example: LEAGUE_OF_LEGENDS
         mode:
           type: string
@@ -934,11 +933,6 @@ components:
           format: int32
           description: 경매 모드에서만 사용되는 최소 입찰 증가 단위
           example: 10
-        positionLimit:
-          type: integer
-          format: int32
-          description: 경매 모드에서만 사용되는 동일 포지션 최대 보유 인원
-          example: 1
         draftOrderStrategy:
           type: string
           description: 드래프트 모드에서만 사용되는 라운드 순서 전략
@@ -953,7 +947,6 @@ components:
             $ref: "#/components/schemas/PlayerRequest"
           minItems: 1
       required:
-      - gameType
       - mode
     PlayerRequest:
       type: object
@@ -966,9 +959,8 @@ components:
           minLength: 1
         position:
           type: string
-          description: 게임 타입에 맞는 포지션 코드
+          description: FE가 관리하는 선수 포지션 메타데이터
           example: TOP
-          minLength: 1
     CreateRoomRequest:
       type: object
       description: 방 생성 요청
@@ -1043,6 +1035,10 @@ components:
           type: string
           description: 방 코드
           example: ROOM01
+        gameType:
+          type: string
+          description: FE가 관리하는 게임 타입 메타데이터
+          example: LEAGUE_OF_LEGENDS
         status:
           type: string
           description: 방 상태
@@ -1121,7 +1117,7 @@ components:
           example: 선수1
         position:
           type: string
-          description: 선수 포지션
+          description: FE가 관리하는 선수 포지션 메타데이터
           example: TOP
         displayOrder:
           type: integer
@@ -1283,6 +1279,10 @@ components:
           type: string
           description: 방 코드
           example: ROOM01
+        gameType:
+          type: string
+          description: FE가 관리하는 게임 타입 메타데이터
+          example: LEAGUE_OF_LEGENDS
         mode:
           type: string
           description: 게임 모드
@@ -1377,7 +1377,7 @@ components:
           example: 선수2
         position:
           type: string
-          description: 선수 포지션
+          description: FE가 관리하는 선수 포지션 메타데이터
           example: JUNGLE
     DraftProgressResponse:
       type: object
@@ -1406,6 +1406,10 @@ components:
           type: string
           description: 원본 방 코드
           example: ROOM01
+        gameType:
+          type: string
+          description: FE가 관리하는 게임 타입 메타데이터
+          example: LEAGUE_OF_LEGENDS
         mode:
           type: string
           description: 게임 모드
@@ -1517,7 +1521,7 @@ components:
           example: 선수1
         position:
           type: string
-          description: 선수 포지션
+          description: FE가 관리하는 선수 포지션 메타데이터
           example: TOP
         displayOrder:
           type: integer
