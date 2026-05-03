@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
-import { buildMeta } from '../meta.ts';
-import { DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE_URL } from '../constants.ts';
+import { buildMeta } from '../seo.ts';
+import { DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, SITE_URL } from '../seo.ts';
 
 describe('buildMeta', () => {
 	it('입력이 없으면 기본값을 그대로 반환한다', () => {

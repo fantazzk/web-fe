@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Sidebar, Icon, Badge } from '$lib/components';
-	import { buildMeta } from '$lib/seo/meta.ts';
+	import { buildMeta } from '$lib/utils/seo.ts';
 
 	const meta = buildMeta({ path: '/lobby', title: '대기실 — FANTAZZK' });
 

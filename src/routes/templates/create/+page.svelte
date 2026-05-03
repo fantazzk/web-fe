@@ -6,7 +6,7 @@
 	import { POSITIONS_BY_GAME } from '$lib/domain/template';
 	import * as cache from '$lib/utils/cache';
 	import type { TemplateSnapshotType } from '$lib/types/snapshot';
-	import { buildMeta } from '$lib/seo/meta.ts';
+	import { buildMeta } from '$lib/utils/seo.ts';
 
 	const meta = buildMeta({
 		path: '/templates/create',

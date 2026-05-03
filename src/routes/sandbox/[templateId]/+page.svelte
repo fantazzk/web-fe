@@ -10,7 +10,7 @@
 	import type { GameType } from '$lib/domain/template';
 	import CaptainRoster from '$lib/features/sandbox/components/CaptainRoster.svelte';
 	import PlayerPool from '$lib/features/sandbox/components/PlayerPool.svelte';
-	import { buildMeta } from '$lib/seo/meta.ts';
+	import { buildMeta } from '$lib/utils/seo.ts';
 
 	const templateId = $page.params.templateId;
 

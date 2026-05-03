@@ -7,7 +7,7 @@
 		TemplateCard,
 		ResultListItem
 	} from '$lib/components';
-	import { buildMeta } from '$lib/seo/meta.ts';
+	import { buildMeta } from '$lib/utils/seo.ts';
 
 	const meta = buildMeta({ path: '/' });
 

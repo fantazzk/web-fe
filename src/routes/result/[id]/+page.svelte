@@ -5,7 +5,7 @@
 	import { Button, Icon } from '$lib/components';
 	import * as cache from '$lib/utils/cache';
 	import type { AuctionResultTeamType, ResultSnapshotType } from '$lib/features/result/types';
-	import { buildMeta } from '$lib/seo/meta.ts';
+	import { buildMeta } from '$lib/utils/seo.ts';
 
 	const meta = buildMeta({
 		path: '/result',

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import './layout.css';
-	import { DEFAULT_DESCRIPTION, SITE_URL } from '$lib/seo/constants.ts';
+	import { DEFAULT_DESCRIPTION, SITE_URL } from '$lib/utils/seo.ts';
 
 	let { children } = $props();
 

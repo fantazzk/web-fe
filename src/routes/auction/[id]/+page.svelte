@@ -10,7 +10,7 @@
 	import type { AuctionConfig } from '$lib/domain/rule-engine/types';
 	import type { CaptainType } from '$lib/features/auction/types';
 	import { apiGet } from '$lib/utils/api-client';
-	import { buildMeta } from '$lib/seo/meta.ts';
+	import { buildMeta } from '$lib/utils/seo.ts';
 
 	const meta = buildMeta({ path: '/auction', title: '경매 진행 — FANTAZZK' });
 

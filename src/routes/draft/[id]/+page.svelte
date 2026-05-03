@@ -11,7 +11,7 @@
 	import type { CaptainType } from '$lib/features/draft/types';
 	import { apiGet } from '$lib/utils/api-client';
 	import { SvelteSet } from 'svelte/reactivity';
-	import { buildMeta } from '$lib/seo/meta.ts';
+	import { buildMeta } from '$lib/utils/seo.ts';
 
 	const meta = buildMeta({ path: '/draft', title: '드래프트 진행 — FANTAZZK' });
 
