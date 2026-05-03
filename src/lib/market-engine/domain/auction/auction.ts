@@ -1,6 +1,6 @@
 import type { Identity } from '$lib/core';
 import { AggregateRoot } from '$lib/core';
-import type { CaptainId, Character } from '$lib/market-engine/domain/shared/character';
+import type { CharacterId, Character } from '$lib/market-engine/domain/shared/character';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { Bid } from '$lib/market-engine/domain/auction/bid';
 import { AuctionError } from '$lib/market-engine/domain/auction/errors';
@@ -17,8 +17,8 @@ class Auction extends AggregateRoot<Auction, AuctionId> {
 		readonly currentCharacter: Character | null,
 		readonly currentBid: Bid | null,
 		readonly captains: readonly Character[],
-		readonly remainingPoints: Readonly<Record<CaptainId, number>>,
-		readonly rosters: Readonly<Record<CaptainId, readonly Character[]>>,
+		readonly remainingPoints: Readonly<Record<CharacterId, number>>,
+		readonly rosters: Readonly<Record<CharacterId, readonly Character[]>>,
 		readonly pendingQueue: readonly Character[],
 		readonly soldHistory: readonly { character: Character; bid: Bid }[],
 		readonly totalPoints: number,
@@ -39,8 +39,8 @@ class Auction extends AggregateRoot<Auction, AuctionId> {
 		currentCharacter: Character | null;
 		currentBid: Bid | null;
 		captains: readonly Character[];
-		remainingPoints: Readonly<Record<CaptainId, number>>;
-		rosters: Readonly<Record<CaptainId, readonly Character[]>>;
+		remainingPoints: Readonly<Record<CharacterId, number>>;
+		rosters: Readonly<Record<CharacterId, readonly Character[]>>;
 		pendingQueue: readonly Character[];
 		soldHistory: readonly { character: Character; bid: Bid }[];
 		totalPoints: number;
@@ -73,8 +73,8 @@ class Auction extends AggregateRoot<Auction, AuctionId> {
 		minBidUnit: number;
 		positionLimit: number;
 	}): Auction {
-		const remainingPoints: Record<CaptainId, number> = {};
-		const rosters: Record<CaptainId, readonly Character[]> = {};
+		const remainingPoints: Record<CharacterId, number> = {};
+		const rosters: Record<CharacterId, readonly Character[]> = {};
 		for (const captain of params.captains) {
 			remainingPoints[captain.id] = params.totalPoints;
 			rosters[captain.id] = [];
@@ -117,7 +117,7 @@ class Auction extends AggregateRoot<Auction, AuctionId> {
 		);
 	}
 
-	placeBid(bidId: Identity, captainId: CaptainId, amount: number): Auction {
+	placeBid(bidId: Identity, captainId: CharacterId, amount: number): Auction {
 		if (this.phase !== 'BIDDING') throw new AuctionError('NOT_BIDDING_PHASE');
 		if (!this.currentCharacter) throw new AuctionError('NO_CURRENT_CHARACTER');
 		if (!this.captains.some((c) => c.id === captainId)) {

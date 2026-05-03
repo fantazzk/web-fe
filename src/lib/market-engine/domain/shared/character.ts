@@ -4,12 +4,6 @@ import { Role } from '$lib/market-engine/domain/shared/role';
 
 type CharacterId = Identity;
 
-/**
- * CAPTAIN role을 가진 Character의 id를 가리킨다.
- * 타입은 CharacterId와 동일하지만 의미를 명시한다.
- */
-type CaptainId = CharacterId;
-
 class Character extends Entity<CharacterId> {
 	private constructor(
 		readonly id: CharacterId,
@@ -26,4 +20,4 @@ class Character extends Entity<CharacterId> {
 }
 
 export { Character };
-export type { CharacterId, CaptainId };
+export type { CharacterId };

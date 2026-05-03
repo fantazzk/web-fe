@@ -1,7 +1,7 @@
 import type { Identity } from '$lib/core';
 import type { IAuctionRepository } from '$lib/market-engine/domain/auction/repository-interface';
 import type { AuctionId } from '$lib/market-engine/domain/auction/auction';
-import type { CaptainId } from '$lib/market-engine/domain/shared/character';
+import type { CharacterId } from '$lib/market-engine/domain/shared/character';
 import type { ITemplateRepository } from '$lib/market-engine/domain/template/repository-interface';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { AuctionFactory } from '$lib/market-engine/domain/services/auction-factory';
@@ -24,7 +24,7 @@ class AuctionService {
 		repo: IAuctionRepository,
 		auctionId: AuctionId,
 		bidId: Identity,
-		captainId: CaptainId,
+		captainId: CharacterId,
 		amount: number
 	): Promise<void> {
 		const auction = await repo.findById(auctionId);

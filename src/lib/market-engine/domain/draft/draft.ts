@@ -1,6 +1,6 @@
 import type { Identity } from '$lib/core';
 import { AggregateRoot } from '$lib/core';
-import type { CaptainId, Character, CharacterId } from '$lib/market-engine/domain/shared/character';
+import type { Character, CharacterId } from '$lib/market-engine/domain/shared/character';
 import type { TemplateId } from '$lib/market-engine/domain/template/template';
 import { Pick } from '$lib/market-engine/domain/draft/pick';
 import { DraftError } from '$lib/market-engine/domain/draft/errors';
@@ -17,17 +17,17 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		readonly templateId: TemplateId,
 		readonly phase: DraftPhase,
 		readonly currentPickIndex: number,
-		readonly pickOrder: readonly CaptainId[],
+		readonly pickOrder: readonly CharacterId[],
 		readonly captains: readonly Character[],
 		readonly pendingQueue: readonly Character[],
 		readonly pickHistory: readonly Pick[],
-		readonly rosters: Readonly<Record<CaptainId, readonly Character[]>>,
+		readonly rosters: Readonly<Record<CharacterId, readonly Character[]>>,
 		readonly draftMode: DraftMode
 	) {
 		super();
 	}
 
-	get currentCaptainId(): CaptainId | null {
+	get currentCaptainId(): CharacterId | null {
 		if (this.phase === 'COMPLETED') return null;
 		return this.pickOrder[this.currentPickIndex] ?? null;
 	}
@@ -45,11 +45,11 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		templateId: TemplateId;
 		phase: DraftPhase;
 		currentPickIndex: number;
-		pickOrder: readonly CaptainId[];
+		pickOrder: readonly CharacterId[];
 		captains: readonly Character[];
 		pendingQueue: readonly Character[];
 		pickHistory: readonly Pick[];
-		rosters: Readonly<Record<CaptainId, readonly Character[]>>;
+		rosters: Readonly<Record<CharacterId, readonly Character[]>>;
 		draftMode: DraftMode;
 	}): Draft {
 		return new Draft(
@@ -79,7 +79,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 			params.rounds,
 			params.draftMode
 		);
-		const rosters: Record<CaptainId, readonly Character[]> = {};
+		const rosters: Record<CharacterId, readonly Character[]> = {};
 		for (const captain of params.captains) {
 			rosters[captain.id] = [];
 		}
@@ -98,7 +98,7 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 		);
 	}
 
-	pick(pickId: Identity, captainId: CaptainId, characterId: CharacterId): Draft {
+	pick(pickId: Identity, captainId: CharacterId, characterId: CharacterId): Draft {
 		if (this.phase === 'COMPLETED') throw new DraftError('DRAFT_ALREADY_COMPLETED');
 		if (this.phase !== 'PICKING') throw new DraftError('NOT_PICKING_PHASE');
 		if (captainId !== this.currentCaptainId) throw new DraftError('NOT_YOUR_TURN');
@@ -143,11 +143,11 @@ class Draft extends AggregateRoot<Draft, DraftId> {
 }
 
 function buildPickOrder(
-	captainIds: readonly CaptainId[],
+	captainIds: readonly CharacterId[],
 	rounds: number,
 	draftMode: DraftMode
-): CaptainId[] {
-	const order: CaptainId[] = [];
+): CharacterId[] {
+	const order: CharacterId[] = [];
 	for (let round = 0; round < rounds; round++) {
 		if (draftMode === 'SNAKE' && round % 2 === 1) {
 			order.push(...[...captainIds].reverse());
