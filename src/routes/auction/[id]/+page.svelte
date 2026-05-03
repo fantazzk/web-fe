@@ -10,6 +10,9 @@
 	import type { AuctionConfig } from '$lib/domain/rule-engine/types';
 	import type { CaptainType } from '$lib/features/auction/types';
 	import { apiGet } from '$lib/utils/api-client';
+	import { buildMeta } from '$lib/utils/seo.ts';
+
+	const meta = buildMeta({ path: '/auction', title: '경매 진행 — FANTAZZK' });
 
 	const store = auctionStore;
 
@@ -187,7 +190,13 @@
 </script>
 
 <svelte:head>
-	<title>경매방 | Fantazzk</title>
+	<title>{meta.title}</title>
+	<meta name="description" content={meta.description} />
+	<link rel="canonical" href={meta.canonical} />
+	<meta property="og:title" content={meta.title} />
+	<meta property="og:description" content={meta.description} />
+	<meta property="og:url" content={meta.canonical} />
+	<meta property="og:image" content={meta.image} />
 </svelte:head>
 
 <!-- a11y-12: skip link -->

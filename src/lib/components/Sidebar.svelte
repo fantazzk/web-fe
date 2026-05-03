@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Icon from './Icon.svelte';
+	import Logo from './Logo.svelte';
 	import SettingsModal from './SettingsModal.svelte';
 	import { NAV_ITEMS, FOOTER_ITEM } from './nav-config';
 
@@ -17,7 +18,7 @@
 	<div class="flex flex-col items-center gap-8">
 		<!-- Logo -->
 		<a href="/" aria-label="홈으로 이동">
-			<img src="/favicon.svg" alt="Fantazzk" class="h-10 w-10" />
+			<Logo size={40} />
 		</a>
 
 		<!-- Navigation -->

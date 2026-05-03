@@ -1,0 +1,17 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<rect width="1200" height="630" fill="#0A0A0A"/>
+	<g transform="translate(80, 135) scale(2.4)">
+		<rect x="0.5" y="0.5" width="149" height="149" rx="28" fill="rgba(255,255,255,0.04)"/>
+		<rect x="25" y="25" width="100" height="100" rx="50" fill="#201D16"/>
+		<line x1="50" y1="50.8359" x2="103" y2="50.8359" stroke="#F4CE76" stroke-width="8"/>
+		<line x1="65" y1="49" x2="65" y2="110.548" stroke="#EAC774" stroke-width="8"/>
+		<line x1="64" y1="78.1953" x2="99.9032" y2="78.1953" stroke="#EAC774" stroke-width="8"/>
+		<line x1="124" y1="123.891" x2="108" y2="123.891" stroke="#8C7747" stroke-width="3"/>
+		<line x1="123.5" y1="125" x2="123.5" y2="111.087" stroke="#E3C173" stroke-width="3"/>
+		<line x1="26" y1="26.1094" x2="42" y2="26.1094" stroke="#E3C173" stroke-width="3"/>
+		<line x1="26.5" y1="25" x2="26.5" y2="38.913" stroke="#8C7747" stroke-width="3"/>
+	</g>
+	<text x="540" y="270" fill="#F4CE76" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="700">자낳대·치지직 대회</text>
+	<text x="540" y="350" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="500">모의 드래프트/경매 시뮬레이터</text>
+	<text x="540" y="540" fill="#8C7747" font-family="system-ui, -apple-system, sans-serif" font-size="28">fantazzk.com</text>
+</svg>

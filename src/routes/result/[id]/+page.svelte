@@ -5,6 +5,13 @@
 	import { Button, Icon } from '$lib/components';
 	import * as cache from '$lib/utils/cache';
 	import type { AuctionResultTeamType, ResultSnapshotType } from '$lib/features/result/types';
+	import { buildMeta } from '$lib/utils/seo.ts';
+
+	const meta = buildMeta({
+		path: '/result',
+		title: '결과 — FANTAZZK',
+		description: '이번 시즌 모의 결과를 친구들과 공유하세요.'
+	});
 
 	let cardEl: HTMLDivElement;
 	let saving = $state(false);
@@ -101,7 +108,13 @@
 </script>
 
 <svelte:head>
-	<title>결과 | Fantazzk</title>
+	<title>{meta.title}</title>
+	<meta name="description" content={meta.description} />
+	<link rel="canonical" href={meta.canonical} />
+	<meta property="og:title" content={meta.title} />
+	<meta property="og:description" content={meta.description} />
+	<meta property="og:url" content={meta.canonical} />
+	<meta property="og:image" content={meta.image} />
 </svelte:head>
 
 {#if loaded && !snapshot}

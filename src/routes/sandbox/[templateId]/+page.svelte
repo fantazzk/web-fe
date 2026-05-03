@@ -10,10 +10,18 @@
 	import type { GameType } from '$lib/domain/template';
 	import CaptainRoster from '$lib/features/sandbox/components/CaptainRoster.svelte';
 	import PlayerPool from '$lib/features/sandbox/components/PlayerPool.svelte';
+	import { buildMeta } from '$lib/utils/seo.ts';
 
 	const templateId = $page.params.templateId;
 
 	let templateName = $state('');
+	const meta = $derived(
+		buildMeta({
+			path: '/sandbox',
+			title: templateName ? `${templateName} — FANTAZZK` : '샌드박스 — FANTAZZK',
+			description: '혼자 모든 팀을 배정해 보는 모의 드래프트/경매.'
+		})
+	);
 	let gameType = $state<GameType>('LEAGUE_OF_LEGENDS');
 	let loaded = $state(false);
 	let error = $state(false);
@@ -74,7 +82,13 @@
 </script>
 
 <svelte:head>
-	<title>{templateName || 'Sandbox'} — Fantazzk</title>
+	<title>{meta.title}</title>
+	<meta name="description" content={meta.description} />
+	<link rel="canonical" href={meta.canonical} />
+	<meta property="og:title" content={meta.title} />
+	<meta property="og:description" content={meta.description} />
+	<meta property="og:url" content={meta.canonical} />
+	<meta property="og:image" content={meta.image} />
 </svelte:head>
 
 {#if error}
