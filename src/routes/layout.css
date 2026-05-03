@@ -55,6 +55,13 @@
 	--radius-lg: 14px;
 }
 
+/* ─── Default token overrides (Tailwind v4 does not emit these from @theme) ─── */
+
+:root {
+	--color-accent-deep: #201d16;
+	--color-accent-dark: #8c7747;
+}
+
 /* ─── Themes ─── */
 
 [data-theme='pink'] {
