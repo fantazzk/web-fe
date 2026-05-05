@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { SandboxPlayerType } from '$lib/domain/sandbox';
+	import type { CharacterDto } from '$lib/market-engine/presentation/character-dto';
 
 	interface Props {
-		player: SandboxPlayerType;
+		player: CharacterDto;
 		draggable?: boolean;
 	}
 
@@ -22,7 +22,6 @@
 	ondragstart={handleDragStart}
 	role="listitem"
 >
-	<span class="w-8 text-center text-xs font-semibold text-accent">{player.tier}</span>
 	<span class="flex-1 text-gray-50">{player.name}</span>
 	{#if player.position}
 		<span class="text-xs text-muted">{player.position}</span>

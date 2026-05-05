@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { SandboxPlayerType } from '$lib/domain/sandbox';
+	import type { CharacterDto } from '$lib/market-engine/presentation/character-dto';
 	import type { GameType } from '$lib/domain/template';
 	import { POSITIONS_BY_GAME } from '$lib/domain/template';
 	import PlayerCard from './PlayerCard.svelte';
 
 	interface Props {
-		pool: readonly SandboxPlayerType[];
+		pool: readonly CharacterDto[];
 		gameType: GameType;
 		positionFilter: string;
 		onFilterChange: (position: string) => void;

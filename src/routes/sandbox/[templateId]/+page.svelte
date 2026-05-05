@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { Button } from '$lib/components';
-	import { SandboxBoard } from '$lib/domain/sandbox';
 	import * as cache from '$lib/utils/cache';
 	import { sandboxStore } from '$lib/features/sandbox/stores/sandbox-store.svelte';
 	import type { TemplateSnapshotType, ResultSnapshotType } from '$lib/types/snapshot';
@@ -12,7 +11,7 @@
 	import PlayerPool from '$lib/features/sandbox/components/PlayerPool.svelte';
 	import { buildMeta } from '$lib/utils/seo.ts';
 
-	const templateId = $page.params.templateId;
+	const templateId = $page.params.templateId ?? '';
 
 	let templateName = $state('');
 	const meta = $derived(
@@ -26,7 +25,11 @@
 	let loaded = $state(false);
 	let error = $state(false);
 
-	onMount(() => {
+	onMount(async () => {
+		if (!templateId) {
+			error = true;
+			return;
+		}
 		const entry = cache.get<TemplateSnapshotType>(`template:${templateId}`);
 		if (!entry) {
 			error = true;
@@ -34,47 +37,22 @@
 		}
 		templateName = entry.data.name;
 		gameType = entry.data.gameType;
-		const board = SandboxBoard.create({
-			templateId,
-			captainsCount: entry.data.captainsCount,
-			players: entry.data.players
-		});
-		sandboxStore.init(board);
+		await sandboxStore.bootstrap(templateId, entry.data);
 		loaded = true;
 	});
 
 	function handleDropToRoster(playerId: string, captainId: string): void {
-		if (!sandboxStore.board) return;
-		try {
-			const next = sandboxStore.board.assign(playerId, captainId);
-			sandboxStore.apply(next);
-		} catch (e) {
-			if (!(e instanceof Error) || !('code' in e) || e.code !== 'PLAYER_NOT_IN_POOL') return;
-			try {
-				const next = sandboxStore.board.move(playerId, captainId);
-				sandboxStore.apply(next);
-			} catch {
-				// 이동 불가 — 무시
-			}
-		}
+		void sandboxStore.assignOrMove(playerId, captainId);
 	}
 
 	function handleDropToPool(playerId: string): void {
-		if (!sandboxStore.board) return;
-		try {
-			const next = sandboxStore.board.unassign(playerId);
-			sandboxStore.apply(next);
-		} catch {
-			// pool에 이미 있는 선수 — 무시
-		}
+		void sandboxStore.unassign(playerId);
 	}
 
 	function handleComplete(): void {
-		if (!sandboxStore.board) return;
-		const snapshot: ResultSnapshotType = {
-			mode: 'SANDBOX',
-			teams: sandboxStore.board.toResult()
-		};
+		const teams = sandboxStore.toResultTeams();
+		if (!teams) return;
+		const snapshot: ResultSnapshotType = { mode: 'SANDBOX', teams };
 		cache.set(`result:${templateId}`, snapshot, 30 * 60 * 1000);
 		cache.remove(`template:${templateId}`);
 		goto(`/result/${templateId}`);
@@ -120,7 +98,7 @@
 			{/each}
 		</section>
 
-		<!-- Player Pool (bottom) -->
+		<!-- Character Pool (bottom) -->
 		<section class="flex-1 overflow-y-auto" aria-label="선수풀">
 			<PlayerPool
 				pool={sandboxStore.board.pool}

@@ -1,12 +1,18 @@
 import type { GameType } from '$lib/domain/template';
-import type { SandboxPlayerType, SandboxResultTeamType } from '$lib/domain/sandbox';
+
+export interface TemplateSnapshotPlayerType {
+	readonly id: string;
+	readonly name: string;
+	readonly position: string | null;
+	readonly tier: string;
+}
 
 // 템플릿 → 샌드박스 진입 시 캐시에 저장하는 스냅샷
 export interface TemplateSnapshotType {
 	name: string;
 	gameType: GameType;
 	captainsCount: number;
-	players: SandboxPlayerType[];
+	players: TemplateSnapshotPlayerType[];
 }
 
 // 경매 결과
@@ -20,6 +26,18 @@ export interface AuctionResultTeamType {
 	captain: string;
 	players: AuctionResultPlayerType[];
 	total: string;
+}
+
+// 샌드박스 결과
+export interface SandboxResultPlayerType {
+	name: string;
+	position: string | null;
+	tier: string;
+}
+
+export interface SandboxResultTeamType {
+	captain: string;
+	players: SandboxResultPlayerType[];
 }
 
 // 판별 유니언 (모드별 결과)
