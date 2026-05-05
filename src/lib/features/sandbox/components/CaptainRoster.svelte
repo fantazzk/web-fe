@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { SandboxCaptainType, SandboxPlayerType } from '$lib/domain/sandbox';
+	import type { CharacterDto } from '$lib/market-engine/presentation/character-dto';
 	import PlayerCard from './PlayerCard.svelte';
 
 	interface Props {
-		captain: SandboxCaptainType;
-		players: readonly SandboxPlayerType[];
+		captain: CharacterDto;
+		players: readonly CharacterDto[];
 		onDrop: (playerId: string, captainId: string) => void;
 	}
 
